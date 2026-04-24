@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gia Phả Phạm Tộc - cập nhập đến tháng 4 năm  2026 </title>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f8fafc; overflow: hidden; margin: 0; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .grab-container { cursor: grab; user-select: none; }
+        .grab-container:active { cursor: grabbing; }
+
+        .node-card {
+            transition: all 0.3s ease;
+            z-index: 20;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .node-card.highlight { ring: 4px solid #f59e0b; transform: scale(1.05); }
+
+        .tree-branch { display: flex; padding-top: 40px; position: relative; }
+        .tree-item { position: relative; padding: 0 20px; display: flex; flex-direction: column; align-items: center; }
+        .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 40px; background: #cbd5e1; transform: translateX(-50%); }
+        .tree-item::after { content: ''; position: absolute; top: 0; width: 100%; height: 2px; background: #cbd5e1; }
+        .tree-item:first-child::after { left: 50%; width: 51%; }
+        .tree-item:last-child::after { right: 50%; width: 51%; }
+        .tree-item:only-child::after { display: none; }
+        .parent-line { position: absolute; bottom: -40px; left: 50%; width: 2px; height: 40px; background: #cbd5e1; transform: translateX(-50%); z-index: 10; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // DỮ LIỆU ĐẦY ĐỦ TỪ CÁC ẢNH GỐC
+        const GIA_PHA_DATA = {
+            name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình",
+            children: [
+                {
+                    name: "Bà cả: BÙI THỊ VÍCH", birth: "1888 Mậu Tý", death: "23-10-1957 Đinh Dậu", color: "bg-slate-800 text-white",
+                    children: [
+                        {
+                            name: "PHẠM VĂN COỎNG", title: "Trưởng tộc", birth: "1909 Kỷ Dậu", death: "13-9-1949 Kỷ Sửu",
+                            info: "Bà cả: Nguyễn Thị Phiềm (Sinh 1908-Mất 30-11-2015 Ất Mùi). Bà hai: Nguyễn Thị Viêm (Sinh: 1927 Đinh Mão)",
+                            children: [
+                                {
+                                    name: "PHẠM NGỌC CHƯ", title: "Trưởng tộc", birth: "1932 Nhâm Thân", death: "1998 Mậu Dần",
+                                    info: "Vợ: PHẠM THỊ UYÊN (S: 1933 Quý Dậu)",
+                                    children: [
+                                        { name: "PHẠM NGỌC CHI", title: "Trưởng tộc", birth: "21-03-1956 Bính Thân", death: "00-00-0000", info: "Vợ Nguyễn Thị Sen 19-9-1959 Kỷ hợi có 3 con", children: [{name: "PHẠM TUYẾT THU", birth: "15-11-1984 Giáp tý"}, {name: "PHẠM THỊ THƯƠNG HUYỀN", birth: "05-08-1987 Đinh Mão"}] },
+                                        { name: "PHẠM VĂN CẨN", birth: "05-04-1962 Nhâm Dần", death: "00-00-0000", info: "00-00-0000" , children: [{name: "PHẠM THỊ THÙY LINH", birth: "28-02-1999 Kỷ Mão"}]},
+                                        { name: "PHẠM THỊ XUÂN", birth: "18-11-1965 Ất tỵ", death: "00-00-0000", info: "00-00-0000" },
+                                        { name: "PHẠM ANH TIẾN", birth: "15-08-1969 Kỷ Dậu", death: "00-00-0000", info: "Vợ PHÌN THỊ THÙY Sinh 12-06-1977 Đinh Tỵ", children: [{name: "PHẠM THÁI BÌNH", birth: "01-10-2003 Quý Mùi"}, {name: "PHẠM THÙY GIANG", birth: "11-06-2011 Tân Mão"}] },
+                                        { name: "PHẠM MINH CHÁNH", birth: "01-05-1971 ", death: "Đã Mất", info: "Chưa vợ" },
+                                        { name: "PHẠM TRỌNG TUỆ", birth: "29-05-1978 Đinh Tỵ", death: "00-00-0000", info: "Vợ TRẦN THỊ THÁI có hai con" , children: [{name: "PHẠM KHÁNH VY", birth: "19-02-2008 Mậu tý"}, {name: "PHẠM NGỌC MINH", birth: "22-05-2012 Nhâm Thìn"}]},
+                                    ]
+                                },
+                                    {
+                                    name: "PHẠM THỊ NÙI", birth: "1938 Mậu Dần", death: "......", info: "Con Bà Cả",
+                                },
+                                  {
+                                    name: "PHẠM THỊ DUNG", birth: "1940 Canh Thìn", death: "16-07-1986 Bính Dần", info: "Con Bà Cà",
+                                },
+                                {
+                                    name: "PHẠM TUẤN KHANH", birth: "1942 Nhâm Ngọ", death: "16-11-2013 Quý Hợi", info: "Con Bà Cả, Vợ: ĐINH THỊ CÚC Sinh 1946 Bính Tuất có ba con",
+                                    children: [
+                                        { name: "PHẠM VĂN TUYÊN", birth: "1969 Kỷ Dậu", death: "30-09-1999 Kỷ Mão", info: "Vợ NGUYỄN THỊ VÂN 1971 Tân Hợi", children: [{name: "PHẠM THỊ LAN HƯƠNG ", birth: "23-01-1996 Bính Tý"}] },
+                                        { name: "PHẠM VĂN DƯƠNG", birth: "28-08-1970 Canh Tuất", death: "00-00-0000", info: "Vợ TRẦN THỊ HUYỀN Sinh 03-05-1977 Đinh Tỵ có hai con", children: [{name: "PHẠM TRẦN KHIÊM ", birth: "29-01-2000 Canh Thìn", death: "Đã Mất"}, {name: "PHẠM PHƯƠNG THẢO ", birth: "17-11-2005 Ất Dậu"}]},
+                                        { name: "PHẠM KIỀU VÂN", birth: "22-04-1976 Bính Thìn", death: "00-00-0000", info: "sống ở Hà Giang"},
+                                    ]
+                                },
+                                   {
+                                    name: "PHẠM THỊ DINH", birth: "1950 Canh Dần", info: "Con Bà Hai",
+                                },
+                            ]
+                        },
+                        { name: "PHẠM NGỌC XIÊM", birth: "1920 Canh Thân", death: "18-02-1945 Ất Dậu ", info: "Mất ở đồn điền Cao Su" },
+                        {
+                            name: "PHẠM NGỌC CƠ", birth: "1922 Nhâm Tuất", death: "02-04-1977 Đinh Tỵ",
+                            info: "Vợ: NGUYỄN THỊ CÚC (Sinh: 1923 Quý Hợi - Mất: 26-09-1963 Quý Mão)",
+                            children: [
+                                { name: "PHẠM THỊ NHẠN", birth: "1944 Giáp Thân", death: "00-00-0000", info: "Có 2 con sống cùng con gái ở Vĩnh Phúc" },
+                                {
+                                    name: "PHẠM THỊ NHIÊN", birth: "1948 Mậu Tý", death: "00-00-0000", info: "có 5 người con sống ở Diêm Điền" },
+                                { name: "PHẠM MINH ĐỨC", birth: "18-10-1953 Quý Tỵ", death: "02-08-2022 Nhâm Dần", info: "Vợ: HOÀNG THỊ XUYẾN Sinh 01-10-1949 Kỷ Sửu Mất 24-02-2025 Ất Tỵ có 3 người con",
+                                    children: [
+                                        { name: "PHẠM THỊ KIM XUÂN", birth: "10-06-1979 Kỷ Mùi", death: "00-00-0000", info: "Có 2 con", children: [{name: "NGUYỄN TUỆ ANH (NẾP)", birth: "20-03-2015"}, {name: "NGUYỄN NGỌC ÁNH (THÓC)", birth: "2021"}] },
+                                        { name: "PHẠM PHƯƠNG ĐÔNG", birth: "04-12-1981 Tân Dậu", death: "00-00-0000", info: "Vợ HOÀNG THANH HUYỀN Sinh 18-07-1985 Ất Sửu", children: [{name: "PHẠM HOÀNG DƯƠNG", birth: "13-05-2011 Tân Mão"}] },
+                                        { name: "PHẠM PHƯƠNG NAM", birth: "26-09-1984 Giáp tý", death: "00-00-0000", info: "Vợ PHAN THỊ HỒNG Sinh 04-10-1989 Kỷ Tỵ Có 2 con", children: [{name: "PHẠM THỦY PHƯƠNG ANH", birth: "04-11-2012 Nhâm Thìn"}, {name: "PHẠM NAM ANH", birth: "27-07-2016 Bính Thân"}] },
+                                    ]},
+                                {
+                                    name: "PHẠM NGỌC THANH", birth: "13-09-1959 Kỷ Hợi", death: "19-08-2008 Mậu Tý", info: "Vợ: ĐẶNG PHƯƠNG DUNG Sinh 01-09-1960 Canh tý có 3 con",
+                                    children: [
+                                        { name: "PHẠM DIỆU HƯƠNG", birth: "16-10-1983 Quý Hợi",},
+                                        { name: "PHẠM DIỆU VÂN", birth: "25-06-1986 Bính Dần", },
+                                        { name: "PHẠM MINH ĐÔ", birth: "06-07-1990 Canh Ngọ" , death: "00-00-0000", info: "Vợ NGUYỄN THỊ LÝ HƯỜNG Sinh 28-04-1990 Canh Ngọ Có 3 con", children: [{name: "PHẠM TRÚC LAM", birth: "04-11-2017 Nhâm Thìn"}, {name: "PHẠM MINH QUÂN", birth: "2020"}, {name: "PHẠM MINH DƯƠNG", birth: "2024"}] },
+                                    ]
+                                },
+
+                            ]
+                        },
+                        { name: "PHẠM THỊ LŨ", birth: "1926 Bính Dần", death: "00-00-0000", info: "00-00-0000" },
+                        { name: "PHẠM NGỌC THỜ", birth: "1929 Kỷ Tỵ", death: "15-08-1945 Ất Dậu", },
+                        { name: "PHẠM NGỌC NHẬT", birth: "1931 Tân Mùi", death: "03-05-1987 Đinh Mão", info: "Vợ ĐINH THỊ LOÁN Sinh 1933 Quý Mão Mất17-02-1982 Nhâm Tuất",
+                        children: [
+                                        { name: "PHẠM NGỌC TUẤN", birth: "11-09-1960 Canh tý" , death: "00-00-0000", info: "Vợ TRẦN THỊ PHƯƠNG Sinh 27-07-1959 Kỷ Hợi Có 3 con", children: [{name: "PHẠM NGỌC ANH", birth: "18-12-1986 Bính Dần"}, {name: "PHẠM TRÂN TUÂN", birth: "20-11-1999 Kỷ Mão"}, {name: "PHẠM THỊ HƯƠNG LAN", birth: "20-06-2002 Nhâm Ngọ"}] },
+                                        { name: "PHẠM THỊ TÚ", birth: "1960 Nhâm Dần",},
+                                        { name: "PHẠM THỊ TÂN", birth: "02-05-1965 Ất tỵ", },
+                                        { name: "PHẠM THỊ TƯ", birth: "1968 Mậu thân", death: "28-03-1978 Mậu Ngọ",},
+                                        { name: "PHẠM ĐỨC CƯỜNG", birth: "15-04-1971 Tân Hợi" , death: "00-00-0000", info: "Vợ NGUYỄN THỊ HỒNG NGA Sinh 26-02-1973 Quý Sửu Có 2 con", children: [{name: "PHẠM ĐỨC MẠNH", birth: "26-02-1995 ẤT Hợi"}, {name: "PHẠM ĐỨC CÔNG", birth: "11=09-2000 Canh Thìn"}] },
+                                    ]
+                        }
+                    ]
+                },
+                {
+                    name: "Bà hai: NGUYỄN THỊ YẾN", birth: "1895 Ất Mùi", death: "21-04-1945 Ất Dậu", color: "bg-emerald-800 text-white",
+                    children: [
+                        {
+                            name: "PHẠM NGỌC THẠCH", birth: "04-04-1929 Kỷ tỵ", death: "Đã Mất", info: "Vợ cả: NGUYỄN THỊ KIM NGÂN Sinh 01-05-1937 Đinh Sửu - Vợ hai: PHẠM THỊ THU Sinh 1952 Nhâm Thìn",
+                            children: [
+                                { name: "PHẠM THỊ NGA", birth: "15-08-1962 Nhâm Dần",},
+                                { name: "PHẠM NGỌC SƠN", birth: "13-10-1964 Giáp Thìn", death: "00-00-0000", info: "Vợ: DƯƠNG THỊ HUỆ Sinh26-10-1969 Kỷ Dậu có 2 con", children: [{name: "PHẠM THỊ THỦY", birth: "18-04-1993 Quý Dậu"}, {name: "PHẠM ĐÔNG TRIỀU", birth: "30-09-1996 Bính Tý"}] },
+                                { name: "PHẠM THỊ ĐÀO", birth: "08-12-1971 Tân Hợi",},
+                                { name: "PHẠM THỊ ÁNH", birth: "08-04-1974 Giáp Dần",},
+                                { name: "PHẠM HỒNG THẮNG", birth: "14-07-1976 Bính Thìn", death: "00-00-0000", info: "Vợ: DƯƠNG THỊ TUYẾT HUỆ Sinh 12-10-1985 Ất Sửu", children: [{name: "PHẠM KHÁNH DUY", birth: "23-01-2007 Đinh Hợi"}, {name: "PHẠM HẢI YẾN", birth: "21-01-2009 Kỷ Sửu"}] },
+                                { name: "PHẠM THỊ ANH ANH", birth: "08-04-1955 Ất Hợi", info: "con bà hai"},
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "Bà ba: NGUYỄN THỊ HOA", birth: "1889 Kỷ Sửu", death: "25-01-2001 Tân tỵ", color: "bg-amber-800 text-white",
+                    children: [
+                        {
+                            name: "PHẠM NGỌC SINH", birth: "1947 Đinh Hợi", info: "Vợ: BÙI THỊ DỤNG Sinh 1945 Ất Dậu",
+                            children: [
+                                { name: "PHẠM THỊ NHUNG", birth: "10-04-1996 Kỷ Dậu",},
+                                { name: "PHẠM VĂN NGỌC", birth: "20-07-1973  Quý Sửu", death: "00-00-0000", info: "Vợ: LÊ THỊ HÀ Sinh 1975 Ất Mão", children: [{name: "PHẠM THỊ YẾN", birth: "02-09-1998 Mậu Dần"}, {name: "PHẠM THỊ LINH", birth: "08-11-2005 Ất Dậu"},{name: "PHẠM MINH ANH", birth: "27-11-2013 Quý Tỵ"}] },
+                                { name: "PHẠM ĐỨC CƯỜNG", birth: "15-02-1975 Ất Mão", death: "00-00-0000", info: "Vợ: ĐỖ THỊ LOAN Sinh 27-06-1979 Quý Mùi", children: [{name: "PHẠM Quỳnh Anh", birth: "10-01-2002 Nhâm Ngọ"}, {name: "PHẠM QUỲNH GIAO", birth: "23-04-2013 Quý Tỵ"}] },
+                                { name: "PHẠM VĂN TUẤN", birth: "22-08-1978 Mậu Ngọ", death: "00-00-0000", info: "Vợ: ĐÀO THỊ NỤ Sinh 11-04-1983 Quý Hợi", children: [{name: "PHẠM THÙY TRANG", birth: "10-01-2008 Mậu Tý"}, {name: "PHẠM DUY KHÁNH", birth: "25-10-2010 Canh Dần"}] },
+                                { name: "PHẠM PHẠM VăN TRỌNG", birth: "10-10-1980 Canh Thân", death: "00-00-0000", info: "Vợ: TRẦN THỊ NGA Sinh 09-03-1988 Mậu THìn", children: [{name: "PHẠM MINH THƯ", birth: "22-11-2011 Tân Mão"}, {name: "PHẠM MINH TUYỀN", birth: "15-04-2013 Quý Tỵ"},{name: "PHẠM THỦY TIÊN", birth: "03-09-2016 Bính Thân"}] },
+                                { name: "PHẠM THỊ THỦY", birth: "25-09-1983 Quý Hợi", death: "00-00-0000",},
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        const Icon = ({ name, size = 16 }) => {
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }}></i>;
+        };
+
+        const TreeNode = ({ data, level = 0, searchTerm }) => {
+            const [isOpen, setIsOpen] = useState(level < 3);
+            const hasChildren = data.children && data.children.length > 0;
+            const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+            const getCardStyle = () => {
+                if (level === 0) return "bg-rose-900 text-white w-72 ring-4 ring-rose-200";
+                if (level === 1) return `${data.color} w-64`;
+                if (data.title) return "bg-amber-50 border-2 border-amber-400 text-slate-900 w-60";
+                return "bg-white border border-slate-200 text-slate-800 w-60";
+            };
+
+            return (
+                <div className="tree-item">
+                    <div className={`node-card relative p-4 text-center flex flex-col ${getCardStyle()} ${isMatch ? 'highlight' : ''}`}>
+                        {data.title && (
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full uppercase z-30">
+                                {data.title}
+                            </div>
+                        )}
+                        <h3 className={`font-serif font-bold leading-tight mb-2 ${level === 0 ? 'text-lg' : 'text-md'}`}>{data.name}</h3>
+
+                        <div className="text-left space-y-1 text-[12px] border-t border-current/10 pt-2">
+                            <div className="flex items-center gap-2 opacity-80">
+                                <Icon name="baby" size={12}/> <span>S: {data.birth || "00-00-0000"}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-red-400 font-medium">
+                                <Icon name="cross" size={12}/> <span>M: {data.death || "00-00-0000"}</span>
+                            </div>
+                            <div className="mt-1 italic opacity-70 leading-tight">
+                                {data.info || "00-00-0000"}
+                            </div>
+                        </div>
+
+                        {hasChildren && (
+                            <button onClick={() => setIsOpen(!isOpen)} className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white border border-slate-200 w-6 h-6 rounded-full flex items-center justify-center shadow-sm z-30 text-slate-500 hover:scale-110 transition-transform">
+                                <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={16} />
+                            </button>
+                        )}
+                        {hasChildren && isOpen && <div className="parent-line" />}
+                    </div>
+                    {hasChildren && isOpen && (
+                        <div className="tree-branch">
+                            {data.children.map((child, i) => <TreeNode key={i} data={child} level={level + 1} searchTerm={searchTerm} />)}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [scale, setScale] = useState(0.6);
+            const [pos, setPos] = useState({ x: 0, y: 30 });
+            const [drag, setDrag] = useState(false);
+            const [searchTerm, setSearchTerm] = useState("");
+            const offset = useRef({ x: 0, y: 0 });
+
+            return (
+                <div className="h-screen w-full flex flex-col overflow-hidden">
+                    {/* Header Gọn Nhẹ */}
+                    <header className="h-16 bg-white border-b-2 border-rose-900 flex items-center justify-between px-6 z-50 shadow-sm">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-rose-900 p-2 rounded-lg text-white"><Icon name="scroll-text" size={20}/></div>
+                            <div>
+                                <h1 className="font-serif text-lg font-black text-slate-900 leading-none">GIA PHẢ TỘC PHẠM</h1>
+                                <p className="text-rose-800 font-bold uppercase tracking-widest text-[8px] mt-0.5">PHẠM HƯƠNG CHỨ</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="relative">
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Icon name="search" size={14}/></div>
+                                <input
+                                    type="text"
+                                    placeholder="Tìm tên..."
+                                    className="pl-9 pr-4 py-1.5 bg-slate-100 rounded-lg w-48 text-xs outline-none focus:ring-1 focus:ring-rose-500 transition-all font-medium"
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <div className="flex items-center bg-slate-100 p-1 rounded-lg border">
+                                <button onClick={() => setScale(s => Math.max(0.1, s-0.1))} className="p-1 hover:bg-white rounded transition-all"><Icon name="zoom-out" size={16}/></button>
+                                <span className="text-xs font-bold w-10 text-center">{Math.round(scale*100)}%</span>
+                                <button onClick={() => setScale(s => Math.min(2, s+0.1))} className="p-1 hover:bg-white rounded transition-all"><Icon name="zoom-in" size={16}/></button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main
+                        className="flex-1 grab-container bg-slate-50 relative"
+                        onMouseDown={e => { setDrag(true); offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; }}
+                        onMouseMove={e => { if(drag) setPos({ x: e.clientX - offset.current.x, y: e.clientY - offset.current.y }); }}
+                        onMouseUp={() => setDrag(false)}
+                    >
+                        <div
+                            style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }}
+                            className="absolute inset-0 flex justify-center pt-16 transition-transform duration-75"
+                        >
+                            <TreeNode data={GIA_PHA_DATA} searchTerm={searchTerm} />
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
