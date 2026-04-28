@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gia Phả Phạm Tộc - tháng 4 năm 2026</title>
+    <title>Gia Phả Phạm Tộc - 4/2026</title>
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -20,24 +20,37 @@
             --gold: #b45309;
             --gold-light: #fbbf24;
         }
-        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: var(--bg-paper); margin: 0; color: #1e293b; overflow: hidden; }
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--bg-paper);
+            margin: 0;
+            color: #1e293b;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; /* Giữ cố định khung hình chính */
+        }
         .font-serif { font-family: 'Playfair Display', serif; }
 
-        /* Chế độ Sơ đồ (Desktop) */
-        .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 30px 30px; }
+        /* Cấu hình di chuyển cho Tree View */
+        .grab-container {
+            cursor: grab;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 30px 30px;
+            touch-action: none; /* Ngăn chặn cuộn mặc định của trình duyệt để kéo sơ đồ mượt hơn */
+        }
         .grab-container:active { cursor: grabbing; }
 
         .node-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             cursor: pointer;
             user-select: none;
         }
         .node-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1); }
-        .node-card:active { transform: scale(0.98); }
         .node-card.highlight { ring: 4px solid var(--gold-light); transform: scale(1.05); z-index: 100; }
 
+        /* Kẻ sơ đồ */
         .tree-branch { display: flex; padding-top: 40px; position: relative; }
         .tree-item { position: relative; padding: 0 10px; display: flex; flex-direction: column; align-items: center; }
         .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 40px; background: #d1d5db; transform: translateX(-50%); }
@@ -48,10 +61,12 @@
         .parent-line { position: absolute; bottom: -40px; left: 50%; width: 2px; height: 40px; background: #d1d5db; transform: translateX(-50%); }
 
         /* Chế độ Danh sách */
+        .list-viewport { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .member-card-ml {
             background: white; border-radius: 16px; border: 1px solid #f1f5f9;
-            margin-bottom: 12px; position: relative; overflow: hidden;
+            margin-bottom: 12px; position: relative;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            cursor: pointer;
         }
         .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 20px; }
         .branch-dot-ml { position: absolute; left: -20px; top: 24px; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; border: 2px solid white; }
@@ -65,6 +80,7 @@
     <script type="text/babel">
         const { useState, useRef, useEffect, useMemo } = React;
 
+        // DỮ LIỆU GỐC GIỮ NGUYÊN 100%
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
@@ -84,7 +100,7 @@
                                         { name: "PHẠM THỊ XUÂN", birth: "10-12-1965 (18-11 Ất tỵ)", death: "00-00-0000", info: "00-00-0000" },
                                         { name: "PHẠM ANH TIẾN", birth: "26-09-1969 (15-08 Kỷ Dậu)", death: "00-00-0000", info: "Vợ PHÌN THỊ THÙY Sinh 26-07-1977 (12-06 Đinh Tỵ)", children: [{name: "PHẠM THÁI BÌNH", birth: "24-11-2003 (01-10 Quý Mùi)"}, {name: "PHẠM THÙY GIANG", birth: "12-07-2011 (11-06 Tân Mão)"}] },
                                         { name: "PHẠM MINH CHÁNH", birth: "01-05-1971 ", death: "Đã Mất", info: "Chưa vợ", deceased: true },
-                                        { name: "PHẠM TRỌNG TUỆ", birth: "05-07-1978 (29-05 Đinh Tỵ)", death: "00-00-0000", info: "Vợ TRẦN THỊ TH thái có hai con" , children: [{name: "PHẠM KHÁNH VY", birth: "25-03-2008 (19-02 Mậu tý)"}, {name: "PHẠM NGỌC MINH", birth: "06-07-2012 (22-05 Nhâm Thìn)"}]},
+                                        { name: "PHẠM TRỌNG TUỆ", birth: "05-07-1978 (29-05 Đinh Tỵ)", death: "00-00-0000", info: "Vợ TRẦN THỊ THÁI có hai con" , children: [{name: "PHẠM KHÁNH VY", birth: "25-03-2008 (19-02 Mậu tý)"}, {name: "PHẠM NGỌC MINH", birth: "06-07-2012 (22-05 Nhâm Thìn)"}]},
                                     ]
                                 },
                                 { name: "PHẠM THỊ NÙI", birth: "1938 Mậu Dần", death: "......", info: "Con Bà Cả", deceased: true },
@@ -176,6 +192,7 @@
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
+        // Tree Node Component
         const TreeNode = ({ data, level = 0, searchTerm }) => {
             const [isOpen, setIsOpen] = useState(level < 2);
             const hasChildren = data.children && data.children.length > 0;
@@ -191,11 +208,7 @@
 
             return (
                 <div className="tree-item">
-                    {/* Toàn bộ thẻ giờ đây là nút bấm */}
-                    <div
-                        className={`${cardClasses} ${isMatch ? 'highlight' : ''}`}
-                        onClick={() => hasChildren && setIsOpen(!isOpen)}
-                    >
+                    <div className={`${cardClasses} ${isMatch ? 'highlight' : ''}`} onClick={(e) => { e.stopPropagation(); if(hasChildren) setIsOpen(!isOpen); }}>
                         {data.title && (
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase shadow-md z-30">
                                 {data.title}
@@ -204,22 +217,14 @@
                         <h3 className={`font-serif font-bold leading-tight mb-2 tracking-tight ${level === 0 ? 'text-xl uppercase' : 'text-md'}`}>
                             {data.name}
                         </h3>
-                        <div className="text-left space-y-1 text-[11px] border-t border-current/10 pt-3 mt-1">
+                        <div className="text-left space-y-1 text-[11px] border-t border-current/10 pt-3 mt-1 pointer-events-none">
                             <div className="flex items-center gap-2 opacity-90"><Icon name="calendar" size={11} className="text-amber-500"/> <span>S: <span className="font-semibold">{data.birth}</span></span></div>
                             {data.death !== "00-00-0000" && <div className="flex items-center gap-2 opacity-90 text-rose-500"><Icon name="moon" size={11}/> <span>M: <span className="font-semibold">{data.death}</span></span></div>}
-                            <div className="mt-2 text-[10px] italic opacity-75 line-clamp-2 leading-snug">{data.info}</div>
+                            <div className="mt-2 text-[10px] italic opacity-75 line-clamp-2">{data.info}</div>
                         </div>
-
-                        {/* Biểu tượng báo hiệu có con và trạng thái đóng mở */}
-                        {hasChildren && (
-                            <div className="mt-3 flex justify-center text-amber-600/50">
-                                <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={16} />
-                            </div>
-                        )}
-
+                        {hasChildren && <div className="mt-3 flex justify-center text-amber-600/50"><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={16} /></div>}
                         {hasChildren && isOpen && <div className="parent-line" />}
                     </div>
-
                     {hasChildren && isOpen && (
                         <div className="tree-branch">
                             {data.children.map((child, i) => <TreeNode key={i} data={child} level={level + 1} searchTerm={searchTerm} />)}
@@ -229,19 +234,16 @@
             );
         };
 
+        // Mobile/List Member Component
         const MemberItem = ({ data, level = 0, forceOpen, searchTerm }) => {
             const [isOpen, setIsOpen] = useState(level < 1);
             const hasChildren = data.children && data.children.length > 0;
             const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
-
             useEffect(() => { if (forceOpen !== null) setIsOpen(forceOpen); }, [forceOpen]);
 
             return (
                 <div className="w-full relative">
-                    <div
-                        className={`member-card-ml p-4 flex flex-col ${isMatch ? 'ring-4 ring-amber-400' : ''} ${data.border ? 'border-l-4 ' + data.border : ''}`}
-                        onClick={() => hasChildren && setIsOpen(!isOpen)}
-                    >
+                    <div className={`member-card-ml p-4 flex flex-col ${isMatch ? 'ring-4 ring-amber-400' : ''} ${data.border ? 'border-l-4 ' + data.border : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         <div className="flex justify-between items-start">
                             <div>
                                 {data.title && <span className="inline-block bg-amber-100 text-amber-800 text-[9px] font-black px-2 py-0.5 rounded uppercase mb-1">{data.title}</span>}
@@ -253,7 +255,6 @@
                             <span className="flex items-center gap-1"><Icon name="sun" size={12} className="text-amber-500"/> {data.birth}</span>
                             {data.death !== "00-00-0000" && <span className="flex items-center gap-1"><Icon name="moon" size={12} className="text-slate-400"/> {data.death}</span>}
                         </div>
-                        {data.info && <p className="mt-2 text-[11px] italic text-slate-400 bg-slate-50 p-2 rounded leading-tight">{data.info}</p>}
                     </div>
                     {hasChildren && isOpen && (
                         <div className="node-container-ml">
@@ -271,61 +272,70 @@
             const [allOpen, setAllOpen] = useState(null);
             const [scale, setScale] = useState(0.5);
             const [pos, setPos] = useState({ x: 0, y: 50 });
-            const [drag, setDrag] = useState(false);
-            const offset = useRef({ x: 0, y: 0 });
+            const isDragging = useRef(false);
+            const startPos = useRef({ x: 0, y: 0 });
+
+            // Xử lý kéo bằng Chuột & Cảm ứng cho Tree View
+            const onStart = (clientX, clientY) => {
+                isDragging.current = true;
+                startPos.current = { x: clientX - pos.x, y: clientY - pos.y };
+            };
+            const onMove = (clientX, clientY) => {
+                if (!isDragging.current) return;
+                setPos({ x: clientX - startPos.current.x, y: clientY - startPos.current.y });
+            };
+            const onEnd = () => { isDragging.current = false; };
 
             return (
                 <div className="h-screen w-full flex flex-col bg-[#fdfaf5]">
-                    <header className="h-20 header-glass text-white flex items-center justify-between px-6 z-50 shrink-0 shadow-lg">
+                    <header className="h-20 header-glass text-white flex items-center justify-between px-6 z-50 shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="bg-amber-600 p-2 rounded-xl hidden sm:block">
-                                <Icon name="library" size={20}/>
-                            </div>
+                            <div className="bg-amber-600 p-2 rounded-xl hidden sm:block"><Icon name="library" size={20}/></div>
                             <div>
                                 <h1 className="font-serif text-lg font-black text-amber-200 leading-none">PHẠM TỘC GIA PHẢ</h1>
                                 <p className="text-white/40 text-[8px] font-bold uppercase tracking-[0.2em] mt-1">Phúc Đức Tại Mẫu</p>
                             </div>
                         </div>
-
-                        <div className="flex items-center gap-2">
-                            <div className="flex bg-white/10 p-1 rounded-xl border border-white/10">
-                                <button onClick={() => setViewMode('list')} className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 ${viewMode === 'list' ? 'bg-amber-600 text-white' : 'text-white/40'}`}>
-                                    <Icon name="list-tree" size={16}/> <span className="text-[10px] font-bold">DANH SÁCH</span>
-                                </button>
-                                <button onClick={() => setViewMode('tree')} className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 ${viewMode === 'tree' ? 'bg-amber-600 text-white' : 'text-white/40'}`}>
-                                    <Icon name="network" size={16}/> <span className="text-[10px] font-bold">SƠ ĐỒ</span>
-                                </button>
-                            </div>
+                        <div className="flex bg-white/10 p-1 rounded-xl border border-white/10">
+                            <button onClick={() => setViewMode('list')} className={`px-4 py-2 rounded-lg flex items-center gap-2 ${viewMode === 'list' ? 'bg-amber-600 text-white' : 'text-white/40'}`}>
+                                <Icon name="list-tree" size={16}/> <span className="text-[10px] font-bold">DANH SÁCH</span>
+                            </button>
+                            <button onClick={() => setViewMode('tree')} className={`px-4 py-2 rounded-lg flex items-center gap-2 ${viewMode === 'tree' ? 'bg-amber-600 text-white' : 'text-white/40'}`}>
+                                <Icon name="network" size={16}/> <span className="text-[10px] font-bold">SƠ ĐỒ</span>
+                            </button>
                         </div>
                     </header>
 
-                    <main className="flex-1 relative">
+                    <main className="flex-1 relative overflow-hidden">
                         {viewMode === 'tree' ? (
                             <div
                                 className="h-full w-full grab-container"
-                                onMouseDown={e => { if(e.target === e.currentTarget) { setDrag(true); offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; } }}
-                                onMouseMove={e => { if(drag) setPos({ x: e.clientX - offset.current.x, y: e.clientY - offset.current.y }); }}
-                                onMouseUp={() => setDrag(false)}
-                                onMouseLeave={() => setDrag(false)}
+                                onMouseDown={e => onStart(e.clientX, e.clientY)}
+                                onMouseMove={e => onMove(e.clientX, e.clientY)}
+                                onMouseUp={onEnd}
+                                onMouseLeave={onEnd}
+                                onTouchStart={e => onStart(e.touches[0].clientX, e.touches[0].clientY)}
+                                onTouchMove={e => onMove(e.touches[0].clientX, e.touches[0].clientY)}
+                                onTouchEnd={onEnd}
                             >
                                 <div className="absolute bottom-6 right-6 z-40 flex flex-col gap-2">
-                                    <button onClick={() => setScale(s => Math.min(1.5, s+0.1))} className="w-10 h-10 bg-white rounded-full shadow-lg border flex items-center justify-center"><Icon name="zoom-in" size={18}/></button>
-                                    <button onClick={() => setScale(0.5)} className="w-10 h-10 bg-white rounded-full shadow-lg border flex items-center justify-center text-[8px] font-bold">1:1</button>
-                                    <button onClick={() => setScale(s => Math.max(0.2, s-0.1))} className="w-10 h-10 bg-white rounded-full shadow-lg border flex items-center justify-center"><Icon name="zoom-out" size={18}/></button>
+                                    <button onClick={() => setScale(s => Math.min(1.5, s+0.1))} className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center"><Icon name="zoom-in" size={20}/></button>
+                                    <button onClick={() => {setPos({x:0, y:50}); setScale(0.5);}} className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[10px] font-bold">RESET</button>
+                                    <button onClick={() => setScale(s => Math.max(0.2, s-0.1))} className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center"><Icon name="zoom-out" size={20}/></button>
                                 </div>
-                                <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-10 transition-transform duration-75">
+                                <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-10">
                                     <TreeNode data={GIA_PHA_DATA} searchTerm={searchTerm} />
                                 </div>
                             </div>
                         ) : (
-                            <div className="h-full w-full overflow-y-auto bg-slate-50">
-                                <div className="max-w-xl mx-auto px-4 py-6">
-                                    <div className="bg-white p-3 rounded-2xl shadow-sm border mb-6 flex items-center gap-3">
+                            <div className="list-viewport">
+                                <div className="max-w-xl mx-auto px-4 py-6 pb-24">
+                                    <div className="bg-white p-3 rounded-2xl shadow-sm border mb-6 flex items-center gap-3 sticky top-0 z-40">
                                         <div className="relative flex-1">
                                             <Icon name="search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
                                             <input type="text" placeholder="Tìm tên..." className="w-full pl-9 pr-4 py-2 bg-slate-100 rounded-lg outline-none text-xs" onChange={(e) => setSearchTerm(e.target.value)}/>
                                         </div>
-                                        <button onClick={() => setAllOpen(!allOpen)} className="whitespace-nowrap px-3 py-2 bg-amber-100 text-amber-700 font-bold rounded-lg text-[9px] uppercase tracking-wider">
+                                        <button onClick={() => setAllOpen(!allOpen)} className="px-3 py-2 bg-amber-100 text-amber-700 font-bold rounded-lg text-[9px] uppercase tracking-wider">
                                             {allOpen ? "Thu gọn" : "Mở hết"}
                                         </button>
                                     </div>
