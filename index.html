@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gia Phả Phạm Tộc - Bản Nâng Cấp</title>
+    <title>Gia Phả Phạm Tộc - Cao Cấp</title>
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -11,42 +11,67 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700;900&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f8f8f2; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg-paper: #fdfaf5;
+            --primary-dark: #450a0a;
+            --gold: #b45309;
+            --gold-light: #fbbf24;
+        }
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: var(--bg-paper); margin: 0; color: #1e293b; }
         .font-serif { font-family: 'Playfair Display', serif; }
 
-        /* Cải tiến đường nối nhánh */
-        .node-container { position: relative; margin-left: 12px; border-left: 2px solid #cbd5e1; padding-left: 18px; margin-top: 4px; }
-        .branch-dot { position: absolute; left: -22px; top: 24px; width: 10px; height: 10px; background: #94a3b8; border-radius: 50%; border: 2px solid #f8f8f2; z-index: 10; }
+        /* Chế độ Sơ đồ (Desktop) */
+        .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 30px 30px; }
+        .grab-container:active { cursor: grabbing; }
 
-        /* Card phong cách mới */
-        .member-card { background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; margin-bottom: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
-        .member-card:active { transform: scale(0.98); }
-        .is-deceased { background: #f1f5f9; border-color: #cbd5e1; }
+        .node-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .node-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .node-card.highlight { ring: 4px solid var(--gold-light); transform: scale(1.1); z-index: 100; }
 
-        .bg-root-header { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%); }
-        .collapse-transition { display: grid; transition: grid-template-rows 0.4s ease-in-out; }
-        .is-open { grid-template-rows: 1fr; }
-        .is-closed { grid-template-rows: 0fr; }
-        .inner-content { overflow: hidden; }
+        .tree-branch { display: flex; padding-top: 50px; position: relative; }
+        .tree-item { position: relative; padding: 0 15px; display: flex; flex-direction: column; align-items: center; }
+        .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 50px; background: #d1d5db; transform: translateX(-50%); }
+        .tree-item::after { content: ''; position: absolute; top: 0; width: 100%; height: 2px; background: #d1d5db; }
+        .tree-item:first-child::after { left: 50%; width: 50%; }
+        .tree-item:last-child::after { right: 50%; width: 50%; }
+        .tree-item:only-child::after { display: none; }
+        .parent-line { position: absolute; bottom: -50px; left: 50%; width: 2px; height: 50px; background: #d1d5db; transform: translateX(-50%); }
 
-        /* Nút nổi */
-        .float-btn { position: fixed; bottom: 24px; right: 24px; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+        /* Chế độ Danh sách (Mobile) */
+        .member-card-ml {
+            background: white; border-radius: 16px; border: 1px solid #f1f5f9;
+            margin-bottom: 12px; position: relative; overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 20px; }
+        .branch-dot-ml { position: absolute; left: -20px; top: 24px; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; border: 2px solid white; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+        /* Header glass */
+        .header-glass { background: rgba(69, 10, 10, 0.95); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useRef, useEffect, useMemo } = React;
 
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
                 {
-                    name: "Bà cả: BÙI THỊ VÍCH", birth: "1888 Mậu Tý", death: "23-10-1957 Đinh Dậu", color: "border-l-slate-800", deceased: true,
+                    name: "Bà cả: BÙI THỊ VÍCH", birth: "1888 Mậu Tý", death: "23-10-1957 Đinh Dậu", color: "bg-slate-900", border: "border-slate-800", deceased: true,
                     children: [
                         {
                             name: "PHẠM VĂN COỎNG", title: "Trưởng tộc", birth: "1909 Kỷ Dậu", death: "13-9-1949 Kỷ Sửu", deceased: true,
@@ -114,7 +139,7 @@
                     ]
                 },
                 {
-                    name: "Bà hai: NGUYỄN THỊ YẾN", birth: "1895 Ất Mùi", death: "21-04-1945 Ất Dậu", color: "border-l-emerald-600", deceased: true,
+                    name: "Bà hai: NGUYỄN THỊ YẾN", birth: "1895 Ất Mùi", death: "21-04-1945 Ất Dậu", color: "bg-emerald-900", border: "border-emerald-600", deceased: true,
                     children: [
                         {
                             name: "PHẠM NGỌC THẠCH", birth: "1929 Kỷ tỵ", death: "Đã Mất", deceased: true, info: "Vợ cả: NGUYỄN THỊ KIM NGÂN Sinh 1937 Đinh Sửu - Vợ hai: PHẠM THỊ THU Sinh 1952 Nhâm Thìn",
@@ -130,7 +155,7 @@
                     ]
                 },
                 {
-                    name: "Bà ba: NGUYỄN THỊ HOA", birth: "1889 Kỷ Sửu", death: "25-01-2001 Tân tỵ", color: "border-l-amber-600", deceased: true,
+                    name: "Bà ba: NGUYỄN THỊ HOA", birth: "1889 Kỷ Sửu", death: "25-01-2001 Tân tỵ", color: "bg-amber-900", border: "border-amber-600", deceased: true,
                     children: [
                         {
                             name: "PHẠM NGỌC SINH", birth: "1947 Đinh Hợi", info: "Vợ: BÙI THỊ DỤNG Sinh 1945 Ất Dậu",
@@ -149,60 +174,87 @@
         };
 
         const Icon = ({ name, size = 16, className = "" }) => {
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, []);
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
-        const MemberItem = ({ data, level = 0, forceOpen }) => {
+        // Tree View Node (Desktop)
+        const TreeNode = ({ data, level = 0, searchTerm }) => {
+            const [isOpen, setIsOpen] = useState(level < 3);
+            const hasChildren = data.children && data.children.length > 0;
+            const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+            const cardClasses = useMemo(() => {
+                let base = "node-card relative p-5 text-center flex flex-col border shadow-lg ";
+                if (level === 0) return base + "bg-red-950 text-amber-100 w-72 border-amber-600 ring-4 ring-amber-900/20";
+                if (level === 1) return base + `${data.color} text-white w-64 border-white/20`;
+                if (data.title) return base + "bg-amber-50 border-amber-300 text-slate-800 w-60";
+                return base + "bg-white border-slate-200 text-slate-800 w-60";
+            }, [level, data.color, data.title]);
+
+            return (
+                <div className="tree-item">
+                    <div className={`${cardClasses} ${isMatch ? 'highlight' : ''}`}>
+                        {data.title && (
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase shadow-md z-30">
+                                {data.title}
+                            </div>
+                        )}
+                        <h3 className={`font-serif font-bold leading-tight mb-2 tracking-tight ${level === 0 ? 'text-xl uppercase' : 'text-md'}`}>
+                            {data.name}
+                        </h3>
+                        <div className="text-left space-y-1 text-[11px] border-t border-current/10 pt-3 mt-1">
+                            <div className="flex items-center gap-2 opacity-90"><Icon name="calendar" size={11} className="text-amber-500"/> <span>S: <span className="font-semibold">{data.birth}</span></span></div>
+                            {data.death !== "00-00-0000" && <div className="flex items-center gap-2 opacity-90 text-rose-500"><Icon name="moon" size={11}/> <span>M: <span className="font-semibold">{data.death}</span></span></div>}
+                            <div className="mt-2 text-xs italic opacity-75 line-clamp-2 leading-snug">{data.info}</div>
+                        </div>
+                        {hasChildren && (
+                            <button onClick={() => setIsOpen(!isOpen)} className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white border border-slate-200 w-8 h-8 rounded-full flex items-center justify-center shadow-lg z-30 text-amber-600 hover:bg-amber-50 transition-all">
+                                <Icon name={isOpen ? "minus" : "plus"} size={16} />
+                            </button>
+                        )}
+                        {hasChildren && isOpen && <div className="parent-line" />}
+                    </div>
+                    {hasChildren && isOpen && (
+                        <div className="tree-branch">
+                            {data.children.map((child, i) => <TreeNode key={i} data={child} level={level + 1} searchTerm={searchTerm} />)}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Mobile List Item
+        const MemberItem = ({ data, level = 0, forceOpen, searchTerm }) => {
             const [isOpen, setIsOpen] = useState(level < 1);
             const hasChildren = data.children && data.children.length > 0;
+            const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
 
-            useEffect(() => {
-                if (forceOpen !== null) setIsOpen(forceOpen);
-            }, [forceOpen]);
+            useEffect(() => { if (forceOpen !== null) setIsOpen(forceOpen); }, [forceOpen]);
 
             return (
                 <div className="w-full relative">
                     <div
-                        className={`member-card p-4 flex flex-col ${data.color ? 'border-l-4 ' + data.color : ''} ${data.deceased ? 'is-deceased' : ''}`}
+                        className={`member-card-ml p-4 flex flex-col ${isMatch ? 'ring-4 ring-amber-400' : ''} ${data.border ? 'border-l-4 ' + data.border : ''}`}
                         onClick={() => hasChildren && setIsOpen(!isOpen)}
                     >
-                        {data.deceased && (
-                            <div className="absolute top-2 right-3 opacity-20">
-                                <Icon name="flower-2" size={14} className="text-slate-600" />
-                            </div>
-                        )}
-
                         <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                                {data.title && <span className="inline-block bg-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase mb-1">{data.title}</span>}
-                                <h3 className={`font-bold tracking-tight ${data.deceased ? 'text-slate-600' : 'text-slate-800'} ${level === 0 ? 'text-xl' : 'text-[16px]'}`}>
-                                    {data.name}
-                                </h3>
+                            <div>
+                                {data.title && <span className="inline-block bg-amber-100 text-amber-800 text-[9px] font-black px-2 py-0.5 rounded uppercase mb-1">{data.title}</span>}
+                                <h3 className={`font-bold ${data.deceased ? 'text-slate-700' : 'text-red-900'} ${level === 0 ? 'text-xl' : 'text-md'}`}>{data.name}</h3>
                             </div>
-                            {hasChildren && <div className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}><Icon name="chevron-down" size={18} className="text-slate-300 mt-1" /></div>}
+                            {hasChildren && <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={20} className="text-slate-300"/>}
                         </div>
-
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">
-                            <div className="flex items-center gap-1.5"><Icon name="sun" size={11} className="text-amber-500"/><span>Sinh: <span className="font-semibold text-slate-700">{data.birth}</span></span></div>
-                            {data.death !== "00-00-0000" && <div className="flex items-center gap-1.5"><Icon name="moon" size={11} className="text-indigo-400"/><span>Mất: <span className="font-semibold text-slate-700">{data.death}</span></span></div>}
+                        <div className="flex gap-4 mt-2 text-[11px] text-slate-500 font-medium">
+                            <span className="flex items-center gap-1"><Icon name="sun" size={12} className="text-amber-500"/> {data.birth}</span>
+                            {data.death !== "00-00-0000" && <span className="flex items-center gap-1"><Icon name="moon" size={12} className="text-slate-400"/> {data.death}</span>}
                         </div>
-
-                        {data.info && data.info !== "00-00-0000" && (
-                            <div className={`rounded-lg p-2 mt-2 ${data.deceased ? 'bg-slate-200/50' : 'bg-slate-50'}`}>
-                                <p className="text-[11px] text-slate-500 italic leading-snug">{data.info}</p>
-                            </div>
-                        )}
+                        {data.info && <p className="mt-2 text-[11px] italic text-slate-400 bg-slate-50 p-2 rounded leading-tight">{data.info}</p>}
                     </div>
-
-                    {hasChildren && (
-                        <div className={`collapse-transition ${isOpen ? 'is-open' : 'is-closed'}`}>
-                            <div className="inner-content">
-                                <div className="node-container">
-                                    <div className="branch-dot" />
-                                    {data.children.map((child, i) => <MemberItem key={i} data={child} level={level + 1} forceOpen={forceOpen} />)}
-                                </div>
-                            </div>
+                    {hasChildren && isOpen && (
+                        <div className="node-container-ml">
+                            <div className="branch-dot-ml" />
+                            {data.children.map((child, i) => <MemberItem key={i} data={child} level={level + 1} forceOpen={forceOpen} searchTerm={searchTerm} />)}
                         </div>
                     )}
                 </div>
@@ -210,308 +262,96 @@
         };
 
         const App = () => {
+            const [viewMode, setViewMode] = useState('tree');
+            const [searchTerm, setSearchTerm] = useState("");
             const [allOpen, setAllOpen] = useState(null);
+            const [scale, setScale] = useState(0.5);
+            const [pos, setPos] = useState({ x: 0, y: 50 });
+            const [drag, setDrag] = useState(false);
+            const offset = useRef({ x: 0, y: 0 });
+
+            useEffect(() => { if (window.innerWidth < 768) setViewMode('list'); }, []);
 
             return (
-                <div className="min-h-screen flex flex-col bg-[#f8f8f2]">
-                    <header className="bg-root-header text-white px-6 py-10 shadow-2xl sticky top-0 z-50 rounded-b-[40px]">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="font-serif text-2xl font-black text-amber-200 tracking-wide uppercase">Phạm Tộc Gia Phả</h1>
-                                <p className="text-amber-400/60 text-[10px] font-bold tracking-[0.2em] mt-1">LƯU TRUYỀN MUÔN ĐỜI</p>
+                <div className="h-screen w-full flex flex-col overflow-hidden bg-[#fdfaf5]">
+                    {/* Premium Header */}
+                    <header className="h-20 header-glass text-white flex items-center justify-between px-6 z-50 border-b border-white/10 shadow-2xl shrink-0">
+                        <div className="flex items-center gap-4">
+                            <div className="bg-gradient-to-br from-amber-400 to-amber-700 p-2.5 rounded-xl shadow-lg border border-amber-300/30">
+                                <Icon name="library" size={24} className="text-red-950"/>
                             </div>
-                            <div className="w-12 h-12 bg-white/10 rounded-2xl backdrop-blur-lg flex items-center justify-center border border-white/20 shadow-inner">
-                                <Icon name="library" size={24} className="text-amber-200" />
+                            <div>
+                                <h1 className="font-serif text-xl md:text-2xl font-black text-amber-200 leading-none">PHẠM TỘC GIA PHẢ</h1>
+                                <p className="text-white/50 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Phúc Đức Tại Mẫu • Gia Đình Vạn Đại</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <div className="relative hidden lg:block">
+                                <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40"/>
+                                <input
+                                    type="text" placeholder="Tìm thành viên..."
+                                    className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-full w-64 text-sm focus:bg-white/10 focus:ring-1 focus:ring-amber-500/50 transition-all outline-none"
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+                                <button onClick={() => setViewMode('tree')} className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${viewMode === 'tree' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>
+                                    <Icon name="network" size={18}/> <span className="text-xs font-bold hidden md:inline">SƠ ĐỒ</span>
+                                </button>
+                                <button onClick={() => setViewMode('list')} className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${viewMode === 'list' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>
+                                    <Icon name="list-tree" size={18}/> <span className="text-xs font-bold hidden md:inline">DANH SÁCH</span>
+                                </button>
                             </div>
                         </div>
                     </header>
 
-                    <main className="flex-1 p-6 max-w-md mx-auto w-full pb-32">
-                        <div className="mb-6 flex items-center justify-between px-2">
-
-                            <button
-                                onClick={() => setAllOpen(prev => prev === true ? false : true)}
-                                className="text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-600 font-bold py-1 px-3 rounded-full transition-colors"
+                    <main className="flex-1 relative overflow-hidden">
+                        {viewMode === 'tree' ? (
+                            <div
+                                className="h-full w-full grab-container"
+                                onMouseDown={e => { setDrag(true); offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; }}
+                                onMouseMove={e => { if(drag) setPos({ x: e.clientX - offset.current.x, y: e.clientY - offset.current.y }); }}
+                                onMouseUp={() => setDrag(false)}
                             >
-                                {allOpen === true ? "THU GỌN HẾT" : "MỞ RỘNG HẾT"}
-                            </button>
-                        </div>
-
-                        <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} />
-
-                        <div className="mt-20 text-center">
-                            <div className="w-12 h-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent mx-auto rounded-full mb-4"></div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Phúc Đức Tại Mẫu</p>
-                        </div>
-                    </main>
-
-                    <button
-                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="float-btn w-14 h-14 bg-amber-600 text-white rounded-2xl flex items-center justify-center active:scale-90 transition-transform shadow-lg"
-                    >
-                        <Icon name="arrow-up" size={24} />
-                    </button>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gia Phả Phạm Tộc - Bản Nâng Cấp</title>
-
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-
-    <style>
-        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f8f8f2; color: #1e293b; -webkit-tap-highlight-color: transparent; }
-        .font-serif { font-family: 'Playfair Display', serif; }
-
-        /* Cải tiến đường nối nhánh */
-        .node-container { position: relative; margin-left: 12px; border-left: 2px solid #cbd5e1; padding-left: 18px; margin-top: 4px; }
-        .branch-dot { position: absolute; left: -22px; top: 24px; width: 10px; height: 10px; background: #94a3b8; border-radius: 50%; border: 2px solid #f8f8f2; z-index: 10; }
-
-        /* Card phong cách mới */
-        .member-card { background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; margin-bottom: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
-        .member-card:active { transform: scale(0.98); }
-        .is-deceased { background: #f1f5f9; border-color: #cbd5e1; }
-
-        .bg-root-header { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%); }
-        .collapse-transition { display: grid; transition: grid-template-rows 0.4s ease-in-out; }
-        .is-open { grid-template-rows: 1fr; }
-        .is-closed { grid-template-rows: 0fr; }
-        .inner-content { overflow: hidden; }
-
-        /* Nút nổi */
-        .float-btn { position: fixed; bottom: 24px; right: 24px; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
-
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-
-        const GIA_PHA_DATA = {
-            name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
-            children: [
-                {
-                    name: "Bà cả: BÙI THỊ VÍCH", birth: "1888 Mậu Tý", death: "23-10-1957 Đinh Dậu", color: "border-l-slate-800", deceased: true,
-                    children: [
-                        {
-                            name: "PHẠM VĂN COỎNG", title: "Trưởng tộc", birth: "1909 Kỷ Dậu", death: "13-9-1949 Kỷ Sửu", deceased: true,
-                            info: "Bà cả: Nguyễn Thị Phiềm (Sinh 1908-Mất 30-11-2015 Ất Mùi). Bà hai: Nguyễn Thị Viêm (Sinh: 1927 Đinh Mão)",
-                            children: [
-                                {
-                                    name: "PHẠM NGỌC CHƯ", title: "Trưởng tộc", birth: "1932 Nhâm Thân", death: "1998 Mậu Dần", deceased: true,
-                                    info: "Vợ: PHẠM THỊ UYÊN (S: 1933 Quý Dậu)",
-                                    children: [
-                                        { name: "PHẠM NGỌC CHI", title: "Trưởng tộc", birth: "29-04-1956 (21-03 Bính Thân)", death: "00-00-0000", info: "Vợ Nguyễn Thị Sen 21-10-1959 (19-9 Kỷ hợi) có 3 con", children: [{name: "PHẠM TUYẾT THU", birth: "07-12-1984 (15-11 Giáp tý)"}, {name: "PHẠM THỊ THƯƠNG HUYỀN", birth: "28-08-1987 (05-08 Đinh Mão)"}] },
-                                        { name: "PHẠM VĂN CẨN", birth: "09-05-1962 (05-04 Nhâm Dần)", death: "00-00-0000", info: "00-00-0000" , children: [{name: "PHẠM THỊ THÙY LINH", birth: "13-04-1999 (28-02 Kỷ Mão)"}]},
-                                        { name: "PHẠM THỊ XUÂN", birth: "10-12-1965 (18-11 Ất tỵ)", death: "00-00-0000", info: "00-00-0000" },
-                                        { name: "PHẠM ANH TIẾN", birth: "26-09-1969 (15-08 Kỷ Dậu)", death: "00-00-0000", info: "Vợ PHÌN THỊ THÙY Sinh 26-07-1977 (12-06 Đinh Tỵ)", children: [{name: "PHẠM THÁI BÌNH", birth: "24-11-2003 (01-10 Quý Mùi)"}, {name: "PHẠM THÙY GIANG", birth: "12-07-2011 (11-06 Tân Mão)"}] },
-                                        { name: "PHẠM MINH CHÁNH", birth: "01-05-1971 ", death: "Đã Mất", info: "Chưa vợ", deceased: true },
-                                        { name: "PHẠM TRỌNG TUỆ", birth: "05-07-1978 (29-05 Đinh Tỵ)", death: "00-00-0000", info: "Vợ TRẦN THỊ THÁI có hai con" , children: [{name: "PHẠM KHÁNH VY", birth: "25-03-2008 (19-02 Mậu tý)"}, {name: "PHẠM NGỌC MINH", birth: "06-07-2012 (22-05 Nhâm Thìn)"}]},
-                                    ]
-                                },
-                                { name: "PHẠM THỊ NÙI", birth: "1938 Mậu Dần", death: "......", info: "Con Bà Cả", deceased: true },
-                                { name: "PHẠM THỊ DUNG", birth: "1940 Canh Thìn", death: "16-07-1986 Bính Dần", info: "Con Bà Cà", deceased: true },
-                                {
-                                    name: "PHẠM TUẤN KHANH", birth: "1942 Nhâm Ngọ", death: "16-11-2013 Quý Hợi", info: "Con Bà Cả, Vợ: ĐINH THỊ CÚC Sinh 1946 Bính Tuất có ba con", deceased: true,
-                                    children: [
-                                        { name: "PHẠM VĂN TUYÊN", birth: "1969 Kỷ Dậu", death: "30-09-1999 Kỷ Mão", info: "Vợ NGUYỄN THỊ VÂN 1971 Tân Hợi", deceased: true, children: [{name: "PHẠM THỊ LAN HƯƠNG ", birth: "13-03-1996 (23-01 Bính Tý)"}] },
-                                        { name: "PHẠM VĂN DƯƠNG", birth: "28-09-1970 (28-08 Canh Tuất)", death: "00-00-0000", info: "Vợ TRẦN THỊ HUYỀN Sinh 19-06-1977 (03-05 Đinh Tỵ) có hai con", children: [{name: "PHẠM TRẦN KHIÊM ", birth: "29-01-2000 Canh Thìn", death: "Đã Mất", deceased: true}, {name: "PHẠM PHƯƠNG THẢO ", birth: "18-12-2005 (17-11 Ất Dậu)"}]},
-                                        { name: "PHẠM KIỀU VÂN", birth: "22-04-1976 Bính Thìn", death: "00-00-0000", info: "sống ở Hà Giang"},
-                                    ]
-                                },
-                                { name: "PHẠM THỊ DINH", birth: "1950 Canh Dần", info: "Con Bà Hai" },
-                            ]
-                        },
-                        { name: "PHẠM NGỌC XIÊM", birth: "1920 Canh Thân", death: "18-02-1945 Ất Dậu ", info: "Mất ở đồn điền Cao Su", deceased: true },
-                        {
-                            name: "PHẠM NGỌC CƠ", birth: "1922 Nhâm Tuất", death: "02-04-1977 Đinh Tỵ", deceased: true,
-                            info: "Vợ: NGUYỄN THỊ CÚC (Sinh: 1923 Quý Hợi - Mất: 26-09-1963 Quý Mão)",
-                            children: [
-                                { name: "PHẠM THỊ NHẠN", birth: "1944 Giáp Thân", death: "00-00-0000", info: "Có 2 con sống cùng con gái ở Vĩnh Phúc" },
-                                { name: "PHẠM THỊ NHIÊN", birth: "1948 Mậu Tý", death: "00-00-0000", info: "có 5 người con sống ở Diêm Điền" },
-                                { name: "PHẠM MINH ĐỨC", birth: "18-10-1953 Quý Tỵ", death: "02-08-2022 Nhâm Dần", deceased: true, info: "Vợ: HOÀNG THỊ XUYẾN Sinh 01-10-1949 Kỷ Sửu Mất 24-02-2025 Ất Tỵ có 3 người con",
-                                    children: [
-                                        { name: "PHẠM THỊ KIM XUÂN", birth: "02-08-1979 (10-06 Kỷ Mùi)", death: "00-00-0000", info: "Có 2 con", children: [{name: "NGUYỄN TUỆ ANH (NẾP)", birth: "20-03-2015"}, {name: "NGUYỄN NGỌC ÁNH (THÓC)", birth: "2021"}] },
-                                        { name: "PHẠM PHƯƠNG ĐÔNG", birth: "29-12-1981 (04-12 Tân Dậu)", death: "00-00-0000", info: "Vợ HOÀNG THANH HUYỀN Sinh 02-09-1985 (Ất Sửu)", children: [{name: "PHẠM HOÀNG DƯƠNG", birth: "14-06-2011 (Tân Mão)"}] },
-                                        { name: "PHẠM PHƯƠNG NAM", birth: "20-10-1984 (26-09 Giáp tý)", death: "00-00-0000", info: "Vợ PHAN THỊ HỒNG Sinh 04-10-1989 (Kỷ Tỵ) Có 2 con", children: [{name: "PHẠM THỦY PHƯƠNG ANH", birth: "07-12-2012 (04-11 Nhâm Thìn)"}, {name: "PHẠM NAM ANH", birth: "29-08-2016 (27-07 Bính Thân)"}] },
-                                    ]},
-                                {
-                                    name: "PHẠM NGỌC THANH", birth: "13-09-1959 Kỷ Hợi", death: "19-08-2008 Mậu Tý", deceased: true, info: "Vợ: ĐẶNG PHƯƠNG DUNG Sinh 21-10-1960 (01-09 Canh tý) có 3 con",
-                                    children: [
-                                        { name: "PHẠM DIỆU HƯƠNG", birth: "20-11-1983 (16-10 Quý Hợi)",},
-                                        { name: "PHẠM DIỆU VÂN", birth: "31-07-1986 (25-06 Bính Dần)", },
-                                        { name: "PHẠM MINH ĐÔ", birth: "27-08-1990 (06-07 Canh Ngọ)" , death: "00-00-0000", info: "Vợ NGUYỄN THỊ LÝ HƯỜNG Sinh 22-05-1990 (28-04 Canh Ngọ) Có 3 con", children: [{name: "PHẠM TRÚC LAM", birth: "22-12-2017 (04-11 Nhâm Thìn)"}, {name: "PHẠM MINH QUÂN", birth: "2020"}, {name: "PHẠM MINH DƯƠNG", birth: "2024"}] },
-                                    ]
-                                },
-                            ]
-                        },
-                        { name: "PHẠM THỊ LŨ", birth: "1926 Bính Dần", death: "00-00-0000", info: "00-00-0000" },
-                        { name: "PHẠM NGỌC THỞ", birth: "1929 Kỷ Tỵ", death: "15-08-1945 Ất Dậu", deceased: true },
-                        { name: "PHẠM NGỌC NHẬT", birth: "1931 Tân Mùi", death: "03-05-1987 Đinh Mão", deceased: true, info: "Vợ ĐINH THỊ LOÁN Sinh 1933 Quý Mão Mất 17-02-1982 Nhâm Tuất",
-                        children: [
-                                { name: "PHẠM NGỌC TUẤN", birth: "30-10-1960 (11-09 Canh tý)" , death: "00-00-0000", info: "Vợ TRẦN THỊ PHƯƠNG Sinh 31-08-1959 (27-07 Kỷ Hợi) Có 3 con", children: [{name: "PHẠM NGỌC ANH", birth: "18-01-1987 (18-12 Bính Dần)"}, {name: "PHẠM TRÂN TUÂN", birth: "27-12-1999 (20-11 Kỷ Mão)"}, {name: "PHẠM THỊ HƯƠNG LAN", birth: "25-07-2002 (20-06 Nhâm Ngọ)"}] },
-                                { name: "PHẠM THỊ TÚ", birth: "1962 NHÂM DẦN",},
-                                { name: "PHẠM THỊ TÂN", birth: "01-06-1965 (02-05 Ất tỵ)", },
-                                { name: "PHẠM THỊ TƯ", birth: "1968 Mậu thân", death: "28-03-1978 Mậu Ngọ", deceased: true },
-                                { name: "PHẠM ĐỨC CƯỜNG", birth: "10-05-1971 (15-04 Tân Hợi)" , death: "00-00-0000", info: "Vợ NGUYỄN THỊ HỒNG NGA Sinh 29-03-1973 (26-02 Quý Sửu) Có 2 con", children: [{name: "PHẠM ĐỨC MẠNH", birth: "26-03-1995 (26-02 ẤT Hợi)"}, {name: "PHẠM ĐỨC CÔNG", birth: "08-10-2000 (11=09-2000 Canh Thìn)"}] },
-                            ]
-                        }
-                    ]
-                },
-                {
-                    name: "Bà hai: NGUYỄN THỊ YẾN", birth: "1895 Ất Mùi", death: "21-04-1945 Ất Dậu", color: "border-l-emerald-600", deceased: true,
-                    children: [
-                        {
-                            name: "PHẠM NGỌC THẠCH", birth: "1929 Kỷ tỵ", death: "Đã Mất", deceased: true, info: "Vợ cả: NGUYỄN THỊ KIM NGÂN Sinh 1937 Đinh Sửu - Vợ hai: PHẠM THỊ THU Sinh 1952 Nhâm Thìn",
-                            children: [
-                                { name: "PHẠM THỊ NGA", birth: "13-09-1962 (15-08 Nhâm Dần)",},
-                                { name: "PHẠM NGỌC SƠN", birth: "17-11-1964 (13-10 Giáp Thìn)", death: "00-00-0000", info: "Vợ: DƯƠNG THỊ HUỆ Sinh 02-12-1969 (26-10 Kỷ Dậu) có 2 con", children: [{name: "PHẠM THỊ THỦY", birth: "09-05-1993 (18-04 Quý Dậu)"}, {name: "PHẠM ĐÔNG TRIỀU", birth: "10-11-1996 (30-09 Bính Tý)"}] },
-                                { name: "PHẠM THỊ ĐàO", birth: "25-01-1972 (08-12 Tân Hợi)",},
-                                { name: "PHẠM THỊ ÁNH", birth: "29-04-1974 (08-04 Giáp Dần)",},
-                                { name: "PHẠM HỒNG THẮNG", birth: "31-08-1976 (14-07 Bính Thìn)", death: "00-00-0000", info: "Vợ: DƯƠNG THỊ TUYẾT HUỆ Sinh 23-11-1985 (12-10 Ất Sửu)", children: [{name: "PHẠM KHÁNH DUY", birth: "12-03-2007 (23-01 Đinh Hợi)"}, {name: "PHẠM HẢI YẾN", birth: "15-02-2009 (21-01 Kỷ Sửu)"}] },
-                                { name: "PHẠM THỊ ANH ANH", birth: "1955 Ất Hợi", info: "con bà hai"},
-                            ]
-                        }
-                    ]
-                },
-                {
-                    name: "Bà ba: NGUYỄN THỊ HOA", birth: "1889 Kỷ Sửu", death: "25-01-2001 Tân tỵ", color: "border-l-amber-600", deceased: true,
-                    children: [
-                        {
-                            name: "PHẠM NGỌC SINH", birth: "1947 Đinh Hợi", info: "Vợ: BÙI THỊ DỤNG Sinh 1945 Ất Dậu",
-                            children: [
-                                { name: "PHẠM THỊ NHUNG", birth: "16-05-1996 (10-04 Kỷ Dậu)",},
-                                { name: "PHẠM VĂN NGỌC", birth: "18-08-1973 (20-07 Quý Sửu)", death: "00-00-0000", info: "Vợ: LÊ THỊ HÀ Sinh 1975 Ất Mão", children: [{name: "PHẠM THỊ YẾN", birth: "18-10-1998 (02-09 Mậu Dần)"}, {name: "PHẠM THỊ LINH", birth: "08-12-2005 (08-11 Ất Dậu)"},{name: "PHẠM MINH ANH", birth: "29-12-2013 (27-11 Quý Tỵ)"}] },
-                                { name: "PHẠM ĐỨC CƯỜNG", birth: "26-03-1975 (15-02 Ất Mão)", death: "00-00-0000", info: "Vợ: ĐỖ THỊ LOAN Sinh 22-08-1979 (27-06 Quý Mùi)", children: [{name: "PHẠM Quỳnh Anh", birth: "21-02-2002 (10-01 Nhâm Ngọ)"}, {name: "PHẠM QUỲNH GIAO", birth: "01-06-2013 (23-04 Quý Tỵ)"}] },
-                                { name: "PHẠM VĂN TUẤN", birth: "25-09-1978 (22-08 Mậu Ngọ)", death: "00-00-0000", info: "Vợ: ĐÀO THỊ NỤ Sinh 17-05-1983 (11-04 Quý Hợi)", children: [{name: "PHẠM THÙY TRANG", birth: "16-02-2008 (10-01 Mậu Tý)"}, {name: "PHẠM DUY KHÁNH", birth: "02-12-2010 (25-10 Canh Dần)"}] },
-                                { name: "PHẠM VĂN TRỌNG", birth: "17-11-1980 (10-10 Canh Thân)", death: "00-00-0000", info: "Vợ: TRẦN THỊ NGA Sinh 25-04-1988 (09-03 Mậu THìn)", children: [{name: "PHẠM MINH THƯ", birth: "17-12-2011 (22-11 Tân Mão)"}, {name: "PHẠM MINH TUYỀN", birth: "25-05-2013 (15-04 Quý Tỵ)"},{name: "PHẠM THỦY TIÊN", birth: "05-10-2016 (03-09 Bính Thân)"}] },
-                                { name: "PHẠM THỊ THỦY", birth: "28-10-1983 (25-09 Quý Hợi)", death: "00-00-0000",},
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
-
-        const Icon = ({ name, size = 16, className = "" }) => {
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, []);
-            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
-        };
-
-        const MemberItem = ({ data, level = 0, forceOpen }) => {
-            const [isOpen, setIsOpen] = useState(level < 1);
-            const hasChildren = data.children && data.children.length > 0;
-
-            useEffect(() => {
-                if (forceOpen !== null) setIsOpen(forceOpen);
-            }, [forceOpen]);
-
-            return (
-                <div className="w-full relative">
-                    <div
-                        className={`member-card p-4 flex flex-col ${data.color ? 'border-l-4 ' + data.color : ''} ${data.deceased ? 'is-deceased' : ''}`}
-                        onClick={() => hasChildren && setIsOpen(!isOpen)}
-                    >
-                        {data.deceased && (
-                            <div className="absolute top-2 right-3 opacity-20">
-                                <Icon name="flower-2" size={14} className="text-slate-600" />
-                            </div>
-                        )}
-
-                        <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                                {data.title && <span className="inline-block bg-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase mb-1">{data.title}</span>}
-                                <h3 className={`font-bold tracking-tight ${data.deceased ? 'text-slate-600' : 'text-slate-800'} ${level === 0 ? 'text-xl' : 'text-[16px]'}`}>
-                                    {data.name}
-                                </h3>
-                            </div>
-                            {hasChildren && <div className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}><Icon name="chevron-down" size={18} className="text-slate-300 mt-1" /></div>}
-                        </div>
-
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">
-                            <div className="flex items-center gap-1.5"><Icon name="sun" size={11} className="text-amber-500"/><span>Sinh: <span className="font-semibold text-slate-700">{data.birth}</span></span></div>
-                            {data.death !== "00-00-0000" && <div className="flex items-center gap-1.5"><Icon name="moon" size={11} className="text-indigo-400"/><span>Mất: <span className="font-semibold text-slate-700">{data.death}</span></span></div>}
-                        </div>
-
-                        {data.info && data.info !== "00-00-0000" && (
-                            <div className={`rounded-lg p-2 mt-2 ${data.deceased ? 'bg-slate-200/50' : 'bg-slate-50'}`}>
-                                <p className="text-[11px] text-slate-500 italic leading-snug">{data.info}</p>
-                            </div>
-                        )}
-                    </div>
-
-                    {hasChildren && (
-                        <div className={`collapse-transition ${isOpen ? 'is-open' : 'is-closed'}`}>
-                            <div className="inner-content">
-                                <div className="node-container">
-                                    <div className="branch-dot" />
-                                    {data.children.map((child, i) => <MemberItem key={i} data={child} level={level + 1} forceOpen={forceOpen} />)}
+                                {/* Zoom Controls */}
+                                <div className="absolute bottom-8 right-8 z-40 flex flex-col gap-3">
+                                    <button onClick={() => setScale(s => Math.min(1.5, s+0.1))} className="w-12 h-12 bg-white text-slate-700 rounded-full shadow-2xl border border-slate-200 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all"><Icon name="zoom-in" size={20}/></button>
+                                    <button onClick={() => setScale(0.5)} className="w-12 h-12 bg-white text-slate-700 rounded-full shadow-2xl border border-slate-200 flex items-center justify-center font-bold text-xs uppercase">Reset</button>
+                                    <button onClick={() => setScale(s => Math.max(0.2, s-0.1))} className="w-12 h-12 bg-white text-slate-700 rounded-full shadow-2xl border border-slate-200 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all"><Icon name="zoom-out" size={20}/></button>
+                                </div>
+                                <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-20 transition-transform duration-100 ease-out">
+                                    <TreeNode data={GIA_PHA_DATA} searchTerm={searchTerm} />
                                 </div>
                             </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        const App = () => {
-            const [allOpen, setAllOpen] = useState(null);
-
-            return (
-                <div className="min-h-screen flex flex-col bg-[#f8f8f2]">
-                    <header className="bg-root-header text-white px-6 py-10 shadow-2xl sticky top-0 z-50 rounded-b-[40px]">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="font-serif text-2xl font-black text-amber-200 tracking-wide uppercase">Phạm Tộc Gia Phả</h1>
-                                <p className="text-amber-400/60 text-[10px] font-bold tracking-[0.2em] mt-1">LƯU TRUYỀN MUÔN ĐỜI</p>
+                        ) : (
+                            <div className="h-full w-full overflow-y-auto bg-slate-50">
+                                <div className="max-w-xl mx-auto px-4 py-10">
+                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex items-center gap-4">
+                                        <div className="relative flex-1">
+                                            <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
+                                            <input type="text" placeholder="Tìm tên..." className="w-full pl-10 pr-4 py-2.5 bg-slate-100 rounded-xl outline-none focus:ring-2 ring-amber-500/20" onChange={(e) => setSearchTerm(e.target.value)}/>
+                                        </div>
+                                        <button onClick={() => setAllOpen(!allOpen)} className="whitespace-nowrap px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl text-xs uppercase tracking-wider">
+                                            {allOpen ? "Thu gọn" : "Mở hết"}
+                                        </button>
+                                    </div>
+                                    <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} searchTerm={searchTerm} />
+                                    <div className="h-32 flex items-center justify-center">
+                                        <div className="h-[1px] w-12 bg-amber-300"></div>
+                                        <Icon name="award" className="mx-4 text-amber-500"/>
+                                        <div className="h-[1px] w-12 bg-amber-300"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="w-12 h-12 bg-white/10 rounded-2xl backdrop-blur-lg flex items-center justify-center border border-white/20 shadow-inner">
-                                <Icon name="library" size={24} className="text-amber-200" />
-                            </div>
-                        </div>
-                    </header>
+                        )}
 
-                    <main className="flex-1 p-6 max-w-md mx-auto w-full pb-32">
-                        <div className="mb-6 flex items-center justify-between px-2">
-                           
-                            <button
-                                onClick={() => setAllOpen(prev => prev === true ? false : true)}
-                                className="text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-600 font-bold py-1 px-3 rounded-full transition-colors"
-                            >
-                                {allOpen === true ? "THU GỌN HẾT" : "MỞ RỘNG HẾT"}
+                        {viewMode === 'list' && (
+                            <button onClick={() => document.querySelector('.overflow-y-auto').scrollTo({top: 0, behavior: 'smooth'})} className="fixed bottom-8 right-8 w-14 h-14 bg-red-900 text-white rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition-all z-[60]">
+                                <Icon name="arrow-up" size={24} />
                             </button>
-                        </div>
-
-                        <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} />
-
-                        <div className="mt-20 text-center">
-                            <div className="w-12 h-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent mx-auto rounded-full mb-4"></div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Phúc Đức Tại Mẫu</p>
-                        </div>
+                        )}
                     </main>
-
-                    <button
-                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="float-btn w-14 h-14 bg-amber-600 text-white rounded-2xl flex items-center justify-center active:scale-90 transition-transform shadow-lg"
-                    >
-                        <Icon name="arrow-up" size={24} />
-                    </button>
                 </div>
             );
         };
