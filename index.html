@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gia Phả Phạm Tộc - Cao Cấp</title>
+    <title>Gia Phả Phạm Tộc - tháng 4 năm 2026</title>
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -11,7 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700;900&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -20,7 +20,7 @@
             --gold: #b45309;
             --gold-light: #fbbf24;
         }
-        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: var(--bg-paper); margin: 0; color: #1e293b; }
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: var(--bg-paper); margin: 0; color: #1e293b; overflow: hidden; }
         .font-serif { font-family: 'Playfair Display', serif; }
 
         /* Chế độ Sơ đồ (Desktop) */
@@ -28,23 +28,26 @@
         .grab-container:active { cursor: grabbing; }
 
         .node-card {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            user-select: none;
         }
-        .node-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .node-card.highlight { ring: 4px solid var(--gold-light); transform: scale(1.1); z-index: 100; }
+        .node-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1); }
+        .node-card:active { transform: scale(0.98); }
+        .node-card.highlight { ring: 4px solid var(--gold-light); transform: scale(1.05); z-index: 100; }
 
-        .tree-branch { display: flex; padding-top: 50px; position: relative; }
-        .tree-item { position: relative; padding: 0 15px; display: flex; flex-direction: column; align-items: center; }
-        .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 50px; background: #d1d5db; transform: translateX(-50%); }
+        .tree-branch { display: flex; padding-top: 40px; position: relative; }
+        .tree-item { position: relative; padding: 0 10px; display: flex; flex-direction: column; align-items: center; }
+        .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 40px; background: #d1d5db; transform: translateX(-50%); }
         .tree-item::after { content: ''; position: absolute; top: 0; width: 100%; height: 2px; background: #d1d5db; }
         .tree-item:first-child::after { left: 50%; width: 50%; }
         .tree-item:last-child::after { right: 50%; width: 50%; }
         .tree-item:only-child::after { display: none; }
-        .parent-line { position: absolute; bottom: -50px; left: 50%; width: 2px; height: 50px; background: #d1d5db; transform: translateX(-50%); }
+        .parent-line { position: absolute; bottom: -40px; left: 50%; width: 2px; height: 40px; background: #d1d5db; transform: translateX(-50%); }
 
-        /* Chế độ Danh sách (Mobile) */
+        /* Chế độ Danh sách */
         .member-card-ml {
             background: white; border-radius: 16px; border: 1px solid #f1f5f9;
             margin-bottom: 12px; position: relative; overflow: hidden;
@@ -53,12 +56,7 @@
         .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 20px; }
         .branch-dot-ml { position: absolute; left: -20px; top: 24px; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; border: 2px solid white; }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-
-        /* Header glass */
-        .header-glass { background: rgba(69, 10, 10, 0.95); backdrop-filter: blur(10px); }
+        .header-glass { background: rgba(69, 10, 10, 0.98); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
@@ -86,7 +84,7 @@
                                         { name: "PHẠM THỊ XUÂN", birth: "10-12-1965 (18-11 Ất tỵ)", death: "00-00-0000", info: "00-00-0000" },
                                         { name: "PHẠM ANH TIẾN", birth: "26-09-1969 (15-08 Kỷ Dậu)", death: "00-00-0000", info: "Vợ PHÌN THỊ THÙY Sinh 26-07-1977 (12-06 Đinh Tỵ)", children: [{name: "PHẠM THÁI BÌNH", birth: "24-11-2003 (01-10 Quý Mùi)"}, {name: "PHẠM THÙY GIANG", birth: "12-07-2011 (11-06 Tân Mão)"}] },
                                         { name: "PHẠM MINH CHÁNH", birth: "01-05-1971 ", death: "Đã Mất", info: "Chưa vợ", deceased: true },
-                                        { name: "PHẠM TRỌNG TUỆ", birth: "05-07-1978 (29-05 Đinh Tỵ)", death: "00-00-0000", info: "Vợ TRẦN THỊ THÁI có hai con" , children: [{name: "PHẠM KHÁNH VY", birth: "25-03-2008 (19-02 Mậu tý)"}, {name: "PHẠM NGỌC MINH", birth: "06-07-2012 (22-05 Nhâm Thìn)"}]},
+                                        { name: "PHẠM TRỌNG TUỆ", birth: "05-07-1978 (29-05 Đinh Tỵ)", death: "00-00-0000", info: "Vợ TRẦN THỊ TH thái có hai con" , children: [{name: "PHẠM KHÁNH VY", birth: "25-03-2008 (19-02 Mậu tý)"}, {name: "PHẠM NGỌC MINH", birth: "06-07-2012 (22-05 Nhâm Thìn)"}]},
                                     ]
                                 },
                                 { name: "PHẠM THỊ NÙI", birth: "1938 Mậu Dần", death: "......", info: "Con Bà Cả", deceased: true },
@@ -178,14 +176,13 @@
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
-        // Tree View Node (Desktop)
         const TreeNode = ({ data, level = 0, searchTerm }) => {
-            const [isOpen, setIsOpen] = useState(level < 3);
+            const [isOpen, setIsOpen] = useState(level < 2);
             const hasChildren = data.children && data.children.length > 0;
             const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
 
             const cardClasses = useMemo(() => {
-                let base = "node-card relative p-5 text-center flex flex-col border shadow-lg ";
+                let base = "node-card relative p-5 text-center flex flex-col border ";
                 if (level === 0) return base + "bg-red-950 text-amber-100 w-72 border-amber-600 ring-4 ring-amber-900/20";
                 if (level === 1) return base + `${data.color} text-white w-64 border-white/20`;
                 if (data.title) return base + "bg-amber-50 border-amber-300 text-slate-800 w-60";
@@ -194,7 +191,11 @@
 
             return (
                 <div className="tree-item">
-                    <div className={`${cardClasses} ${isMatch ? 'highlight' : ''}`}>
+                    {/* Toàn bộ thẻ giờ đây là nút bấm */}
+                    <div
+                        className={`${cardClasses} ${isMatch ? 'highlight' : ''}`}
+                        onClick={() => hasChildren && setIsOpen(!isOpen)}
+                    >
                         {data.title && (
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase shadow-md z-30">
                                 {data.title}
@@ -206,15 +207,19 @@
                         <div className="text-left space-y-1 text-[11px] border-t border-current/10 pt-3 mt-1">
                             <div className="flex items-center gap-2 opacity-90"><Icon name="calendar" size={11} className="text-amber-500"/> <span>S: <span className="font-semibold">{data.birth}</span></span></div>
                             {data.death !== "00-00-0000" && <div className="flex items-center gap-2 opacity-90 text-rose-500"><Icon name="moon" size={11}/> <span>M: <span className="font-semibold">{data.death}</span></span></div>}
-                            <div className="mt-2 text-xs italic opacity-75 line-clamp-2 leading-snug">{data.info}</div>
+                            <div className="mt-2 text-[10px] italic opacity-75 line-clamp-2 leading-snug">{data.info}</div>
                         </div>
+
+                        {/* Biểu tượng báo hiệu có con và trạng thái đóng mở */}
                         {hasChildren && (
-                            <button onClick={() => setIsOpen(!isOpen)} className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white border border-slate-200 w-8 h-8 rounded-full flex items-center justify-center shadow-lg z-30 text-amber-600 hover:bg-amber-50 transition-all">
-                                <Icon name={isOpen ? "minus" : "plus"} size={16} />
-                            </button>
+                            <div className="mt-3 flex justify-center text-amber-600/50">
+                                <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={16} />
+                            </div>
                         )}
+
                         {hasChildren && isOpen && <div className="parent-line" />}
                     </div>
+
                     {hasChildren && isOpen && (
                         <div className="tree-branch">
                             {data.children.map((child, i) => <TreeNode key={i} data={child} level={level + 1} searchTerm={searchTerm} />)}
@@ -224,7 +229,6 @@
             );
         };
 
-        // Mobile List Item
         const MemberItem = ({ data, level = 0, forceOpen, searchTerm }) => {
             const [isOpen, setIsOpen] = useState(level < 1);
             const hasChildren = data.children && data.children.length > 0;
@@ -262,7 +266,7 @@
         };
 
         const App = () => {
-            const [viewMode, setViewMode] = useState('tree');
+            const [viewMode, setViewMode] = useState('list');
             const [searchTerm, setSearchTerm] = useState("");
             const [allOpen, setAllOpen] = useState(null);
             const [scale, setScale] = useState(0.5);
@@ -270,86 +274,64 @@
             const [drag, setDrag] = useState(false);
             const offset = useRef({ x: 0, y: 0 });
 
-            useEffect(() => { if (window.innerWidth < 768) setViewMode('list'); }, []);
-
             return (
-                <div className="h-screen w-full flex flex-col overflow-hidden bg-[#fdfaf5]">
-                    {/* Premium Header */}
-                    <header className="h-20 header-glass text-white flex items-center justify-between px-6 z-50 border-b border-white/10 shadow-2xl shrink-0">
-                        <div className="flex items-center gap-4">
-                            <div className="bg-gradient-to-br from-amber-400 to-amber-700 p-2.5 rounded-xl shadow-lg border border-amber-300/30">
-                                <Icon name="library" size={24} className="text-red-950"/>
+                <div className="h-screen w-full flex flex-col bg-[#fdfaf5]">
+                    <header className="h-20 header-glass text-white flex items-center justify-between px-6 z-50 shrink-0 shadow-lg">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-amber-600 p-2 rounded-xl hidden sm:block">
+                                <Icon name="library" size={20}/>
                             </div>
                             <div>
-                                <h1 className="font-serif text-xl md:text-2xl font-black text-amber-200 leading-none">PHẠM TỘC GIA PHẢ</h1>
-                                <p className="text-white/50 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Phúc Đức Tại Mẫu • Gia Đình Vạn Đại</p>
+                                <h1 className="font-serif text-lg font-black text-amber-200 leading-none">PHẠM TỘC GIA PHẢ</h1>
+                                <p className="text-white/40 text-[8px] font-bold uppercase tracking-[0.2em] mt-1">Phúc Đức Tại Mẫu</p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <div className="relative hidden lg:block">
-                                <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40"/>
-                                <input
-                                    type="text" placeholder="Tìm thành viên..."
-                                    className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-full w-64 text-sm focus:bg-white/10 focus:ring-1 focus:ring-amber-500/50 transition-all outline-none"
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
-                                <button onClick={() => setViewMode('tree')} className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${viewMode === 'tree' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>
-                                    <Icon name="network" size={18}/> <span className="text-xs font-bold hidden md:inline">SƠ ĐỒ</span>
+                        <div className="flex items-center gap-2">
+                            <div className="flex bg-white/10 p-1 rounded-xl border border-white/10">
+                                <button onClick={() => setViewMode('list')} className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 ${viewMode === 'list' ? 'bg-amber-600 text-white' : 'text-white/40'}`}>
+                                    <Icon name="list-tree" size={16}/> <span className="text-[10px] font-bold">DANH SÁCH</span>
                                 </button>
-                                <button onClick={() => setViewMode('list')} className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${viewMode === 'list' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>
-                                    <Icon name="list-tree" size={18}/> <span className="text-xs font-bold hidden md:inline">DANH SÁCH</span>
+                                <button onClick={() => setViewMode('tree')} className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 ${viewMode === 'tree' ? 'bg-amber-600 text-white' : 'text-white/40'}`}>
+                                    <Icon name="network" size={16}/> <span className="text-[10px] font-bold">SƠ ĐỒ</span>
                                 </button>
                             </div>
                         </div>
                     </header>
 
-                    <main className="flex-1 relative overflow-hidden">
+                    <main className="flex-1 relative">
                         {viewMode === 'tree' ? (
                             <div
                                 className="h-full w-full grab-container"
-                                onMouseDown={e => { setDrag(true); offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; }}
+                                onMouseDown={e => { if(e.target === e.currentTarget) { setDrag(true); offset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; } }}
                                 onMouseMove={e => { if(drag) setPos({ x: e.clientX - offset.current.x, y: e.clientY - offset.current.y }); }}
                                 onMouseUp={() => setDrag(false)}
+                                onMouseLeave={() => setDrag(false)}
                             >
-                                {/* Zoom Controls */}
-                                <div className="absolute bottom-8 right-8 z-40 flex flex-col gap-3">
-                                    <button onClick={() => setScale(s => Math.min(1.5, s+0.1))} className="w-12 h-12 bg-white text-slate-700 rounded-full shadow-2xl border border-slate-200 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all"><Icon name="zoom-in" size={20}/></button>
-                                    <button onClick={() => setScale(0.5)} className="w-12 h-12 bg-white text-slate-700 rounded-full shadow-2xl border border-slate-200 flex items-center justify-center font-bold text-xs uppercase">Reset</button>
-                                    <button onClick={() => setScale(s => Math.max(0.2, s-0.1))} className="w-12 h-12 bg-white text-slate-700 rounded-full shadow-2xl border border-slate-200 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all"><Icon name="zoom-out" size={20}/></button>
+                                <div className="absolute bottom-6 right-6 z-40 flex flex-col gap-2">
+                                    <button onClick={() => setScale(s => Math.min(1.5, s+0.1))} className="w-10 h-10 bg-white rounded-full shadow-lg border flex items-center justify-center"><Icon name="zoom-in" size={18}/></button>
+                                    <button onClick={() => setScale(0.5)} className="w-10 h-10 bg-white rounded-full shadow-lg border flex items-center justify-center text-[8px] font-bold">1:1</button>
+                                    <button onClick={() => setScale(s => Math.max(0.2, s-0.1))} className="w-10 h-10 bg-white rounded-full shadow-lg border flex items-center justify-center"><Icon name="zoom-out" size={18}/></button>
                                 </div>
-                                <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-20 transition-transform duration-100 ease-out">
+                                <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-10 transition-transform duration-75">
                                     <TreeNode data={GIA_PHA_DATA} searchTerm={searchTerm} />
                                 </div>
                             </div>
                         ) : (
                             <div className="h-full w-full overflow-y-auto bg-slate-50">
-                                <div className="max-w-xl mx-auto px-4 py-10">
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex items-center gap-4">
+                                <div className="max-w-xl mx-auto px-4 py-6">
+                                    <div className="bg-white p-3 rounded-2xl shadow-sm border mb-6 flex items-center gap-3">
                                         <div className="relative flex-1">
-                                            <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
-                                            <input type="text" placeholder="Tìm tên..." className="w-full pl-10 pr-4 py-2.5 bg-slate-100 rounded-xl outline-none focus:ring-2 ring-amber-500/20" onChange={(e) => setSearchTerm(e.target.value)}/>
+                                            <Icon name="search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
+                                            <input type="text" placeholder="Tìm tên..." className="w-full pl-9 pr-4 py-2 bg-slate-100 rounded-lg outline-none text-xs" onChange={(e) => setSearchTerm(e.target.value)}/>
                                         </div>
-                                        <button onClick={() => setAllOpen(!allOpen)} className="whitespace-nowrap px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-xl text-xs uppercase tracking-wider">
+                                        <button onClick={() => setAllOpen(!allOpen)} className="whitespace-nowrap px-3 py-2 bg-amber-100 text-amber-700 font-bold rounded-lg text-[9px] uppercase tracking-wider">
                                             {allOpen ? "Thu gọn" : "Mở hết"}
                                         </button>
                                     </div>
                                     <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} searchTerm={searchTerm} />
-                                    <div className="h-32 flex items-center justify-center">
-                                        <div className="h-[1px] w-12 bg-amber-300"></div>
-                                        <Icon name="award" className="mx-4 text-amber-500"/>
-                                        <div className="h-[1px] w-12 bg-amber-300"></div>
-                                    </div>
                                 </div>
                             </div>
-                        )}
-
-                        {viewMode === 'list' && (
-                            <button onClick={() => document.querySelector('.overflow-y-auto').scrollTo({top: 0, behavior: 'smooth'})} className="fixed bottom-8 right-8 w-14 h-14 bg-red-900 text-white rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition-all z-[60]">
-                                <Icon name="arrow-up" size={24} />
-                            </button>
                         )}
                     </main>
                 </div>
