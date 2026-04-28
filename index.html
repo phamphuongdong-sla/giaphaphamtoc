@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gia Phả Phạm Tộc - Đầy Đủ & Nhắc Giỗ</title>
+    <title>Gia Phả Phạm Tộc - Bản Hoàn Thiện & Nhắc Giỗ Thông Minh</title>
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -22,8 +22,8 @@
         .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 30px 30px; touch-action: none; position: relative; width: 100%; height: 100%; }
         .grab-container:active { cursor: grabbing; }
 
-        .node-card { transition: box-shadow 0.2s, transform 0.2s; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; user-select: none; background: white; }
-        .node-card:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+        .node-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; user-select: none; background: white; }
+        .node-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .node-card.highlight { ring: 4px solid #fbbf24; transform: scale(1.05); z-index: 50; }
 
         .tree-branch { display: flex; padding-top: 40px; position: relative; }
@@ -41,12 +41,11 @@
         .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 20px; }
         .header-glass { background: rgba(69, 10, 10, 0.98); backdrop-filter: blur(10px); z-index: 100; }
 
-        /* Animation cho Popup */
         @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
-        .animate-popup { animation: fadeInScale 0.3s ease-out forwards; }
+        .animate-popup { animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
 <body>
@@ -55,7 +54,7 @@
     <script type="text/babel">
         const { useState, useRef, useEffect, useMemo } = React;
 
-        // DỮ LIỆU GIỮ NGUYÊN 100% CHI TIẾT
+        // DỮ LIỆU GỐC BẢO TOÀN 100%
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
@@ -149,31 +148,52 @@
             ]
         };
 
-        // --- LOGIC NHẮC GIỖ ---
-        const checkAnniversary = (deathStr) => {
-            if (!deathStr || deathStr.includes("......") || deathStr.includes("Đã Mất")) return null;
-            const parts = deathStr.split('-');
-            if (parts.length < 2) return null;
+        // --- HỆ THỐNG QUÉT THÔNG MINH (QUÉT CẢ TRONG GHI CHÚ) ---
+        const extractDate = (str) => {
+            if (!str) return null;
+            // Tìm định dạng DD-MM (ví dụ 15-05) trong chuỗi bất kỳ
+            const match = str.match(/(\d{1,2})[-/](\d{1,2})/);
+            return match ? { d: parseInt(match[1]), m: parseInt(match[2]) - 1 } : null;
+        };
 
-            const d = parseInt(parts[0]);
-            const m = parseInt(parts[1]) - 1;
+        const getAnniversaries = (node, list = []) => {
+            // 1. Quét ngày mất chính thức
+            let date = extractDate(node.death);
+            if (date) {
+                const days = calculateDays(date);
+                if (days !== null) list.push({ name: node.name, days, dateStr: node.death });
+            }
+
+            // 2. Quét trong ghi chú (Tìm các bà vợ)
+            if (node.info && (node.info.toLowerCase().includes("mất") || node.info.toLowerCase().includes("giỗ"))) {
+                // Tách ghi chú theo các cụm "Mất" hoặc "Giỗ" để lấy ngày sau đó
+                const parts = node.info.split(/[M|m]ất|[G|g]iỗ/);
+                if (parts.length > 1) {
+                    parts.slice(1).forEach(part => {
+                        const subDate = extractDate(part);
+                        if (subDate) {
+                            const days = calculateDays(subDate);
+                            // Cố gắng tìm tên vợ trong ghi chú (thường đứng trước từ "mất")
+                            const nameMatch = node.info.match(/([A-ZÀ-Ỹ\s]{5,})/);
+                            const displayName = nameMatch ? `Bà ${nameMatch[0].trim()}` : `Vợ của ${node.name}`;
+                            if (days !== null) list.push({ name: displayName, days, dateStr: part.trim().substring(0, 10) });
+                        }
+                    });
+                }
+            }
+
+            if (node.children) node.children.forEach(c => getAnniversaries(c, list));
+            return list;
+        };
+
+        const calculateDays = (dateObj) => {
             const now = new Date();
-            const currentYear = now.getFullYear();
-            
-            let anni = new Date(currentYear, m, d);
-            const diff = Math.ceil((anni - now) / (1000 * 60 * 60 * 24));
-            
-            if (diff >= 0 && diff <= 15) return diff;
-            return null;
+            const target = new Date(now.getFullYear(), dateObj.m, dateObj.d);
+            const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+            return (diff >= 0 && diff <= 15) ? diff : null;
         };
 
-        const getAllAnniversaries = (node, results = []) => {
-            const daysLeft = checkAnniversary(node.death);
-            if (daysLeft !== null) results.push({ name: node.name, daysLeft, death: node.death });
-            if (node.children) node.children.forEach(c => getAllAnniversaries(c, results));
-            return results;
-        };
-
+        // --- GIAO DIỆN COMPONENT ---
         const Icon = ({ name, size = 16, className = "" }) => {
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
@@ -206,7 +226,7 @@
 
             const cardClasses = useMemo(() => {
                 let base = "node-card relative p-5 flex flex-col border ";
-                if (level === 0) return base + "bg-red-950 text-amber-100 w-80 border-amber-600 ring-4 ring-amber-900/20 shadow-2xl";
+                if (level === 0) return base + "bg-red-950 text-amber-100 w-80 border-amber-600 ring-4 ring-amber-900/20";
                 if (level === 1) return base + `${data.color} text-white w-72 border-white/20`;
                 if (data.title) return base + "bg-amber-50 border-amber-300 text-slate-800 w-64";
                 return base + "bg-white border-slate-200 text-slate-800 w-64";
@@ -216,7 +236,7 @@
                 <div className="tree-item">
                     <div className={`${cardClasses} ${isMatch ? 'highlight' : ''}`} onClick={(e) => { e.stopPropagation(); if(hasChildren) setIsOpen(!isOpen); }}>
                         {data.title && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase z-50 shadow-md">{data.title}</div>}
-                        <h3 className={`font-serif font-bold text-center leading-tight mb-1 ${level === 0 ? 'text-xl uppercase' : 'text-[15px]'}`}>{data.name}</h3>
+                        <h3 className={`font-serif font-bold text-center leading-tight mb-1 ${level === 0 ? 'text-xl' : 'text-[15px]'}`}>{data.name}</h3>
                         <FullInfo data={data} />
                         {hasChildren && <div className="mt-2 flex justify-center opacity-40"><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
                         {hasChildren && isOpen && <div className="parent-line" />}
@@ -238,7 +258,7 @@
 
             return (
                 <div className="w-full relative">
-                    <div className={`member-card-ml p-4 flex flex-col ${isMatch ? 'ring-4 ring-amber-400 scale-[1.02]' : ''} ${data.color ? 'border-l-4 border-amber-600' : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                    <div className={`member-card-ml p-4 flex flex-col ${isMatch ? 'ring-4 ring-amber-400 scale-[1.01]' : ''} ${data.color ? 'border-l-4 border-amber-600' : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         <div className="flex justify-between items-start">
                             <div className="flex-1">
                                 {data.title && <span className="inline-block bg-amber-100 text-amber-800 text-[9px] font-black px-2 py-0.5 rounded uppercase mb-1">{data.title}</span>}
@@ -265,14 +285,14 @@
             const [pos, setPos] = useState({ x: 0, y: 50 });
             const [anniversaries, setAnniversaries] = useState([]);
             const [showModal, setShowModal] = useState(false);
-            
+
             const isDragging = useRef(false);
             const startPos = useRef({ x: 0, y: 0 });
 
             useEffect(() => {
-                const list = getAllAnniversaries(GIA_PHA_DATA);
+                const list = getAnniversaries(GIA_PHA_DATA);
                 if (list.length > 0) {
-                    setAnniversaries(list.sort((a,b) => a.daysLeft - b.daysLeft));
+                    setAnniversaries(list.sort((a,b) => a.days - b.days));
                     setShowModal(true);
                 }
             }, []);
@@ -294,54 +314,57 @@
             const onEnd = () => { isDragging.current = false; };
 
             return (
-                <div className="h-screen w-full flex flex-col bg-[#fdfaf5]">
-                    {/* MODAL NHẮC GIỖ */}
+                <div className="h-screen w-full flex flex-col bg-[#fdfaf5] selection:bg-amber-200">
+                    {/* BẢNG NHẮC GIỖ THÔNG MINH */}
                     {showModal && (
-                        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-popup border-t-8 border-amber-600">
-                                <div className="bg-amber-50 p-6 text-center border-b border-amber-100">
-                                    <div className="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg ring-4 ring-amber-100">
-                                        <Icon name="bell" size={32} className="text-white"/>
+                        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+                            <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md overflow-hidden animate-popup border border-amber-100">
+                                <div className="bg-amber-600 p-8 text-center text-white relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+                                        <Icon name="bell" size={150} />
                                     </div>
-                                    <h2 className="font-serif text-2xl font-black text-amber-900">TƯỞNG NHỚ GIA TIÊN</h2>
-                                    <p className="text-amber-700 text-xs mt-1 font-bold uppercase tracking-widest">Danh sách ngày giỗ sắp tới</p>
+                                    <h2 className="font-serif text-3xl font-black mb-2">TƯỞNG NHỚ</h2>
+                                    <p className="text-amber-100 text-[10px] font-bold uppercase tracking-[0.2em]">Danh sách ngày giỗ sắp tới</p>
                                 </div>
-                                <div className="max-h-[45vh] overflow-y-auto p-4 space-y-3">
+                                <div className="max-h-[50vh] overflow-y-auto p-6 space-y-4">
                                     {anniversaries.map((item, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-amber-50 transition-colors">
-                                            <div className="flex-1">
-                                                <div className="font-bold text-slate-800 text-base">{item.name}</div>
-                                                <div className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Ngày mất: {item.death}</div>
+                                        <div key={idx} className="flex items-center gap-4 p-4 bg-amber-50/50 rounded-2xl border border-amber-100">
+                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm shrink-0">
+                                                <Icon name="heart" className="text-rose-500" size={20} />
                                             </div>
-                                            <div className="text-right ml-4">
-                                                <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${item.daysLeft === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-200 text-amber-900'}`}>
-                                                    {item.daysLeft === 0 ? "Hôm nay" : `Còn ${item.daysLeft} ngày`}
-                                                </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-bold text-slate-800 text-base truncate">{item.name}</div>
+                                                <div className="text-[10px] text-slate-500 font-bold uppercase">Ngày mất: {item.dateStr}</div>
+                                            </div>
+                                            <div className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase whitespace-nowrap ${item.days === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-200 text-amber-900'}`}>
+                                                {item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
-                                <button onClick={() => setShowModal(false)} className="w-full py-5 bg-slate-900 text-white font-black text-xs uppercase tracking-[0.2em] hover:bg-black transition-all active:scale-95">
-                                    Tiếp tục vào Gia phả
-                                </button>
+                                <div className="p-6">
+                                    <button onClick={() => setShowModal(false)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200">
+                                        Đóng thông báo
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
 
-                    <header className="h-20 header-glass text-white flex items-center justify-between px-6 shrink-0 shadow-xl">
+                    <header className="h-20 header-glass text-white flex items-center justify-between px-6 shrink-0 shadow-xl border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <div className="bg-amber-600 p-2 rounded-xl hidden sm:block"><Icon name="library" size={20}/></div>
+                            <div className="bg-amber-600 p-2.5 rounded-xl"><Icon name="scroll" size={20}/></div>
                             <div>
-                                <h1 className="font-serif text-lg font-black text-amber-200 uppercase">PHẠM TỘC GIA PHẢ</h1>
-                                <p className="text-white/40 text-[8px] font-bold uppercase tracking-widest mt-0.5">Phúc Đức Tại Mẫu</p>
+                                <h1 className="font-serif text-lg font-black text-amber-200 uppercase leading-none">PHẠM TỘC</h1>
+                                <p className="text-white/40 text-[8px] font-bold uppercase tracking-widest mt-1">Gia Phả Trường Tồn</p>
                             </div>
                         </div>
-                        <div className="flex bg-white/10 p-1 rounded-xl border border-white/10">
-                            <button onClick={() => setViewMode('list')} className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${viewMode === 'list' ? 'bg-amber-600 text-white' : 'text-white/40'}`}>
-                                <Icon name="list-tree" size={16}/> <span className="text-[10px] font-bold">DANH SÁCH</span>
+                        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 backdrop-blur-xl">
+                            <button onClick={() => setViewMode('list')} className={`px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all ${viewMode === 'list' ? 'bg-amber-600 shadow-lg text-white' : 'text-white/40 hover:text-white'}`}>
+                                <Icon name="align-left" size={16}/> <span className="text-[10px] font-black uppercase">Danh sách</span>
                             </button>
-                            <button onClick={() => setViewMode('tree')} className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${viewMode === 'tree' ? 'bg-amber-600 text-white' : 'text-white/40'}`}>
-                                <Icon name="network" size={16}/> <span className="text-[10px] font-bold">SƠ ĐỒ</span>
+                            <button onClick={() => setViewMode('tree')} className={`px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all ${viewMode === 'tree' ? 'bg-amber-600 shadow-lg text-white' : 'text-white/40 hover:text-white'}`}>
+                                <Icon name="layout-grid" size={16}/> <span className="text-[10px] font-black uppercase">Sơ đồ</span>
                             </button>
                         </div>
                     </header>
@@ -359,15 +382,17 @@
                                 onTouchMove={e => onMove(e.touches[0].clientX, e.touches[0].clientY)}
                                 onTouchEnd={onEnd}
                             >
-                                <div className="absolute bottom-6 right-6 z-40 flex flex-col gap-2 pointer-events-none">
-                                    <div className="bg-white/90 backdrop-blur p-3 rounded-xl shadow-lg border text-[9px] font-bold text-slate-500 mb-2 pointer-events-auto">
-                                        💡 Lăn chuột để Zoom <br/> 💡 Kéo để di chuyển
+                                <div className="absolute bottom-6 left-6 z-40 bg-white/80 backdrop-blur p-4 rounded-2xl shadow-xl border border-slate-200 max-w-[200px]">
+                                    <div className="text-[10px] font-black text-amber-800 uppercase mb-2">Hướng dẫn</div>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-500"><Icon name="mouse-pointer-2" size={12}/> Kéo để di chuyển</div>
+                                        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-500"><Icon name="maximize" size={12}/> Cuộn để phóng to/thu nhỏ</div>
                                     </div>
-                                    <div className="flex flex-col gap-2 pointer-events-auto">
-                                        <button onClick={() => setScale(s => Math.min(2, s+0.1))} className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-slate-800"><Icon name="zoom-in" /></button>
-                                        <button onClick={() => {setPos({x:0, y:50}); setScale(0.4);}} className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[10px] font-bold text-slate-800 uppercase">Gốc</button>
-                                        <button onClick={() => setScale(s => Math.max(0.1, s-0.1))} className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-slate-800"><Icon name="zoom-out" /></button>
-                                    </div>
+                                </div>
+                                <div className="absolute bottom-6 right-6 z-40 flex flex-col gap-3">
+                                    <button onClick={() => setScale(s => Math.min(2, s+0.1))} className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border border-slate-100 active:scale-90 transition-transform"><Icon name="plus" /></button>
+                                    <button onClick={() => {setPos({x:0, y:50}); setScale(0.4);}} className="w-12 h-12 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-[10px] font-black text-white uppercase active:scale-90 transition-transform">Gốc</button>
+                                    <button onClick={() => setScale(s => Math.max(0.1, s-0.1))} className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border border-slate-100 active:scale-90 transition-transform"><Icon name="minus" /></button>
                                 </div>
                                 <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-10 transition-transform duration-75">
                                     <TreeNode data={GIA_PHA_DATA} searchTerm={searchTerm} />
@@ -375,13 +400,13 @@
                             </div>
                         ) : (
                             <div className="list-viewport">
-                                <div className="max-w-2xl mx-auto px-4 py-6 pb-24">
-                                    <div className="bg-white p-3 rounded-2xl shadow-sm border mb-6 flex items-center gap-3 sticky top-4 z-40">
+                                <div className="max-w-2xl mx-auto px-4 py-8 pb-32">
+                                    <div className="bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 flex items-center gap-3 sticky top-4 z-40">
                                         <div className="relative flex-1">
-                                            <Icon name="search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
-                                            <input type="text" placeholder="Tìm tên thành viên..." className="w-full pl-9 pr-4 py-2.5 bg-slate-100 rounded-lg outline-none text-sm" onChange={(e) => setSearchTerm(e.target.value)}/>
+                                            <Icon name="search" size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"/>
+                                            <input type="text" placeholder="Tìm tên thành viên trong gia tộc..." className="w-full pl-11 pr-4 py-3 bg-slate-100/50 rounded-xl outline-none text-sm font-medium focus:ring-2 ring-amber-500/20 transition-all" onChange={(e) => setSearchTerm(e.target.value)}/>
                                         </div>
-                                        <button onClick={() => setAllOpen(!allOpen)} className="px-4 py-2.5 bg-amber-100 text-amber-700 font-bold rounded-lg text-[10px] uppercase">
+                                        <button onClick={() => setAllOpen(!allOpen)} className="px-5 py-3 bg-slate-900 text-white font-black rounded-xl text-[10px] uppercase tracking-wider whitespace-nowrap active:scale-95 transition-all">
                                             {allOpen ? "Thu gọn" : "Mở hết"}
                                         </button>
                                     </div>
