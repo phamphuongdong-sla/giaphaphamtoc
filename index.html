@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gia Phả Phạm Tộc - Đầy Đủ & Zoom</title>
+    <title>Gia Phả Phạm Tộc - Đầy Đủ & Nhắc Giỗ</title>
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -40,6 +40,13 @@
         .member-card-ml { background: white; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
         .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 20px; }
         .header-glass { background: rgba(69, 10, 10, 0.98); backdrop-filter: blur(10px); z-index: 100; }
+
+        /* Animation cho Popup */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-popup { animation: fadeInScale 0.3s ease-out forwards; }
     </style>
 </head>
 <body>
@@ -48,7 +55,7 @@
     <script type="text/babel">
         const { useState, useRef, useEffect, useMemo } = React;
 
-        // DỮ LIỆU GIỮ NGUYÊN 100% CHI TIẾT TỪ CODE ĐẦU TIÊN
+        // DỮ LIỆU GIỮ NGUYÊN 100% CHI TIẾT
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
@@ -56,7 +63,7 @@
                     name: "Bà cả: BÙI THỊ VÍCH", birth: "1888 Mậu Tý", death: "23-10-1957 Đinh Dậu", color: "bg-slate-900", deceased: true,
                     children: [
                         {
-                            name: "PHẠM VĂN COỎNG", title: "Trưởng tộc", birth: "1909 Kỷ Dậu", death: "13-9-1949 Kỷ Sửu", deceased: true,
+                            name: "PHẠM VĂN COỎNG", title: "Trưởng tộc", birth: "1909 Kỷ Dậu", death: "13-09-1949 Kỷ Sửu", deceased: true,
                             info: "Bà cả: Nguyễn Thị Phiềm (Sinh 1908-Mất 30-11-2015 Ất Mùi). Bà hai: Nguyễn Thị Viêm (Sinh: 1927 Đinh Mão)",
                             children: [
                                 {
@@ -142,12 +149,36 @@
             ]
         };
 
+        // --- LOGIC NHẮC GIỖ ---
+        const checkAnniversary = (deathStr) => {
+            if (!deathStr || deathStr.includes("......") || deathStr.includes("Đã Mất")) return null;
+            const parts = deathStr.split('-');
+            if (parts.length < 2) return null;
+
+            const d = parseInt(parts[0]);
+            const m = parseInt(parts[1]) - 1;
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            let anni = new Date(currentYear, m, d);
+            const diff = Math.ceil((anni - now) / (1000 * 60 * 60 * 24));
+            
+            if (diff >= 0 && diff <= 15) return diff;
+            return null;
+        };
+
+        const getAllAnniversaries = (node, results = []) => {
+            const daysLeft = checkAnniversary(node.death);
+            if (daysLeft !== null) results.push({ name: node.name, daysLeft, death: node.death });
+            if (node.children) node.children.forEach(c => getAllAnniversaries(c, results));
+            return results;
+        };
+
         const Icon = ({ name, size = 16, className = "" }) => {
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
-        // UI Chi tiết nội dung (Dùng chung cho cả 2 view)
         const FullInfo = ({ data }) => (
             <div className="text-left space-y-1.5 text-[11px] mt-2 pt-2 border-t border-current/10">
                 <div className="flex items-start gap-2 opacity-90">
@@ -232,10 +263,20 @@
             const [allOpen, setAllOpen] = useState(null);
             const [scale, setScale] = useState(0.5);
             const [pos, setPos] = useState({ x: 0, y: 50 });
+            const [anniversaries, setAnniversaries] = useState([]);
+            const [showModal, setShowModal] = useState(false);
+            
             const isDragging = useRef(false);
             const startPos = useRef({ x: 0, y: 0 });
 
-            // ZOOM BẰNG LĂN CHUỘT
+            useEffect(() => {
+                const list = getAllAnniversaries(GIA_PHA_DATA);
+                if (list.length > 0) {
+                    setAnniversaries(list.sort((a,b) => a.daysLeft - b.daysLeft));
+                    setShowModal(true);
+                }
+            }, []);
+
             const handleWheel = (e) => {
                 if (viewMode !== 'tree') return;
                 e.preventDefault();
@@ -254,6 +295,39 @@
 
             return (
                 <div className="h-screen w-full flex flex-col bg-[#fdfaf5]">
+                    {/* MODAL NHẮC GIỖ */}
+                    {showModal && (
+                        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-popup border-t-8 border-amber-600">
+                                <div className="bg-amber-50 p-6 text-center border-b border-amber-100">
+                                    <div className="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg ring-4 ring-amber-100">
+                                        <Icon name="bell" size={32} className="text-white"/>
+                                    </div>
+                                    <h2 className="font-serif text-2xl font-black text-amber-900">TƯỞNG NHỚ GIA TIÊN</h2>
+                                    <p className="text-amber-700 text-xs mt-1 font-bold uppercase tracking-widest">Danh sách ngày giỗ sắp tới</p>
+                                </div>
+                                <div className="max-h-[45vh] overflow-y-auto p-4 space-y-3">
+                                    {anniversaries.map((item, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-amber-50 transition-colors">
+                                            <div className="flex-1">
+                                                <div className="font-bold text-slate-800 text-base">{item.name}</div>
+                                                <div className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Ngày mất: {item.death}</div>
+                                            </div>
+                                            <div className="text-right ml-4">
+                                                <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${item.daysLeft === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-200 text-amber-900'}`}>
+                                                    {item.daysLeft === 0 ? "Hôm nay" : `Còn ${item.daysLeft} ngày`}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button onClick={() => setShowModal(false)} className="w-full py-5 bg-slate-900 text-white font-black text-xs uppercase tracking-[0.2em] hover:bg-black transition-all active:scale-95">
+                                    Tiếp tục vào Gia phả
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     <header className="h-20 header-glass text-white flex items-center justify-between px-6 shrink-0 shadow-xl">
                         <div className="flex items-center gap-3">
                             <div className="bg-amber-600 p-2 rounded-xl hidden sm:block"><Icon name="library" size={20}/></div>
