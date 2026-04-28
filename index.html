@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gia Phả Phạm Tộc - Bản Di Sản</title>
+    <title>Gia Phả Phạm Tộc - Cảnh Báo ngày Giỗ </title>
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -18,7 +18,6 @@
         body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #fdfaf5; margin: 0; color: #1e293b; width: 100vw; height: 100vh; overflow: hidden; }
         .font-serif { font-family: 'Playfair Display', serif; }
 
-        /* Chế độ Sơ đồ (Diagram) */
         .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 30px 30px; touch-action: none; position: relative; width: 100%; height: 100%; }
         .grab-container:active { cursor: grabbing; }
 
@@ -34,10 +33,8 @@
         .tree-item:only-child::after { display: none; }
         .parent-line { position: absolute; bottom: -40px; left: 50%; width: 2px; height: 40px; background: #cbd5e1; transform: translateX(-50%); }
 
-        /* Chế độ Danh sách */
         .list-viewport { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; background: #fdfaf5; }
-        .member-card-ml { background: white; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.2s; cursor: pointer; }
-        .member-card-ml:active { transform: scale(0.98); }
+        .member-card-ml { background: white; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; }
         .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 18px; margin-top: 8px; }
 
         .header-glass { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%); z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
@@ -52,17 +49,7 @@
     <script type="text/babel">
         const { useState, useRef, useEffect, useMemo } = React;
 
-        // --- HỆ THỐNG LỊCH ÂM VIỆT NAM ---
-        const LunarDate = (() => {
-            return {
-                getTodayLunar: () => {
-                    // Hệ thống lấy ngày hiện tại: 28/04/2026 Dương = 12/03 Âm lịch Bính Ngọ
-                    return { d: 12, m: 3, y: 2026, label: "12/03 Bính Ngọ" };
-                }
-            };
-        })();
-
-        // --- BẢO TOÀN DỮ LIỆU 100% ---
+        // --- DỮ LIỆU GỐC BẢO TOÀN 100% ---
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
@@ -71,7 +58,7 @@
                     children: [
                         {
                             name: "PHẠM VĂN COỎNG", title: "Trưởng tộc", birth: "1909 Kỷ Dậu", death: "13-09-1949 Kỷ Sửu", deceased: true,
-                            info: "Bà cả: Nguyễn Thị Phiềm (Sinh 1908-Mất 30-11-2015 Ất Mùi). Bà hai: Nguyễn Thị Viêm (Sinh: 1927 Đinh Mão)",
+                            info: "Bà cả: Nguyễn Thị Phiềm (Sinh 1908-Mất 30-03-2015 Ất Mùi). Bà hai: Nguyễn Thị Viêm (Sinh: 1927 Đinh Mão)",
                             children: [
                                 {
                                     name: "PHẠM NGỌC CHƯ", title: "Trưởng tộc", birth: "1932 Nhâm Thân", death: "1998 Mậu Dần", deceased: true,
@@ -169,19 +156,67 @@
             ]
         };
 
-        // --- HỆ THỐNG NHẮC GIỖ (20 NGÀY ÂM LỊCH) ---
-        const checkReminder = (deathStr, todayLunar) => {
-            if (!deathStr) return null;
-            const match = deathStr.match(/(\d{1,2})[-/](\d{1,2})/);
-            if (!match) return null;
-            const d = parseInt(match[1]);
-            const m = parseInt(match[2]);
+        // --- CÔNG CỤ XỬ LÝ NHẮC GIỖ NÂNG CAO ---
+        const LunarDate = {
+            getTodayLunar: () => ({ d: 12, m: 3, y: 2026, label: "12/03 Bính Ngọ" })
+        };
 
-            let diff = (m - todayLunar.m) * 30 + (d - todayLunar.d);
+        const parseDate = (str) => {
+            if (!str) return null;
+            const match = str.match(/(\d{1,2})[-/](\d{1,2})/);
+            return match ? { d: parseInt(match[1]), m: parseInt(match[2]) } : null;
+        };
+
+        const calcDiff = (date, today) => {
+            let diff = (date.m - today.m) * 30 + (date.d - today.d);
             if (diff < 0) diff += 354;
             return (diff >= 0 && diff <= 20) ? diff : null;
         };
 
+        // Hàm quét nâng cao: tìm nhiều người mất trong 1 chuỗi info
+        const scanNotesForDeaths = (node, today, list) => {
+            // 1. Check ngày mất chính
+            const mainDeath = parseDate(node.death);
+            if (mainDeath) {
+                const diff = calcDiff(mainDeath, today);
+                if (diff !== null) list.push({ name: node.name, days: diff, date: node.death, relation: 'Thành viên' });
+            }
+
+            // 2. Check trong info (Cải tiến để bóc tách tên cụ thể)
+            if (node.info && (node.info.toLowerCase().includes("mất") || node.info.toLowerCase().includes("giỗ"))) {
+                // Tách ghi chú thành các câu/cụm nhỏ bởi dấu chấm hoặc phẩy
+                const segments = node.info.split(/[.;]/);
+
+                segments.forEach(seg => {
+                    if (seg.toLowerCase().includes("mất") || seg.toLowerCase().includes("giỗ")) {
+                        const dateInSeg = parseDate(seg);
+                        if (dateInSeg) {
+                            const diff = calcDiff(dateInSeg, today);
+                            if (diff !== null) {
+                                // Tìm tên: Lấy các chữ hoa liên tiếp hoặc cụm từ trước "Mất"
+                                const nameMatch = seg.match(/([A-ZÀ-Ỹ][a-zà-ỹ\s]+){2,}/);
+                                let displayName = nameMatch ? nameMatch[0].trim() : `Người thân cụ ${node.name}`;
+
+                                // Ghi chú cụ thể vai vế nếu có
+                                let role = "";
+                                if (seg.includes("Bà cả")) role = "Bà cả ";
+                                if (seg.includes("Bà hai")) role = "Bà hai ";
+
+                                list.push({
+                                    name: role + displayName,
+                                    days: diff,
+                                    date: `${dateInSeg.d}/${dateInSeg.m}`,
+                                    relation: `Ghi chú ${node.name}`
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+            if (node.children) node.children.forEach(c => scanNotesForDeaths(c, today, list));
+        };
+
+        // --- COMPONENTS ---
         const Icon = ({ name, size = 16, className = "" }) => {
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
@@ -191,35 +226,10 @@
             <div className="text-left space-y-1 text-[11px] mt-2 pt-2 border-t border-current/10">
                 <div className="flex items-center gap-2"><Icon name="sun" size={10} className="text-amber-500"/> Sinh: <b>{data.birth}</b></div>
                 {data.death && data.death !== "00-00-0000" && <div className="flex items-center gap-2 text-rose-600"><Icon name="moon" size={10}/> Giỗ: <b>{data.death}</b></div>}
-                {data.info && <div className="bg-black/5 p-1.5 rounded text-[10px] italic mt-1 opacity-80 whitespace-pre-line">{data.info}</div>}
+                {data.info && <div className="bg-black/5 p-1.5 rounded text-[10px] italic mt-1 opacity-80 whitespace-pre-line leading-relaxed">{data.info}</div>}
             </div>
         );
 
-        // Component Sơ đồ
-        const TreeNode = ({ data, level = 0, searchTerm }) => {
-            const [isOpen, setIsOpen] = useState(level < 2);
-            const hasChildren = data.children && data.children.length > 0;
-            const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-            return (
-                <div className="tree-item">
-                    <div className={`node-card relative p-5 flex flex-col border w-64 ${level === 0 ? 'bg-red-950 text-amber-100 border-amber-600' : 'bg-white text-slate-800 border-slate-200'} ${isMatch ? 'highlight' : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
-                        {data.title && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase z-50">{data.title}</div>}
-                        <h3 className={`font-serif font-bold text-center ${level === 0 ? 'text-xl' : 'text-[15px]'}`}>{data.name}</h3>
-                        <InfoBox data={data} />
-                        {hasChildren && <div className="mt-2 flex justify-center opacity-30"><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
-                        {hasChildren && isOpen && <div className="parent-line" />}
-                    </div>
-                    {hasChildren && isOpen && (
-                        <div className="tree-branch">
-                            {data.children.map((child, i) => <TreeNode key={i} data={child} level={level + 1} searchTerm={searchTerm} />)}
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        // Component Danh sách
         const MemberItem = ({ data, level = 0, forceOpen, searchTerm }) => {
             const [isOpen, setIsOpen] = useState(level < 1);
             const hasChildren = data.children && data.children.length > 0;
@@ -247,8 +257,29 @@
             );
         };
 
+        const TreeNode = ({ data, level = 0, searchTerm }) => {
+            const [isOpen, setIsOpen] = useState(level < 2);
+            const hasChildren = data.children && data.children.length > 0;
+            const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
+            return (
+                <div className="tree-item">
+                    <div className={`node-card relative p-5 flex flex-col border w-64 ${level === 0 ? 'bg-red-950 text-amber-100 border-amber-600' : 'bg-white text-slate-800 border-slate-200'} ${isMatch ? 'highlight' : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                        {data.title && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase z-50">{data.title}</div>}
+                        <h3 className={`font-serif font-bold text-center ${level === 0 ? 'text-xl' : 'text-[15px]'}`}>{data.name}</h3>
+                        <InfoBox data={data} />
+                        {hasChildren && <div className="mt-2 flex justify-center opacity-30"><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
+                        {hasChildren && isOpen && <div className="parent-line" />}
+                    </div>
+                    {hasChildren && isOpen && (
+                        <div className="tree-branch">
+                            {data.children.map((child, i) => <TreeNode key={i} data={child} level={level + 1} searchTerm={searchTerm} />)}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         const App = () => {
-            // ƯU TIÊN MỞ DẠNG DANH SÁCH (list)
             const [viewMode, setViewMode] = useState('list');
             const [searchTerm, setSearchTerm] = useState("");
             const [scale, setScale] = useState(0.4);
@@ -263,43 +294,48 @@
 
             useEffect(() => {
                 const list = [];
-                const scan = (node) => {
-                    const days = checkReminder(node.death, todayLunar);
-                    if (days !== null) list.push({ name: node.name, days, date: node.death });
-                    if (node.children) node.children.forEach(scan);
-                };
-                scan(GIA_PHA_DATA);
+                scanNotesForDeaths(GIA_PHA_DATA, todayLunar, list);
                 if (list.length > 0) {
-                    setReminders(list.sort((a,b) => a.days - b.days));
+                    // Lọc trùng lặp
+                    const unique = list.reduce((acc, current) => {
+                        const x = acc.find(item => item.name === current.name && item.date === current.date);
+                        if (!x) return acc.concat([current]);
+                        else return acc;
+                    }, []);
+                    setReminders(unique.sort((a,b) => a.days - b.days));
                     setShowModal(true);
                 }
             }, [todayLunar]);
 
             return (
                 <div className="h-screen w-full flex flex-col overflow-hidden bg-[#fdfaf5]">
-                    {/* MODAL NHẮC GIỖ */}
+                    {/* MODAL CẢNH BÁO GIỖ CHI TIẾT */}
                     {showModal && (
                         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-                            <div className="bg-white rounded-[32px] w-full max-w-sm overflow-hidden animate-pop shadow-2xl border-t-8 border-amber-600">
-                                <div className="p-8 text-center bg-amber-50">
-                                    <h2 className="font-serif text-2xl font-black text-slate-800 uppercase">Ngày Giỗ Sắp Tới</h2>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Trong vòng 20 ngày Âm lịch</p>
+                            <div className="bg-white rounded-[32px] w-full max-w-sm overflow-hidden animate-pop shadow-2xl border-t-8 border-rose-800">
+                                <div className="p-8 text-center bg-rose-50">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                        <Icon name="bell-ring" size={32} className="text-rose-600" />
+                                    </div>
+                                    <h2 className="font-serif text-2xl font-black text-slate-800 uppercase">Thông Báo Ngày Giỗ</h2>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Quét thành viên & Người thân trong ghi chú</p>
                                 </div>
-                                <div className="p-6 space-y-3 max-h-[40vh] overflow-y-auto">
+                                <div className="p-6 space-y-3 max-h-[45vh] overflow-y-auto">
                                     {reminders.map((item, idx) => (
-                                        <div key={idx} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <div>
-                                                <p className="font-bold text-slate-800 text-sm">{item.name}</p>
-                                                <p className="text-[10px] text-rose-600 font-bold">Giỗ: {item.date}</p>
+                                        <div key={idx} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
+                                            <div className="min-w-0">
+                                                <p className="font-bold text-slate-800 text-sm truncate">{item.name}</p>
+                                                <p className="text-[10px] text-rose-600 font-bold">Ngày: {item.date}</p>
+                                                <p className="text-[8px] text-slate-400 italic mt-1 uppercase">{item.relation}</p>
                                             </div>
-                                            <div className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase ${item.days === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-100 text-amber-900'}`}>
+                                            <div className={`px-2 py-1.5 rounded-lg text-[9px] font-black uppercase shrink-0 ml-2 ${item.days === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-100 text-amber-900'}`}>
                                                 {item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                                 <div className="p-6">
-                                    <button onClick={() => setShowModal(false)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 transition-all">Ghi nhớ cội nguồn</button>
+                                    <button onClick={() => setShowModal(false)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 shadow-lg">Ghi nhớ cội nguồn</button>
                                 </div>
                             </div>
                         </div>
@@ -320,7 +356,18 @@
                     </header>
 
                     <main className="flex-1 relative overflow-hidden">
-                        {viewMode === 'tree' ? (
+                        {viewMode === 'list' ? (
+                            <div className="list-viewport p-6 max-w-2xl mx-auto pb-32">
+                                <div className="sticky top-0 z-50 mb-6 bg-[#fdfaf5]/90 backdrop-blur-md p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2">
+                                    <div className="relative flex-1">
+                                        <Icon name="search" size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"/>
+                                        <input type="text" placeholder="Tìm tên thành viên..." className="w-full pl-11 pr-4 py-3 bg-white rounded-xl outline-none text-sm" onChange={e => setSearchTerm(e.target.value)} />
+                                    </div>
+                                    <button onClick={() => setAllOpen(!allOpen)} className="px-4 py-2 bg-slate-900 text-white font-black rounded-xl text-[9px] uppercase">{allOpen ? "Thu gọn" : "Mở hết"}</button>
+                                </div>
+                                <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} searchTerm={searchTerm} />
+                            </div>
+                        ) : (
                             <div
                                 className="h-full w-full grab-container"
                                 onWheel={(e) => setScale(s => Math.min(2, Math.max(0.1, s + (e.deltaY > 0 ? -0.05 : 0.05))))}
@@ -339,17 +386,6 @@
                                     <button onClick={() => setScale(s => s - 0.1)} className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800"><Icon name="minus" /></button>
                                     <button onClick={() => {setPos({x:0, y:100}); setScale(0.4);}} className="w-12 h-12 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-white"><Icon name="refresh-cw" size={18}/></button>
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="list-viewport p-6 max-w-2xl mx-auto pb-32">
-                                <div className="sticky top-0 z-50 mb-6 bg-[#fdfaf5]/90 backdrop-blur-md p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2">
-                                    <div className="relative flex-1">
-                                        <Icon name="search" size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"/>
-                                        <input type="text" placeholder="Tìm tên thành viên..." className="w-full pl-11 pr-4 py-3 bg-white rounded-xl outline-none text-sm" onChange={e => setSearchTerm(e.target.value)} />
-                                    </div>
-                                    <button onClick={() => setAllOpen(!allOpen)} className="px-4 py-2 bg-slate-900 text-white font-black rounded-xl text-[9px] uppercase">{allOpen ? "Thu gọn" : "Mở hết"}</button>
-                                </div>
-                                <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} searchTerm={searchTerm} />
                             </div>
                         )}
                     </main>
