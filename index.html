@@ -21,15 +21,14 @@
         .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px); background-size: 40px 40px; touch-action: none; position: relative; width: 100%; height: 100%; }
         .grab-container:active { cursor: grabbing; }
 
-        /* BOX CHUẨN TRONG SƠ ĐỒ CÂY */
+        /* SƠ ĐỒ CÂY - GIỮ NGUYÊN KHUNG CHUẨN */
         .node-card {
             width: 300px;
-            height: 240px; /* Cố định chiều cao */
+            height: 240px;
             border-radius: 20px;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
             background: white;
             border: 1px solid #e2e8f0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: visible !important;
             display: flex;
@@ -37,56 +36,23 @@
         }
 
         .node-content-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border-radius: 20px;
-            overflow: hidden;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
+            position: relative; width: 100%; height: 100%; border-radius: 20px;
+            overflow: hidden; z-index: 10; display: flex; flex-direction: column; padding: 20px;
         }
 
         .deceased-ribbon {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 60px;
-            height: 60px;
-            overflow: hidden;
-            z-index: 30;
+            position: absolute; top: 0; left: 0; width: 60px; height: 60px; overflow: hidden; z-index: 30;
         }
         .deceased-ribbon::before {
-            content: "";
-            position: absolute;
-            top: 10px;
-            left: -22px;
-            width: 70px;
-            height: 18px;
-            background: #1a1a1a;
-            transform: rotate(-45deg);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            content: ""; position: absolute; top: 10px; left: -22px; width: 70px; height: 18px;
+            background: #1a1a1a; transform: rotate(-45deg); box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .badge-truong-toc {
-            position: absolute;
-            top: -14px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
             background: linear-gradient(135deg, #92400e 0%, #d97706 50%, #92400e 100%);
-            color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            border: 2px solid #fef3c7;
-            box-shadow: 0 4px 10px rgba(146, 64, 14, 0.4);
-            white-space: nowrap;
-            padding: 4px 16px;
-            border-radius: 99px;
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            z-index: 50;
+            color: white; border: 2px solid #fef3c7; box-shadow: 0 4px 10px rgba(146, 64, 14, 0.4);
+            white-space: nowrap; padding: 4px 16px; border-radius: 99px; font-size: 10px; font-weight: 900; z-index: 50;
         }
 
         .tree-branch { display: flex; padding-top: 60px; position: relative; }
@@ -98,22 +64,29 @@
         .tree-item:only-child::after { display: none; }
         .parent-line { position: absolute; bottom: -60px; left: 50%; width: 2px; height: 60px; background: #cbd5e1; transform: translateX(-50%); }
 
-        /* BOX CHUẨN TRONG DANH SÁCH */
+        /* DANH SÁCH - FIX LỖI THỤT LỀ QUÁ SÂU */
         .member-card-ml {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #f1f5f9;
-            margin-bottom: 12px;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            cursor: pointer;
-            overflow: hidden;
-            min-height: 140px; /* Đảm bảo form đều nhưng không gây kẹt cuộn */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: white; border-radius: 16px; border: 1px solid #f1f5f9;
+            margin-bottom: 8px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            cursor: pointer; overflow: hidden; min-height: 120px; display: flex; flex-direction: column;
+            width: 100%;
         }
-        .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 18px; margin-top: 8px; }
+
+        /* Chỉ thụt lề tối đa 3 cấp để bảo vệ không gian hiển thị trên mobile */
+        .node-container-ml {
+            border-left: 1.5px dashed #cbd5e1;
+            margin-left: 8px; /* Giảm từ 14px xuống 8px */
+            padding-left: 10px;
+            margin-top: 4px;
+        }
+
+        /* Khi lồng nhau quá sâu (đời thứ 4+), dừng thụt lề */
+        .node-container-ml .node-container-ml .node-container-ml .node-container-ml {
+            margin-left: 0;
+            padding-left: 4px;
+            border-left-style: solid;
+            border-left-color: #e2e8f0;
+        }
 
         .header-glass { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%); z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
 
@@ -127,7 +100,6 @@
     <script type="text/babel">
         const { useState, useRef, useEffect, useMemo } = React;
 
-        // --- CHUYỂN ĐỔI ÂM LỊCH ---
         const LunarConverter = (() => {
             const INT = Math.floor;
             const getJdn = (d, m, y) => {
@@ -150,7 +122,7 @@
             };
         })();
 
-        // --- DỮ LIỆU GIA PHẢ (GIỮ NGUYÊN 100%) ---
+        // DỮ LIỆU GIA PHẢ (GIỮ NGUYÊN 100%)
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
@@ -422,7 +394,7 @@
         };
 
         const InfoBox = ({ data, isDark = false }) => (
-            <div className={`text-left space-y-1.5 text-[11px] mt-2.5 pt-2.5 border-t ${isDark ? 'border-white/20' : 'border-current/10'}`}>
+            <div className={`text-left space-y-1.5 text-[11px] mt-2 pt-2 border-t ${isDark ? 'border-white/20' : 'border-current/10'}`}>
                 <div className={`flex items-center gap-2 font-medium ${isDark ? 'text-white/70' : 'text-slate-500'}`}>
                     <Icon name="sun" size={10} className="text-amber-500"/> Sinh: <b>{data.birth}</b>
                 </div>
@@ -432,7 +404,7 @@
                     </div>
                 )}
                 {data.info && (
-                    <div className={`${isDark ? 'bg-white/10 text-white/90' : 'bg-black/5 text-slate-600'} p-2 rounded-lg text-[10px] italic mt-2 opacity-80 border border-black/5 leading-relaxed`}>
+                    <div className={`${isDark ? 'bg-white/10 text-white/90' : 'bg-black/5 text-slate-600'} p-2 rounded-lg text-[10px] italic mt-1.5 leading-snug`}>
                         {data.info}
                     </div>
                 )}
@@ -447,14 +419,16 @@
 
             return (
                 <div className="w-full relative">
-                    <div className={`member-card-ml p-5 ${data.color || ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                    <div className={`member-card-ml p-4 ${data.color || ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         {data.deceased && <div className="deceased-ribbon"></div>}
-                        <div className="flex-1 flex flex-col justify-center z-10 relative pl-4">
-                            {data.title && <span className="badge-truong-toc !relative !top-0 !left-0 !transform-none px-2 py-0.5 mb-2 inline-block shadow-none border-none text-[9px]">{data.title}</span>}
+                        <div className="flex-1 flex flex-col justify-center z-10 relative pl-2">
                             <div className="flex justify-between items-start">
-                                <h3 className={`font-serif font-bold ${isCustomColor ? 'text-white' : (data.deceased ? 'text-slate-800' : 'text-red-900')} ${level === 0 ? 'text-xl' : 'text-[16px]'}`}>
-                                    {data.name}
-                                </h3>
+                                <div className="flex-1">
+                                    {data.title && <span className="bg-amber-600 text-white text-[9px] px-2 py-0.5 rounded-full mb-1.5 inline-block font-black uppercase">{data.title}</span>}
+                                    <h3 className={`font-serif font-bold ${isCustomColor ? 'text-white' : (data.deceased ? 'text-slate-800' : 'text-red-900')} ${level === 0 ? 'text-xl' : 'text-[15px]'}`}>
+                                        {data.name}
+                                    </h3>
+                                </div>
                                 {hasChildren && <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={18} className={`${isCustomColor ? 'text-white/50' : 'text-slate-300'} ml-2 mt-1`}/>}
                             </div>
                             <InfoBox data={data} isDark={isCustomColor} />
@@ -474,14 +448,12 @@
             const hasChildren = data.children && data.children.length > 0;
             const isSpouse = data.name.startsWith("Vợ:") || data.name.startsWith("Bà cả:") || data.name.startsWith("Bà hai:") || data.name.startsWith("Bà ba:");
             const isCustomColor = !!data.color;
-
             const nodeStyle = data.color || (level === 0 ? 'bg-red-950 text-amber-50 border-amber-600' : (isSpouse ? 'bg-amber-50 border-amber-200 italic text-slate-800' : 'bg-white text-slate-800 border-slate-200'));
 
             return (
                 <div className="tree-item">
                     <div className={`node-card ${nodeStyle}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         {data.title && <div className="badge-truong-toc">{data.title}</div>}
-
                         <div className="node-content-wrapper">
                             {data.deceased && <div className="deceased-ribbon"></div>}
                             <div className="z-20 relative flex flex-col h-full">
@@ -541,29 +513,29 @@
                                         </div>
                                     ))}
                                 </div>
-                                <div className="p-6"><button onClick={() => setShowModal(false)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg">Đóng để xem gia phả</button></div>
+                                <div className="p-6"><button onClick={() => setShowModal(false)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg">Đóng</button></div>
                             </div>
                         </div>
                     )}
                     <header className="h-24 header-glass text-white flex items-center justify-between px-6 shrink-0 sticky top-0">
-                        <div className="flex items-center gap-3"><div className="bg-amber-600 p-2.5 rounded-2xl shadow-inner border border-amber-500/30"><Icon name="scroll" size={22}/></div><div><h1 className="font-serif text-lg font-black text-amber-200 uppercase leading-none tracking-tight">PHẠM TỘC GIA PHẢ</h1><p className="text-white/50 text-[12px] font-bold uppercase mt-1.5 tracking-widest">HÔM NAY LÀ NGÀY: {todayLunar.label}</p></div></div>
+                        <div className="flex items-center gap-3"><div className="bg-amber-600 p-2.5 rounded-2xl shadow-inner border border-amber-500/30"><Icon name="scroll" size={22}/></div><div><h1 className="font-serif text-lg font-black text-amber-200 uppercase leading-none tracking-tight">PHẠM TỘC GIA PHẢ</h1><p className="text-white/50 text-[12px] font-bold uppercase mt-1.5 tracking-widest">{todayLunar.label}</p></div></div>
                         <div className="flex bg-black/20 p-1.5 rounded-2xl border border-white/10">
-                            <button onClick={() => setViewMode('list')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${viewMode === 'list' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>Danh sách</button>
-                            <button onClick={() => setViewMode('tree')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${viewMode === 'tree' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>Sơ đồ cây</button>
+                            <button onClick={() => setViewMode('list')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${viewMode === 'list' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>DANH SÁCH</button>
+                            <button onClick={() => setViewMode('tree')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${viewMode === 'tree' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>SƠ ĐỒ CÂY</button>
                         </div>
                     </header>
                     <main className="flex-1 relative overflow-hidden bg-[#fdfaf5]">
                         {viewMode === 'list' ? (
                             <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-                                <div className="p-6 max-w-2xl mx-auto pb-32">
-                                    <div className="flex justify-end mb-6"><button onClick={() => setAllOpen(!allOpen)} className="px-6 py-3 bg-slate-900 text-white font-black rounded-2xl text-[10px] uppercase shadow-lg tracking-widest active:scale-95">{allOpen ? "Thu gọn tất cả" : "Mở rộng tất cả"}</button></div>
+                                <div className="p-4 max-w-2xl mx-auto pb-32">
+                                    <div className="flex justify-end mb-4"><button onClick={() => setAllOpen(!allOpen)} className="px-4 py-2 bg-slate-900 text-white font-black rounded-xl text-[10px] uppercase shadow-lg active:scale-95">{allOpen ? "Thu gọn" : "Mở hết"}</button></div>
                                     <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} />
                                 </div>
                             </div>
                         ) : (
                             <div className="h-full w-full grab-container" onWheel={(e) => setScale(s => Math.min(2, Math.max(0.1, s + (e.deltaY > 0 ? -0.05 : 0.05))))} onMouseDown={e => { isDragging.current = true; startPos.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; }} onMouseMove={e => isDragging.current && setPos({ x: e.clientX - startPos.current.x, y: e.clientY - startPos.current.y })} onMouseUp={() => isDragging.current = false} onTouchStart={e => { isDragging.current = true; startPos.current = { x: e.touches[0].clientX - pos.x, y: e.touches[0].clientY - pos.y }; }} onTouchMove={e => isDragging.current && setPos({ x: e.touches[0].clientX - startPos.current.x, y: e.touches[0].clientY - startPos.current.y })} onTouchEnd={() => isDragging.current = false}>
                                 <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-10 transition-transform duration-75"><TreeNode data={GIA_PHA_DATA} /></div>
-                                <div className="absolute bottom-8 right-8 flex flex-col gap-3"><button onClick={() => setScale(s => s + 0.05)} className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border active:scale-90"><Icon name="plus" /></button><button onClick={() => setScale(s => s - 0.05)} className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border active:scale-90"><Icon name="minus" /></button><button onClick={() => {setPos({x:0, y:120}); setScale(0.35);}} className="w-14 h-14 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-white active:scale-90"><Icon name="refresh-cw" size={20}/></button></div>
+                                <div className="absolute bottom-8 right-8 flex flex-col gap-3"><button onClick={() => setScale(s => s + 0.05)} className="w-12 h-12 bg-white rounded-xl shadow-xl flex items-center justify-center text-slate-800 border"><Icon name="plus" /></button><button onClick={() => setScale(s => s - 0.05)} className="w-12 h-12 bg-white rounded-xl shadow-xl flex items-center justify-center text-slate-800 border"><Icon name="minus" /></button><button onClick={() => {setPos({x:0, y:120}); setScale(0.35);}} className="w-12 h-12 bg-amber-600 rounded-xl shadow-xl flex items-center justify-center text-white"><Icon name="refresh-cw" size={18}/></button></div>
                             </div>
                         )}
                     </main>
