@@ -21,7 +21,6 @@
         .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px); background-size: 40px 40px; touch-action: none; position: relative; width: 100%; height: 100%; }
         .grab-container:active { cursor: grabbing; }
 
-        /* Card trong sơ đồ cây */
         .node-card {
             border-radius: 20px;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
@@ -29,11 +28,9 @@
             border: 1px solid #e2e8f0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            /* Để huy hiệu có thể nhảy ra ngoài border */
             overflow: visible !important;
         }
 
-        /* Container riêng cho nội dung cần bo góc và cắt ribbon */
         .node-content-wrapper {
             position: relative;
             width: 100%;
@@ -43,7 +40,6 @@
             z-index: 10;
         }
 
-        /* Băng đen báo hiếu - Bên trái */
         .deceased-ribbon {
             position: absolute;
             top: 0;
@@ -65,7 +61,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Huy hiệu Trưởng Tộc - Kiểu bảng vàng */
         .badge-truong-toc {
             position: absolute;
             top: -18px;
@@ -134,12 +129,13 @@
             };
         })();
 
-        // --- DỮ LIỆU GIA PHẢ (GIỮ NGUYÊN 100%) ---
+        // --- DỮ LIỆU GIA PHẢ (ĐÃ CẬP NHẬT MÀU RIÊNG CHO 3 BÀ) ---
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
                 {
-                    name: "Bà cả: BÙI THỊ VÍCH", birth: "1888 Mậu Tý", death: "23-10-1957 Đinh Dậu", color: "bg-slate-900", deceased: true,
+                    name: "Bà cả: BÙI THỊ VÍCH", birth: "1888 Mậu Tý", death: "23-10-1957 Đinh Dậu",
+                    color: "bg-gradient-to-br from-indigo-900 to-slate-900 text-indigo-50 border-indigo-400", deceased: true,
                     children: [
                         {
                             name: "PHẠM VĂN COỎNG", title: "Trưởng họ", birth: "1909 Kỷ Dậu", death: "13-09-1949 Kỷ Sửu", deceased: true,
@@ -297,7 +293,8 @@
                     ]
                 },
                 {
-                    name: "Bà hai: NGUYỄN THỊ YẾN", birth: "1895 Ất Mùi", death: "21-04-1945 Ất Dậu", color: "bg-emerald-900", deceased: true,
+                    name: "Bà hai: NGUYỄN THỊ YẾN", birth: "1895 Ất Mùi", death: "21-04-1945 Ất Dậu",
+                    color: "bg-gradient-to-br from-emerald-900 to-teal-950 text-emerald-50 border-emerald-400", deceased: true,
                     children: [
                         {
                             name: "PHẠM NGỌC THẠCH", birth: "1929 Kỷ tỵ", death: "Đã Mất", deceased: true,
@@ -333,7 +330,8 @@
                     ]
                 },
                 {
-                    name: "Bà ba: NGUYỄN THỊ HOA", birth: "1889 Kỷ Sửu", death: "25-01-2001 Tân tỵ", color: "bg-amber-900", deceased: true,
+                    name: "Bà ba: NGUYỄN THỊ HOA", birth: "1889 Kỷ Sửu", death: "25-01-2001 Tân tỵ",
+                    color: "bg-gradient-to-br from-rose-900 to-red-950 text-rose-50 border-rose-400", deceased: true,
                     children: [
                         {
                             name: "PHẠM NGỌC SINH", birth: "1947 Đinh Hợi",
@@ -351,7 +349,7 @@
                                         {
                                             name: "PHẠM ĐỨC CƯỜNG", birth: "26-03-1975 (15-02 Ất Mão)",
                                             children: [
-                                                { name: "Vợ: ĐỖ THỊ LOAN", birth: "22-08-1979 (27-06 Quý Mùi)", children: [{name: "PHẠM Quỳnh Anh", birth: "21-02-2002 (10-01 Nhâm Ngọ)"}, {name: "PHẠM QUỲNH GIAO", birth: "01-06-2013 (23-04 Quý Tỵ)"}] }
+                                                { name: "Vợ: ĐỖ THỊ LOAN", birth: "22-08-1979 (27-06 Quý Mùi)", children: [{name: "PHẠM QUỲNH ANH", birth: "21-02-2002 (10-01 Nhâm Ngọ)"}, {name: "PHẠM QUỲNH GIAO", birth: "01-06-2013 (23-04 Quý Tỵ)"}] }
                                             ]
                                         },
                                         {
@@ -402,29 +400,43 @@
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
-        const InfoBox = ({ data }) => (
-            <div className="text-left space-y-1.5 text-[11px] mt-2.5 pt-2.5 border-t border-current/10">
-                <div className="flex items-center gap-2 text-slate-500 font-medium"><Icon name="sun" size={10} className="text-amber-500"/> Sinh: <b>{data.birth}</b></div>
-                {data.death && data.death !== "00-00-0000" && <div className="flex items-center gap-2 text-rose-700 font-bold"><Icon name="moon" size={10}/> Giỗ: <b>{data.death}</b></div>}
-                {data.info && <div className="bg-black/5 p-2 rounded-lg text-[10px] italic mt-2 opacity-80 border border-black/5 leading-relaxed">{data.info}</div>}
+        const InfoBox = ({ data, isDark = false }) => (
+            <div className={`text-left space-y-1.5 text-[11px] mt-2.5 pt-2.5 border-t ${isDark ? 'border-white/20' : 'border-current/10'}`}>
+                <div className={`flex items-center gap-2 font-medium ${isDark ? 'text-white/70' : 'text-slate-500'}`}>
+                    <Icon name="sun" size={10} className="text-amber-500"/> Sinh: <b>{data.birth}</b>
+                </div>
+                {data.death && data.death !== "00-00-0000" && (
+                    <div className={`flex items-center gap-2 font-bold ${isDark ? 'text-amber-300' : 'text-rose-700'}`}>
+                        <Icon name="moon" size={10}/> Giỗ: <b>{data.death}</b>
+                    </div>
+                )}
+                {data.info && (
+                    <div className={`${isDark ? 'bg-white/10 text-white/90' : 'bg-black/5 text-slate-600'} p-2 rounded-lg text-[10px] italic mt-2 opacity-80 border border-black/5 leading-relaxed`}>
+                        {data.info}
+                    </div>
+                )}
             </div>
         );
 
         const MemberItem = ({ data, level = 0, forceOpen }) => {
             const [isOpen, setIsOpen] = useState(level < 1);
             const hasChildren = data.children && data.children.length > 0;
+            const isCustomColor = !!data.color;
             useEffect(() => { if (forceOpen !== null) setIsOpen(forceOpen); }, [forceOpen]);
+
             return (
                 <div className="w-full relative">
-                    <div className="member-card-ml p-4 flex flex-col" onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                    <div className={`member-card-ml p-4 flex flex-col ${data.color || ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         {data.deceased && <div className="deceased-ribbon"></div>}
                         <div className="flex justify-between items-start z-10">
                             <div className="flex-1 pr-4 pl-4">
                                 {data.title && <span className="badge-truong-toc !relative !top-0 !left-0 !transform-none px-2 py-0.5 mb-2 inline-block shadow-none border-none text-[9px]">{data.title}</span>}
-                                <h3 className={`font-serif font-bold ${data.deceased ? 'text-slate-800' : 'text-red-900'} ${level === 0 ? 'text-lg' : 'text-[15px]'}`}>{data.name}</h3>
-                                <InfoBox data={data} />
+                                <h3 className={`font-serif font-bold ${isCustomColor ? 'text-white' : (data.deceased ? 'text-slate-800' : 'text-red-900')} ${level === 0 ? 'text-lg' : 'text-[15px]'}`}>
+                                    {data.name}
+                                </h3>
+                                <InfoBox data={data} isDark={isCustomColor} />
                             </div>
-                            {hasChildren && <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={18} className="text-slate-300 ml-2 mt-1"/>}
+                            {hasChildren && <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={18} className={`${isCustomColor ? 'text-white/50' : 'text-slate-300'} ml-2 mt-1`}/>}
                         </div>
                     </div>
                     {hasChildren && isOpen && (
@@ -439,18 +451,25 @@
         const TreeNode = ({ data, level = 0 }) => {
             const [isOpen, setIsOpen] = useState(level < 1);
             const hasChildren = data.children && data.children.length > 0;
-            const isSpouse = data.name.startsWith("Vợ:") || data.name.startsWith("Bà cả:") || data.name.startsWith("Bà hai:");
+            const isSpouse = data.name.startsWith("Vợ:") || data.name.startsWith("Bà cả:") || data.name.startsWith("Bà hai:") || data.name.startsWith("Bà ba:");
+            const isCustomColor = !!data.color;
+
+            // Logic màu sắc: Ưu tiên màu riêng, sau đó đến màu gốc, sau đó đến màu vợ chồng
+            const nodeStyle = data.color || (level === 0 ? 'bg-red-950 text-amber-50 border-amber-600' : (isSpouse ? 'bg-amber-50 border-amber-200 italic text-slate-800' : 'bg-white text-slate-800 border-slate-200'));
+
             return (
                 <div className="tree-item">
-                    <div className={`node-card p-6 flex flex-col border w-72 ${level === 0 ? 'bg-red-950 text-amber-50 border-amber-600' : (isSpouse ? 'bg-amber-50 border-amber-200 italic' : 'bg-white text-slate-800 border-slate-200')}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                    <div className={`node-card p-6 flex flex-col border w-72 ${nodeStyle}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         {data.title && <div className="badge-truong-toc">{data.title}</div>}
 
                         <div className="node-content-wrapper">
                             {data.deceased && <div className="deceased-ribbon"></div>}
                             <div className="z-20 relative px-2">
-                                <h3 className={`font-serif font-bold text-center leading-tight mt-1 mb-1 ${level === 0 ? 'text-2xl' : 'text-[17px]'}`}>{data.name}</h3>
-                                <InfoBox data={data} />
-                                {hasChildren && <div className="mt-4 flex justify-center opacity-30"><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
+                                <h3 className={`font-serif font-bold text-center leading-tight mt-1 mb-1 ${level === 0 ? 'text-2xl' : 'text-[17px]'} ${isCustomColor ? 'text-white' : ''}`}>
+                                    {data.name}
+                                </h3>
+                                <InfoBox data={data} isDark={isCustomColor || level === 0} />
+                                {hasChildren && <div className={`mt-4 flex justify-center ${isCustomColor ? 'opacity-50' : 'opacity-30'}`}><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
                             </div>
                         </div>
                         {hasChildren && isOpen && <div className="parent-line" />}
