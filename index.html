@@ -49,7 +49,7 @@
     <script type="text/babel">
         const { useState, useRef, useEffect, useMemo } = React;
 
-        // --- THUẬT TOÁN CHUYỂN ĐỔI DƯƠNG LỊCH -> ÂM LỊCH (Hồ Ngọc Đức) ---
+        // --- THUẬT TOÁN CHUYỂN ĐỔI DƯƠNG LỊCH -> ÂM LỊCH ---
         const LunarConverter = (() => {
             const INT = Math.floor;
             const getJdn = (d, m, y) => {
@@ -58,8 +58,6 @@
                 return INT(365.25 * (y + 4716)) + INT(30.6001 * (m + 1)) + d + (2 - a + INT(a / 4)) - 1524.5;
             };
 
-            // Hàm chuyển đổi chính xác dựa trên thời gian thực
-            // Bản rút gọn tối ưu cho ứng dụng web di động
             return {
                 getLunarToday: () => {
                     const now = new Date();
@@ -67,20 +65,14 @@
                     const m = now.getMonth() + 1;
                     const y = now.getFullYear();
 
-                    // Tính toán xấp xỉ cho mục đích nhắc giỗ (Sai số < 1 ngày)
-                    // Lưu ý: Đối với Gia Phả, người dùng thường quan tâm ngày/tháng âm.
-                    // Ngày 28/04/2026 Dương là 12/03 Âm
-                    // Chúng ta sẽ tính dựa trên sự chênh lệch (offset) từ ngày mốc
                     const baseJdn = getJdn(28, 4, 2026);
                     const currentJdn = getJdn(d, m, y);
                     const diffDays = currentJdn - baseJdn;
 
-                    // Ngày âm cơ bản (Mốc 12/03/2026)
                     let ld = 12 + diffDays;
                     let lm = 3;
                     let ly = 2026;
 
-                    // Logic nhảy tháng đơn giản cho Âm lịch (xấp xỉ 29.5 ngày)
                     while (ld > 29) { ld -= 30; lm++; }
                     while (ld <= 0) { ld += 30; lm--; }
                     if (lm > 12) { lm = 1; ly++; }
@@ -91,7 +83,7 @@
             };
         })();
 
-        // --- DỮ LIỆU GỐC BẢO TOÀN 100% ---
+        // --- DỮ LIỆU ĐÃ CẬP NHẬT TÁCH RIÊNG VỢ CHO TẤT CẢ THÀNH VIÊN ---
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
@@ -100,65 +92,155 @@
                     children: [
                         {
                             name: "PHẠM VĂN COỎNG", title: "Trưởng tộc", birth: "1909 Kỷ Dậu", death: "13-09-1949 Kỷ Sửu", deceased: true,
-                            info: "Bà cả: Nguyễn Thị Phiềm (Sinh 1908-Mất 03-11-2014 Giáp Ngọ). Bà hai: Nguyễn Thị Viêm (Sinh: 1927 Đinh Mão)",
                             children: [
                                 {
-                                    name: "PHẠM NGỌC CHƯ", title: "Trưởng tộc", birth: "1932 Nhâm Thân", death: "1998 Mậu Dần", deceased: true,
-                                    info: "Vợ: PHẠM THỊ UYÊN (S: 1933 Quý Dậu)",
+                                    name: "Bà cả: NGUYỄN THỊ PHIỀM", birth: "1908", death: "03-11-2014 Giáp Ngọ", deceased: true,
                                     children: [
-                                        { name: "PHẠM NGỌC CHI", title: "Trưởng tộc", birth: "01-05-1956 (21-03 Bính Thân)", info: "Vợ Nguyễn Thị Sen 21-10-1959 (19-9 Kỷ hợi) có 2 con", children: [{name: "PHẠM TUYẾT THU", birth: "07-12-1984 (15-11 Giáp tý)"}, {name: "PHẠM THỊ THƯƠNG HUYỀN", birth: "08-05-1987 (11-04 Đinh Mão)"}] },
-                                        { name: "PHẠM HUY CẨN", birth: "09-05-1962 (05-04 Nhâm Dần)", children: [{name: "PHẠM THỊ THÙY LINH", birth: "13-04-1999 (28-02 Kỷ Mão)"}]},
-                                        { name: "PHẠM THỊ XUÂN", birth: "10-12-1965 (18-11 Ất tỵ)" },
-                                        { name: "PHẠM ANH TIẾN", birth: "26-09-1969 (15-08 Kỷ Dậu)", info: "Vợ PHÌN THỊ THÙY Sinh 26-07-1977 (12-06 Đinh Tỵ)", children: [{name: "PHẠM THÁI BÌNH", birth: "24-11-2003 (01-10 Quý Mùi)"}, {name: "PHẠM NGỌC DIỆU GIANG", birth: "12-07-2011 (11-06 Tân Mão)"}] },
-                                        { name: "PHẠM MINH CHÁNH", birth: "01-05-1971 ", death: "Đã Mất", info: "Chưa vợ", deceased: true },
-                                        { name: "PHẠM TRỌNG TUỆ", birth: "26-08-1977 (12-07 Đinh Tỵ)", info: "Vợ TRẦN THỊ THÁI có hai con" , children: [{name: "PHẠM KHÁNH VY", birth: "19-03-2008 (12-02 Mậu tý)"}, {name: "PHẠM NGỌC MINH", birth: "22-05-2012 (02-04 Nhâm Thìn)"}]},
+                                        {
+                                            name: "PHẠM NGỌC CHƯ", title: "Trưởng tộc", birth: "1932 Nhâm Thân", death: "1998 Mậu Dần", deceased: true,
+                                            children: [
+                                                {
+                                                    name: "Vợ: PHẠM THỊ UYÊN", birth: "1933 Quý Dậu",
+                                                    children: [
+                                                        {
+                                                            name: "PHẠM NGỌC CHI", title: "Trưởng tộc", birth: "01-05-1956 (21-03 Bính Thân)",
+                                                            children: [
+                                                                { name: "Vợ: NGUYỄN THỊ SEN", birth: "21-10-1959 (19-9 Kỷ hợi)", children: [{name: "PHẠM TUYẾT THU", birth: "07-12-1984 (15-11 Giáp tý)"}, {name: "PHẠM THỊ THƯƠNG HUYỀN", birth: "08-05-1987 (11-04 Đinh Mão)"}] }
+                                                            ]
+                                                        },
+                                                        { name: "PHẠM HUY CẨN", birth: "09-05-1962 (05-04 Nhâm Dần)", children: [{name: "PHẠM THỊ THÙY LINH", birth: "13-04-1999 (28-02 Kỷ Mão)"}]},
+                                                        { name: "PHẠM THỊ XUÂN", birth: "10-12-1965 (18-11 Ất tỵ)" },
+                                                        {
+                                                            name: "PHẠM ANH TIẾN", birth: "26-09-1969 (15-08 Kỷ Dậu)",
+                                                            children: [
+                                                                { name: "Vợ: PHÌN THỊ THÙY", birth: "26-07-1977 (12-06 Đinh Tỵ)", children: [{name: "PHẠM THÁI BÌNH", birth: "24-11-2003 (01-10 Quý Mùi)"}, {name: "PHẠM NGỌC DIỆU GIANG", birth: "12-07-2011 (11-06 Tân Mão)"}] }
+                                                            ]
+                                                        },
+                                                        { name: "PHẠM MINH CHÁNH", birth: "01-05-1971 ", death: "Đã Mất", info: "Chưa vợ", deceased: true },
+                                                        {
+                                                            name: "PHẠM TRỌNG TUỆ", birth: "26-08-1977 (12-07 Đinh Tỵ)",
+                                                            children: [
+                                                                { name: "Vợ: TRẦN THỊ THÁI", children: [{name: "PHẠM KHÁNH VY", birth: "19-03-2008 (12-02 Mậu tý)"}, {name: "PHẠM NGỌC MINH", birth: "22-05-2012 (02-04 Nhâm Thìn)"}] }
+                                                            ]
+                                                        },
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        { name: "PHẠM THỊ NÙI", birth: "1938 Mậu Dần", death: "......", info: "Con Bà Cả", deceased: true },
+                                        { name: "PHẠM THỊ DUNG", birth: "1940 Canh Thìn", death: "16-07-1986 Bính Dần", info: "Con Bà Cà", deceased: true },
+                                        {
+                                            name: "PHẠM TUẤN KHANH", birth: "1942 Nhâm Ngọ", death: "16-11-2013 Quý Hợi", info: "Con Bà Cả", deceased: true,
+                                            children: [
+                                                {
+                                                    name: "Vợ: ĐINH THỊ CÚC", birth: "1946 Bính Tuất",
+                                                    children: [
+                                                        {
+                                                            name: "PHẠM TUYÊN", birth: "1969 Kỷ Dậu", death: "30-09-1999 Kỷ Mão", deceased: true,
+                                                            children: [
+                                                                { name: "Vợ: NGUYỄN THỊ VÂN", birth: "1971 Tân Hợi", children: [{name: "PHẠM THỊ LAN HƯƠNG", birth: "13-03-1996 (23-01 Bính Tý)"}] }
+                                                            ]
+                                                        },
+                                                        {
+                                                            name: "PHẠM TUẤN DƯƠNG", birth: "28-09-1970 (28-08 Canh Tuất)",
+                                                            children: [
+                                                                { name: "Vợ: TRẦN THỊ HUYỀN", birth: "19-06-1977 (03-05 Đinh Tỵ)", children: [{name: "PHẠM TRẦN KHIÊM", death: " ", deceased: true}, {name: "PHẠM PHƯƠNG THẢO", birth: "18-12-2005 (17-11 Ất Dậu)"}] }
+                                                            ]
+                                                        },
+                                                        { name: "PHẠM KIỀU VÂN", birth: "22-04-1976 Bính Thìn", info: "sống ở Hà Giang"},
+                                                    ]
+                                                }
+                                            ]
+                                        },
                                     ]
                                 },
-                                { name: "PHẠM THỊ NÙI", birth: "1938 Mậu Dần", death: "......", info: "Con Bà Cả", deceased: true },
-                                { name: "PHẠM THỊ DUNG", birth: "1940 Canh Thìn", death: "16-07-1986 Bính Dần", info: "Con Bà Cà", deceased: true },
                                 {
-                                    name: "PHẠM TUẤN KHANH", birth: "1942 Nhâm Ngọ", death: "16-11-2013 Quý Hợi", info: "Con Bà Cả, Vợ: ĐINH THỊ CÚC Sinh 1946 Bính Tuất có ba con", deceased: true,
+                                    name: "Bà hai: NGUYỄN THỊ VIÊM", birth: "1927 Đinh Mão",
                                     children: [
-                                        { name: "PHẠM TUYÊN", birth: "1969 Kỷ Dậu", death: "30-09-1999 Kỷ Mão", info: "Vợ NGUYỄN THỊ VÂN 1971 Tân Hợi", deceased: true, children: [{name: "PHẠM THỊ LAN HƯƠNG", birth: "13-03-1996 (23-01 Bính Tý)"}] },
-                                        { name: "PHẠM TUẤN DƯƠNG", birth: "28-09-1970 (28-08 Canh Tuất)", info: "Vợ TRẦN THỊ HUYỀN Sinh 19-06-1977 (03-05 Đinh Tỵ) có hai con", children: [{name: "PHẠM TRẦN KHIÊM", death: " ", deceased: true}, {name: "PHẠM PHƯƠNG THẢO", birth: "18-12-2005 (17-11 Ất Dậu)"}]},
-                                        { name: "PHẠM KIỀU VÂN", birth: "22-04-1976 Bính Thìn", info: "sống ở Hà Giang"},
+                                        { name: "PHẠM THỊ DINH", birth: "1950 Canh Dần", info: "Con Bà Hai" },
                                     ]
-                                },
-                                { name: "PHẠM THỊ DINH", birth: "1950 Canh Dần", info: "Con Bà Hai" },
+                                }
                             ]
                         },
                         { name: "PHẠM NGỌC XIÊM", birth: "1920 Canh Thân", death: "18-02-1945 Ất Dậu ", info: "Mất ở đồn điền Cao Su", deceased: true },
                         {
                             name: "PHẠM NGỌC CƠ", birth: "1922 Nhâm Tuất", death: "02-04-1977 Đinh Tỵ", deceased: true,
-                            info: "Vợ: NGUYỄN THỊ CÚC (Sinh: 1923 Quý Hợi - Mất: 26-09-1963 Quý Mão)",
                             children: [
-                                { name: "PHẠM THỊ NHẠN", birth: "1944 Giáp Thân", info: "Có 2 con sống cùng con gái ở Vĩnh Phúc" },
-                                { name: "PHẠM THỊ NHIÊN", birth: "1948 Mậu Tý", info: "có 5 người con sống ở Diêm Điền" },
-                                { name: "PHẠM MINH ĐỨC", birth: "18-10-1953 Quý Tỵ", death: "02-08-2022 Nhâm Dần", deceased: true, info: "Vợ: HOÀNG THỊ XUYẾN Sinh 01-10-1949 Kỷ Sửu Mất 24-02-2025 Ất Tỵ có 3 người con",
-                                    children: [
-                                        { name: "PHẠM THỊ KIM XUÂN", birth: "02-08-1979 (10-06 Kỷ Mùi)" },
-                                        { name: "PHẠM PHƯƠNG ĐÔNG", birth: "29-12-1981 (04-12 Tân Dậu)", info: "Vợ HOÀNG THANH HUYỀN Sinh 02-09-1985 (Ất Sửu)", children: [{name: "PHẠM HOÀNG DƯƠNG", birth: "14-06-2011 (Tân Mão)"}] },
-                                        { name: "PHẠM PHƯƠNG NAM", birth: "20-10-1984 (26-09 Giáp tý)", info: "Vợ PHAN THỊ HỒNG Sinh 04-10-1989 (Kỷ Tỵ) Có 2 con", children: [{name: "PHẠM THỦY PHƯƠNG ANH", birth: "07-12-2012 (04-11 Nhâm Thìn)"}, {name: "PHẠM NAM ANH", birth: "29-08-2016 (27-07 Bính Thân)"}] },
-                                    ]},
                                 {
-                                    name: "PHẠM NGỌC THANH", birth: "13-09-1959 Kỷ Hợi", death: "19-08-2008 Mậu Tý", deceased: true, info: "Vợ: ĐẶNG PHƯƠNG DUNG Sinh 21-10-1960 (01-09 Canh tý) có 3 con",
+                                    name: "Vợ: NGUYỄN THỊ CÚC", birth: "1923 Quý Hợi", death: "26-09-1963 Quý Mão", deceased: true,
                                     children: [
-                                        { name: "PHẠM DIỆU HƯƠNG", birth: "20-11-1983 (16-10 Quý Hợi)"},
-                                        { name: "PHẠM DIỆU VÂN", birth: "31-07-1986 (25-06 Bính Dần)"},
-                                        { name: "PHẠM MINH ĐÔ", birth: "27-08-1990 (06-07 Canh Ngọ)", info: "Vợ NGUYỄN THỊ LÝ HƯỜNG Sinh 22-05-1990 (28-04 Canh Ngọ) Có 3 con", children: [{name: "PHẠM TRÚC LAM", birth: "22-12-2017 (04-11 Nhâm Thìn)"}, {name: "PHẠM MINH QUÂN", birth: "8/9/2020"}, {name: "PHẠM MINH DƯƠNG", birth: "10/7/2024"}] },
+                                        { name: "PHẠM THỊ NHẠN", birth: "1944 Giáp Thân", info: "Có 2 con sống cùng con gái ở Vĩnh Phúc" },
+                                        { name: "PHẠM THỊ NHIÊN", birth: "1948 Mậu Tý", info: "có 5 người con sống ở Diêm Điền" },
+                                        {
+                                            name: "PHẠM MINH ĐỨC", birth: "18-10-1953 Quý Tỵ", death: "02-08-2022 Nhâm Dần", deceased: true,
+                                            children: [
+                                                {
+                                                    name: "Vợ: HOÀNG THỊ XUYẾN", birth: "01-10-1949 Kỷ Sửu", death: "24-02-2025 Ất Tỵ", deceased: true,
+                                                    children: [
+                                                        { name: "PHẠM THỊ KIM XUÂN", birth: "02-08-1979 (10-06 Kỷ Mùi)" },
+                                                        {
+                                                            name: "PHẠM PHƯƠNG ĐÔNG", birth: "29-12-1981 (04-12 Tân Dậu)",
+                                                            children: [
+                                                                { name: "Vợ: HOÀNG THANH HUYỀN", birth: "02-09-1985 (Ất Sửu)", children: [{name: "PHẠM HOÀNG DƯƠNG", birth: "14-06-2011 (Tân Mão)"}] }
+                                                            ]
+                                                        },
+                                                        {
+                                                            name: "PHẠM PHƯƠNG NAM", birth: "20-10-1984 (26-09 Giáp tý)",
+                                                            children: [
+                                                                { name: "Vợ: PHAN THỊ HỒNG", birth: "04-10-1989 (Kỷ Tỵ)", children: [{name: "PHẠM THỦY PHƯƠNG ANH", birth: "07-12-2012 (04-11 Nhâm Thìn)"}, {name: "PHẠM NAM ANH", birth: "29-08-2016 (27-07 Bính Thân)"}] }
+                                                            ]
+                                                        },
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            name: "PHẠM NGỌC THANH", birth: "13-09-1959 Kỷ Hợi", death: "19-08-2008 Mậu Tý", deceased: true,
+                                            children: [
+                                                {
+                                                    name: "Vợ: ĐẶNG PHƯƠNG DUNG", birth: "21-10-1960 (01-09 Canh tý)",
+                                                    children: [
+                                                        { name: "PHẠM DIỆU HƯƠNG", birth: "20-11-1983 (16-10 Quý Hợi)"},
+                                                        { name: "PHẠM DIỆU VÂN", birth: "31-07-1986 (25-06 Bính Dần)"},
+                                                        {
+                                                            name: "PHẠM MINH ĐÔ", birth: "27-08-1990 (06-07 Canh Ngọ)",
+                                                            children: [
+                                                                { name: "Vợ: NGUYỄN THỊ LÝ HƯỜNG", birth: "22-05-1990 (28-04 Canh Ngọ)", children: [{name: "PHẠM TRÚC LAM", birth: "22-12-2017 (04-11 Nhâm Thìn)"}, {name: "PHẠM MINH QUÂN", birth: "8/9/2020"}, {name: "PHẠM MINH DƯƠNG", birth: "10/7/2024"}] }
+                                                            ]
+                                                        },
+                                                    ]
+                                                }
+                                            ]
+                                        },
                                     ]
-                                },
+                                }
                             ]
                         },
                         { name: "PHẠM THỊ LŨ", birth: "1926 Bính Dần", info: "00-00-0000" },
                         { name: "PHẠM NGỌC THỞ", birth: "1929 Kỷ Tỵ", death: "15-08-1945 Ất Dậu", deceased: true },
-                        { name: "PHẠM NGỌC NHẬT", birth: "1931 Tân Mùi", death: "03-05-1987 Đinh Mão", deceased: true, info: "Vợ ĐINH THỊ LOÁN Sinh 1933 Quý Mão Mất 17-02-1982 Nhâm Tuất",
-                        children: [
-                                { name: "PHẠM NGỌC TUẤN", birth: "30-10-1960 (11-09 Canh tý)", info: "Vợ TRẦN THỊ PHƯƠNG Sinh 31-08-1959 (27-07 Kỷ Hợi) Có 3 con", children: [{name: "PHẠM NGỌC ANH", birth: "18-01-1987 (18-12 Bính Dần)"}, {name: "PHẠM TRÂN TUÂN", birth: "27-12-1999 (20-11 Kỷ Mão)"}, {name: "PHẠM THỊ HƯƠNG LAN", birth: "25-07-2002 (20-06 Nhâm Ngọ)"}] },
-                                { name: "PHẠM THỊ TÚ", birth: "1962 Nhâm Dần" },
-                                { name: "PHẠM THỊ TÂN", birth: "01-06-1965 (02-05 Ất tỵ)" },
-                                { name: "PHẠM THỊ TƯ", birth: "1968 Mậu Thân", death: "28-03-1978 Mậu Ngọ", deceased: true },
-                                { name: "PHẠM ĐỨC CƯỜNG", birth: "10-05-1971 (15-04 Tân Hợi)", info: "Vợ NGUYỄN THỊ HỒNG NGA Sinh 30-03-1973 (26-02 Quý Sửu) Có 2 con", children: [{name: "PHẠM ĐỨC MẠNH", birth: "26-03-1995 (26-02 ẤT Hợi)"}, {name: "PHẠM ĐỨC CÔNG", birth: "08-10-2000 (11-09-2000 Canh Thìn)"}] },
+                        {
+                            name: "PHẠM NGỌC NHẬT", birth: "1931 Tân Mùi", death: "03-05-1987 Đinh Mão", deceased: true,
+                            children: [
+                                {
+                                    name: "Vợ: ĐINH THỊ LOÁN", birth: "1933 Quý Mão", death: "17-02-1982 Nhâm Tuất", deceased: true,
+                                    children: [
+                                        {
+                                            name: "PHẠM NGỌC TUẤN", birth: "30-10-1960 (11-09 Canh tý)",
+                                            children: [
+                                                { name: "Vợ: TRẦN THỊ PHƯƠNG", birth: "31-08-1959 (27-07 Kỷ Hợi)", children: [{name: "PHẠM NGỌC ANH", birth: "18-01-1987 (18-12 Bính Dần)"}, {name: "PHẠM TRÂN TUÂN", birth: "27-12-1999 (20-11 Kỷ Mão)"}, {name: "PHẠM THỊ HƯƠNG LAN", birth: "25-07-2002 (20-06 Nhâm Ngọ)"}] }
+                                            ]
+                                        },
+                                        { name: "PHẠM THỊ TÚ", birth: "1962 Nhâm Dần" },
+                                        { name: "PHẠM THỊ TÂN", birth: "01-06-1965 (02-05 Ất tỵ)" },
+                                        { name: "PHẠM THỊ TƯ", birth: "1968 Mậu Thân", death: "28-03-1978 Mậu Ngọ", deceased: true },
+                                        {
+                                            name: "PHẠM ĐỨC CƯỜNG", birth: "10-05-1971 (15-04 Tân Hợi)",
+                                            children: [
+                                                { name: "Vợ: NGUYỄN THỊ HỒNG NGA", birth: "30-03-1973 (26-02 Quý Sửu)", children: [{name: "PHẠM ĐỨC MẠNH", birth: "26-03-1995 (26-02 ẤT Hợi)"}, {name: "PHẠM ĐỨC CÔNG", birth: "08-10-2000 (11-09-2000 Canh Thìn)"}] }
+                                            ]
+                                        },
+                                    ]
+                                }
                             ]
                         }
                     ]
@@ -167,14 +249,34 @@
                     name: "Bà hai: NGUYỄN THỊ YẾN", birth: "1895 Ất Mùi", death: "21-04-1945 Ất Dậu", color: "bg-emerald-900", deceased: true,
                     children: [
                         {
-                            name: "PHẠM NGỌC THẠCH", birth: "1929 Kỷ tỵ", death: "Đã Mất", deceased: true, info: "Vợ cả: NGUYỄN THỊ KIM NGÂN Sinh 1937 Đinh Sửu - Vợ hai: PHẠM THỊ THU Sinh 1952 Nhâm Thìn",
+                            name: "PHẠM NGỌC THẠCH", birth: "1929 Kỷ tỵ", death: "Đã Mất", deceased: true,
                             children: [
-                                { name: "PHẠM THỊ NGA", birth: "13-09-1962 (15-08 Nhâm Dần)" },
-                                { name: "PHẠM NGỌC SƠN", birth: "17-11-1964 (13-10 Giáp Thìn)", info: "Vợ: DƯƠNG THỊ HUỆ Sinh 02-12-1969 (26-10 Kỷ Dậu) có 2 con", children: [{name: "PHẠM THỊ THỦY", birth: "09-05-1993 (18-04 Quý Dậu)"}, {name: "PHẠM ĐÔNG TRIỀU", birth: "10-11-1996 (30-09 Bính Tý)"}] },
-                                { name: "PHẠM THỊ ĐÀO", birth: "25-01-1972 (08-12 Tân Hợi)" },
-                                { name: "PHẠM THỊ ÁNH", birth: "29-04-1974 (08-04 Giáp Dần)" },
-                                { name: "PHẠM HỒNG THẮNG", birth: "31-08-1976 (14-07 Bính Thìn)", info: "Vợ: DƯƠNG THỊ TUYẾT HUỆ Sinh 23-11-1985 (12-10 Ất Sửu)", children: [{name: "PHẠM KHÁNH DUY", birth: "12-03-2007 (23-01 Đinh Hợi)"}, {name: "PHẠM HẢI YẾN", birth: "15-02-2009 (21-01 Kỷ Sửu)"}] },
-                                { name: "PHẠM THỊ ANH ANH", birth: "1955 Ất Hợi", info: "con bà hai" },
+                                {
+                                    name: "Bà cả: NGUYỄN THỊ KIM NGÂN", birth: "1937 Đinh Sửu",
+                                    children: [
+                                        { name: "PHẠM THỊ NGA", birth: "13-09-1962 (15-08 Nhâm Dần)" },
+                                        {
+                                            name: "PHẠM NGỌC SƠN", birth: "17-11-1964 (13-10 Giáp Thìn)",
+                                            children: [
+                                                { name: "Vợ: DƯƠNG THỊ HUỆ", birth: "02-12-1969 (26-10 Kỷ Dậu)", children: [{name: "PHẠM THỊ THỦY", birth: "09-05-1993 (18-04 Quý Dậu)"}, {name: "PHẠM ĐÔNG TRIỀU", birth: "10-11-1996 (30-09 Bính Tý)"}] }
+                                            ]
+                                        },
+                                        { name: "PHẠM THỊ ĐÀO", birth: "25-01-1972 (08-12 Tân Hợi)" },
+                                        { name: "PHẠM THỊ ÁNH", birth: "29-04-1974 (08-04 Giáp Dần)" },
+                                        {
+                                            name: "PHẠM HỒNG THẮNG", birth: "31-08-1976 (14-07 Bính Thìn)",
+                                            children: [
+                                                { name: "Vợ: DƯƠNG THỊ TUYẾT HUỆ", birth: "23-11-1985 (12-10 Ất Sửu)", children: [{name: "PHẠM KHÁNH DUY", birth: "12-03-2007 (23-01 Đinh Hợi)"}, {name: "PHẠM HẢI YẾN", birth: "15-02-2009 (21-01 Kỷ Sửu)"}] }
+                                            ]
+                                        },
+                                    ]
+                                },
+                                {
+                                    name: "Bà hai: PHẠM THỊ THU", birth: "1952 Nhâm Thìn",
+                                    children: [
+                                        { name: "PHẠM THỊ ANH ANH", birth: "1955 Ất Hợi", info: "con bà hai" },
+                                    ]
+                                }
                             ]
                         }
                     ]
@@ -183,14 +285,39 @@
                     name: "Bà ba: NGUYỄN THỊ HOA", birth: "1889 Kỷ Sửu", death: "25-01-2001 Tân tỵ", color: "bg-amber-900", deceased: true,
                     children: [
                         {
-                            name: "PHẠM NGỌC SINH", birth: "1947 Đinh Hợi", info: "Vợ: BÙI THỊ DỤNG Sinh 1945 Ất Dậu",
+                            name: "PHẠM NGỌC SINH", birth: "1947 Đinh Hợi",
                             children: [
-                                { name: "PHẠM THỊ NHUNG", birth: "16-05-1996 (10-04 Kỷ Dậu)" },
-                                { name: "PHẠM VĂN NGỌC", birth: "18-08-1973 (20-07 Quý Sửu)", info: "Vợ: LÊ THỊ HÀ Sinh 1975 Ất mão", children: [{name: "PHẠM THỊ YẾN", birth: "18-10-1998 (02-09 Mậu Dần)"}, {name: "PHẠM THỊ LINH", birth: "08-12-2005 (08-11 Ất Dậu)"},{name: "PHẠM MINH ANH", birth: "29-12-2013 (27-11 Quý Tỵ)"}] },
-                                { name: "PHẠM ĐỨC CƯỜNG", birth: "26-03-1975 (15-02 Ất Mão)", info: "Vợ: ĐỖ THỊ LOAN Sinh 22-08-1979 (27-06 Quý Mùi)", children: [{name: "PHẠM Quỳnh Anh", birth: "21-02-2002 (10-01 Nhâm Ngọ)"}, {name: "PHẠM QUỲNH GIAO", birth: "01-06-2013 (23-04 Quý Tỵ)"}] },
-                                { name: "PHẠM VĂN TUẤN", birth: "25-09-1978 (22-08 Mậu Ngọ)", info: "Vợ: ĐÀO THỊ NỤ Sinh 17-05-1983 (11-04 Quý Hợi)", children: [{name: "PHẠM THÙY TRANG", birth: "16-02-2008 (10-01 Mậu Tý)"}, {name: "PHẠM DUY KHÁNH", birth: "02-12-2010 (25-10 Canh Dần)"}] },
-                                { name: "PHẠM VĂN TRỌNG", birth: "17-11-1980 (10-10 Canh Thân)", info: "Vợ: TRẦN THỊ NGA Sinh 25-04-1988 (09-03 Mậu THìn)", children: [{name: "PHẠM MINH THƯ", birth: "17-12-2011 (22-11 Tân Mão)"}, {name: "PHẠM MINH TUYỀN", birth: "25-05-2013 (15-04 Quý Tỵ)"},{name: "PHẠM THỦY TIÊN", birth: "05-10-2016 (03-09 Bính Thân)"}] },
-                                { name: "PHẠM THỊ THỦY", birth: "28-10-1983 (25-09 Quý Hợi)" },
+                                {
+                                    name: "Vợ: BÙI THỊ DỤNG", birth: "1945 Ất Dậu",
+                                    children: [
+                                        { name: "PHẠM THỊ NHUNG", birth: "16-05-1996 (10-04 Kỷ Dậu)" },
+                                        {
+                                            name: "PHẠM VĂN NGỌC", birth: "18-08-1973 (20-07 Quý Sửu)",
+                                            children: [
+                                                { name: "Vợ: LÊ THỊ HÀ", birth: "1975 Ất mão", children: [{name: "PHẠM THỊ YẾN", birth: "18-10-1998 (02-09 Mậu Dần)"}, {name: "PHẠM THỊ LINH", birth: "08-12-2005 (08-11 Ất Dậu)"},{name: "PHẠM MINH ANH", birth: "29-12-2013 (27-11 Quý Tỵ)"}] }
+                                            ]
+                                        },
+                                        {
+                                            name: "PHẠM ĐỨC CƯỜNG", birth: "26-03-1975 (15-02 Ất Mão)",
+                                            children: [
+                                                { name: "Vợ: ĐỖ THỊ LOAN", birth: "22-08-1979 (27-06 Quý Mùi)", children: [{name: "PHẠM Quỳnh Anh", birth: "21-02-2002 (10-01 Nhâm Ngọ)"}, {name: "PHẠM QUỲNH GIAO", birth: "01-06-2013 (23-04 Quý Tỵ)"}] }
+                                            ]
+                                        },
+                                        {
+                                            name: "PHẠM VĂN TUẤN", birth: "25-09-1978 (22-08 Mậu Ngọ)",
+                                            children: [
+                                                { name: "Vợ: ĐÀO THỊ NỤ", birth: "17-05-1983 (11-04 Quý Hợi)", children: [{name: "PHẠM THÙY TRANG", birth: "16-02-2008 (10-01 Mậu Tý)"}, {name: "PHẠM DUY KHÁNH", birth: "02-12-2010 (25-10 Canh Dần)"}] }
+                                            ]
+                                        },
+                                        {
+                                            name: "PHẠM VĂN TRỌNG", birth: "17-11-1980 (10-10 Canh Thân)",
+                                            children: [
+                                                { name: "Vợ: TRẦN THỊ NGA", birth: "25-04-1988 (09-03 Mậu THìn)", children: [{name: "PHẠM MINH THƯ", birth: "17-12-2011 (22-11 Tân Mão)"}, {name: "PHẠM MINH TUYỀN", birth: "25-05-2013 (15-04 Quý Tỵ)"},{name: "PHẠM THỦY TIÊN", birth: "05-10-2016 (03-09 Bính Thân)"}] }
+                                            ]
+                                        },
+                                        { name: "PHẠM THỊ THỦY", birth: "28-10-1983 (25-09 Quý Hợi)" },
+                                    ]
+                                }
                             ]
                         }
                     ]
@@ -198,7 +325,7 @@
             ]
         };
 
-        // --- CÔNG CỤ NHẮC GIỖ NÂNG CAO ---
+        // --- CÔNG CỤ NHẮC GIỖ ---
         const parseDate = (str) => {
             if (!str) return null;
             const match = str.match(/(\d{1,2})[-/](\d{1,2})/);
@@ -206,21 +333,18 @@
         };
 
         const calcLunarDiff = (deathDate, today) => {
-            // Logic liên tháng: (Tháng mất - Tháng hiện tại) * 30 + (Ngày mất - Ngày hiện tại)
             let diff = (deathDate.m - today.m) * 30 + (deathDate.d - today.d);
-            if (diff < 0) diff += 354; // Chuyển sang chu kỳ năm sau
+            if (diff < 0) diff += 354;
             return (diff >= 0 && diff <= 20) ? diff : null;
         };
 
         const scanAllReminders = (node, today, list) => {
-            // 1. Quét ngày mất chính
             const mainDeath = parseDate(node.death);
             if (mainDeath) {
                 const diff = calcLunarDiff(mainDeath, today);
                 if (diff !== null) list.push({ name: node.name, days: diff, date: node.death, relation: 'Thành viên' });
             }
 
-            // 2. Quét sâu trong info (Bà cả, Bà hai...)
             if (node.info && (node.info.toLowerCase().includes("mất") || node.info.toLowerCase().includes("giỗ"))) {
                 const segments = node.info.split(/[.;]/);
                 segments.forEach(seg => {
@@ -229,22 +353,13 @@
                         if (dateInSeg) {
                             const diff = calcLunarDiff(dateInSeg, today);
                             if (diff !== null) {
-                                // Tìm tên cụ thể trong ghi chú
                                 const nameMatch = seg.match(/([A-ZÀ-Ỹ][a-zà-ỹ\s]+){2,}/);
                                 let displayName = nameMatch ? nameMatch[0].trim() : `Người thân cụ ${node.name}`;
-
-                                // Phân loại vai vế
                                 let prefix = "";
                                 if (seg.includes("Bà cả")) prefix = "Bà cả ";
                                 if (seg.includes("Bà hai")) prefix = "Bà hai ";
                                 if (seg.includes("Vợ")) prefix = "Vợ ";
-
-                                list.push({
-                                    name: prefix + displayName,
-                                    days: diff,
-                                    date: `${dateInSeg.d}/${dateInSeg.m}`,
-                                    relation: `Ghi chú ${node.name}`
-                                });
+                                list.push({ name: prefix + displayName, days: diff, date: `${dateInSeg.d}/${dateInSeg.m}`, relation: `Ghi chú ${node.name}` });
                             }
                         }
                     }
@@ -295,14 +410,18 @@
         };
 
         const TreeNode = ({ data, level = 0, searchTerm }) => {
-            const [isOpen, setIsOpen] = useState(level < 2);
+            const [isOpen, setIsOpen] = useState(level < 4);
             const hasChildren = data.children && data.children.length > 0;
             const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+            // Màu sắc đặc biệt cho node Vợ để dễ phân biệt
+            const isSpouse = data.name.startsWith("Vợ:") || data.name.startsWith("Bà cả:") || data.name.startsWith("Bà hai:");
+
             return (
                 <div className="tree-item">
-                    <div className={`node-card relative p-5 flex flex-col border w-64 ${level === 0 ? 'bg-red-950 text-amber-100 border-amber-600' : 'bg-white text-slate-800 border-slate-200'} ${isMatch ? 'highlight' : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                    <div className={`node-card relative p-5 flex flex-col border w-64 ${level === 0 ? 'bg-red-950 text-amber-100 border-amber-600' : (isSpouse ? 'bg-amber-50 border-amber-200 italic' : 'bg-white text-slate-800 border-slate-200')} ${isMatch ? 'highlight' : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         {data.title && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase z-50">{data.title}</div>}
-                        <h3 className={`font-serif font-bold text-center ${level === 0 ? 'text-xl' : 'text-[15px]'}`}>{data.name}</h3>
+                        <h3 className={`font-serif font-bold text-center ${level === 0 ? 'text-xl' : 'text-[15px]'} ${isSpouse ? 'text-amber-900' : ''}`}>{data.name}</h3>
                         <InfoBox data={data} />
                         {hasChildren && <div className="mt-2 flex justify-center opacity-30"><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
                         {hasChildren && isOpen && <div className="parent-line" />}
@@ -317,18 +436,16 @@
         };
 
         const App = () => {
-            const [viewMode, setViewMode] = useState('list'); // MẶC ĐỊNH DANH SÁCH
+            const [viewMode, setViewMode] = useState('list');
             const [searchTerm, setSearchTerm] = useState("");
-            const [scale, setScale] = useState(0.4);
-            const [pos, setPos] = useState({ x: 0, y: 100 });
+            const [scale, setScale] = useState(0.35);
+            const [pos, setPos] = useState({ x: 0, y: 80 });
             const [allOpen, setAllOpen] = useState(null);
             const [reminders, setReminders] = useState([]);
             const [showModal, setShowModal] = useState(false);
 
             const isDragging = useRef(false);
             const startPos = useRef({ x: 0, y: 0 });
-
-            // LẤY NGÀY HỆ THỐNG THỰC TẾ
             const todayLunar = useMemo(() => LunarConverter.getLunarToday(), []);
 
             useEffect(() => {
@@ -346,7 +463,6 @@
 
             return (
                 <div className="h-screen w-full flex flex-col overflow-hidden bg-[#fdfaf5]">
-                    {/* MODAL CẢNH BÁO GIỖ TRÍ TUỆ NHÂN TẠO */}
                     {showModal && (
                         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
                             <div className="bg-white rounded-[32px] w-full max-w-sm overflow-hidden animate-pop shadow-2xl border-t-8 border-rose-800">
@@ -421,7 +537,7 @@
                                 <div className="absolute bottom-6 right-6 flex flex-col gap-2">
                                     <button onClick={() => setScale(s => s + 0.1)} className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800"><Icon name="plus" /></button>
                                     <button onClick={() => setScale(s => s - 0.1)} className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800"><Icon name="minus" /></button>
-                                    <button onClick={() => {setPos({x:0, y:100}); setScale(0.4);}} className="w-12 h-12 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-white"><Icon name="refresh-cw" size={18}/></button>
+                                    <button onClick={() => {setPos({x:0, y:80}); setScale(0.35);}} className="w-12 h-12 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-white"><Icon name="refresh-cw" size={18}/></button>
                                 </div>
                             </div>
                         )}
