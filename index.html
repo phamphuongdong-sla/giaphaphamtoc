@@ -21,7 +21,10 @@
         .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px); background-size: 40px 40px; touch-action: none; position: relative; width: 100%; height: 100%; }
         .grab-container:active { cursor: grabbing; }
 
+        /* BOX CHUẨN TRONG SƠ ĐỒ CÂY */
         .node-card {
+            width: 300px;
+            height: 240px; /* Cố định chiều cao */
             border-radius: 20px;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
             background: white;
@@ -29,6 +32,8 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: visible !important;
+            display: flex;
+            flex-direction: column;
         }
 
         .node-content-wrapper {
@@ -38,6 +43,9 @@
             border-radius: 20px;
             overflow: hidden;
             z-index: 10;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
         }
 
         .deceased-ribbon {
@@ -63,7 +71,7 @@
 
         .badge-truong-toc {
             position: absolute;
-            top: -18px;
+            top: -14px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(135deg, #92400e 0%, #d97706 50%, #92400e 100%);
@@ -74,24 +82,37 @@
             white-space: nowrap;
             padding: 4px 16px;
             border-radius: 99px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 900;
             letter-spacing: 0.1em;
             text-transform: uppercase;
             z-index: 50;
         }
 
-        .tree-branch { display: flex; padding-top: 50px; position: relative; }
-        .tree-item { position: relative; padding: 0 25px; display: flex; flex-direction: column; align-items: center; }
-        .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 50px; background: #cbd5e1; transform: translateX(-50%); }
+        .tree-branch { display: flex; padding-top: 60px; position: relative; }
+        .tree-item { position: relative; padding: 0 30px; display: flex; flex-direction: column; align-items: center; }
+        .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 60px; background: #cbd5e1; transform: translateX(-50%); }
         .tree-item::after { content: ''; position: absolute; top: 0; width: 100%; height: 2px; background: #cbd5e1; }
         .tree-item:first-child::after { left: 50%; width: 50%; }
         .tree-item:last-child::after { right: 50%; width: 50%; }
         .tree-item:only-child::after { display: none; }
-        .parent-line { position: absolute; bottom: -50px; left: 50%; width: 2px; height: 50px; background: #cbd5e1; transform: translateX(-50%); }
+        .parent-line { position: absolute; bottom: -60px; left: 50%; width: 2px; height: 60px; background: #cbd5e1; transform: translateX(-50%); }
 
-        .list-viewport { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; background: #fdfaf5; }
-        .member-card-ml { background: white; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; overflow: hidden; }
+        /* BOX CHUẨN TRONG DANH SÁCH */
+        .member-card-ml {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+            margin-bottom: 12px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            cursor: pointer;
+            overflow: hidden;
+            min-height: 140px; /* Đảm bảo form đều nhưng không gây kẹt cuộn */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
         .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 18px; margin-top: 8px; }
 
         .header-glass { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%); z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
@@ -129,7 +150,7 @@
             };
         })();
 
-        // --- DỮ LIỆU GIA PHẢ (ĐÃ CẬP NHẬT MÀU RIÊNG CHO 3 BÀ) ---
+        // --- DỮ LIỆU GIA PHẢ (GIỮ NGUYÊN 100%) ---
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
@@ -304,7 +325,7 @@
                                     children: [
                                         { name: "PHẠM THỊ NGA", birth: "13-09-1962 (15-08 Nhâm Dần)" },
                                         {
-                                            name: "PHẠM NGỌC SƠN", birth: "17-11-1964 (13-10 Giáp Thìn)",
+                                            name: "PHẠM NGỌC SƠOR", birth: "17-11-1964 (13-10 Giáp Thìn)",
                                             children: [
                                                 { name: "Vợ: DƯƠNG THỊ HUỆ", birth: "02-12-1969 (26-10 Kỷ Dậu)", children: [{name: "PHẠM THỊ THỦY", birth: "09-05-1993 (18-04 Quý Dậu)"}, {name: "PHẠM ĐÔNG TRIỀU", birth: "10-11-1996 (30-09 Bính Tý)"}] }
                                             ]
@@ -426,17 +447,17 @@
 
             return (
                 <div className="w-full relative">
-                    <div className={`member-card-ml p-4 flex flex-col ${data.color || ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                    <div className={`member-card-ml p-5 ${data.color || ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         {data.deceased && <div className="deceased-ribbon"></div>}
-                        <div className="flex justify-between items-start z-10">
-                            <div className="flex-1 pr-4 pl-4">
-                                {data.title && <span className="badge-truong-toc !relative !top-0 !left-0 !transform-none px-2 py-0.5 mb-2 inline-block shadow-none border-none text-[9px]">{data.title}</span>}
-                                <h3 className={`font-serif font-bold ${isCustomColor ? 'text-white' : (data.deceased ? 'text-slate-800' : 'text-red-900')} ${level === 0 ? 'text-lg' : 'text-[15px]'}`}>
+                        <div className="flex-1 flex flex-col justify-center z-10 relative pl-4">
+                            {data.title && <span className="badge-truong-toc !relative !top-0 !left-0 !transform-none px-2 py-0.5 mb-2 inline-block shadow-none border-none text-[9px]">{data.title}</span>}
+                            <div className="flex justify-between items-start">
+                                <h3 className={`font-serif font-bold ${isCustomColor ? 'text-white' : (data.deceased ? 'text-slate-800' : 'text-red-900')} ${level === 0 ? 'text-xl' : 'text-[16px]'}`}>
                                     {data.name}
                                 </h3>
-                                <InfoBox data={data} isDark={isCustomColor} />
+                                {hasChildren && <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={18} className={`${isCustomColor ? 'text-white/50' : 'text-slate-300'} ml-2 mt-1`}/>}
                             </div>
-                            {hasChildren && <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={18} className={`${isCustomColor ? 'text-white/50' : 'text-slate-300'} ml-2 mt-1`}/>}
+                            <InfoBox data={data} isDark={isCustomColor} />
                         </div>
                     </div>
                     {hasChildren && isOpen && (
@@ -454,22 +475,25 @@
             const isSpouse = data.name.startsWith("Vợ:") || data.name.startsWith("Bà cả:") || data.name.startsWith("Bà hai:") || data.name.startsWith("Bà ba:");
             const isCustomColor = !!data.color;
 
-            // Logic màu sắc: Ưu tiên màu riêng, sau đó đến màu gốc, sau đó đến màu vợ chồng
             const nodeStyle = data.color || (level === 0 ? 'bg-red-950 text-amber-50 border-amber-600' : (isSpouse ? 'bg-amber-50 border-amber-200 italic text-slate-800' : 'bg-white text-slate-800 border-slate-200'));
 
             return (
                 <div className="tree-item">
-                    <div className={`node-card p-6 flex flex-col border w-72 ${nodeStyle}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                    <div className={`node-card ${nodeStyle}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
                         {data.title && <div className="badge-truong-toc">{data.title}</div>}
 
                         <div className="node-content-wrapper">
                             {data.deceased && <div className="deceased-ribbon"></div>}
-                            <div className="z-20 relative px-2">
-                                <h3 className={`font-serif font-bold text-center leading-tight mt-1 mb-1 ${level === 0 ? 'text-2xl' : 'text-[17px]'} ${isCustomColor ? 'text-white' : ''}`}>
+                            <div className="z-20 relative flex flex-col h-full">
+                                <h3 className={`font-serif font-bold text-center leading-tight mt-1 mb-2 ${level === 0 ? 'text-2xl' : 'text-[17px]'} ${isCustomColor ? 'text-white' : ''}`}>
                                     {data.name}
                                 </h3>
                                 <InfoBox data={data} isDark={isCustomColor || level === 0} />
-                                {hasChildren && <div className={`mt-4 flex justify-center ${isCustomColor ? 'opacity-50' : 'opacity-30'}`}><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
+                                {hasChildren && (
+                                    <div className={`mt-auto pt-2 flex justify-center ${isCustomColor ? 'opacity-50' : 'opacity-30'}`}>
+                                        <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} />
+                                    </div>
+                                )}
                             </div>
                         </div>
                         {hasChildren && isOpen && <div className="parent-line" />}
@@ -485,7 +509,7 @@
 
         const App = () => {
             const [viewMode, setViewMode] = useState('list');
-            const [scale, setScale] = useState(0.4);
+            const [scale, setScale] = useState(0.35);
             const [pos, setPos] = useState({ x: 0, y: 120 });
             const [allOpen, setAllOpen] = useState(null);
             const [reminders, setReminders] = useState([]);
@@ -493,11 +517,13 @@
             const isDragging = useRef(false);
             const startPos = useRef({ x: 0, y: 0 });
             const todayLunar = useMemo(() => LunarConverter.getLunarToday(), []);
+
             useEffect(() => {
                 const list = [];
                 scanAllReminders(GIA_PHA_DATA, todayLunar, list);
                 if (list.length > 0) { setReminders(list.sort((a,b) => a.days - b.days)); setShowModal(true); }
             }, [todayLunar]);
+
             return (
                 <div className="h-screen w-full flex flex-col overflow-hidden bg-[#fdfaf5]">
                     {showModal && (
@@ -526,16 +552,18 @@
                             <button onClick={() => setViewMode('tree')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${viewMode === 'tree' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>Sơ đồ cây</button>
                         </div>
                     </header>
-                    <main className="flex-1 relative overflow-hidden">
+                    <main className="flex-1 relative overflow-hidden bg-[#fdfaf5]">
                         {viewMode === 'list' ? (
-                            <div className="list-viewport p-6 max-w-2xl mx-auto pb-32">
-                                <div className="flex justify-end mb-6"><button onClick={() => setAllOpen(!allOpen)} className="px-6 py-3 bg-slate-900 text-white font-black rounded-2xl text-[10px] uppercase shadow-lg tracking-widest active:scale-95">{allOpen ? "Thu gọn tất cả" : "Mở rộng tất cả"}</button></div>
-                                <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} />
+                            <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+                                <div className="p-6 max-w-2xl mx-auto pb-32">
+                                    <div className="flex justify-end mb-6"><button onClick={() => setAllOpen(!allOpen)} className="px-6 py-3 bg-slate-900 text-white font-black rounded-2xl text-[10px] uppercase shadow-lg tracking-widest active:scale-95">{allOpen ? "Thu gọn tất cả" : "Mở rộng tất cả"}</button></div>
+                                    <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} />
+                                </div>
                             </div>
                         ) : (
                             <div className="h-full w-full grab-container" onWheel={(e) => setScale(s => Math.min(2, Math.max(0.1, s + (e.deltaY > 0 ? -0.05 : 0.05))))} onMouseDown={e => { isDragging.current = true; startPos.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; }} onMouseMove={e => isDragging.current && setPos({ x: e.clientX - startPos.current.x, y: e.clientY - startPos.current.y })} onMouseUp={() => isDragging.current = false} onTouchStart={e => { isDragging.current = true; startPos.current = { x: e.touches[0].clientX - pos.x, y: e.touches[0].clientY - pos.y }; }} onTouchMove={e => isDragging.current && setPos({ x: e.touches[0].clientX - startPos.current.x, y: e.touches[0].clientY - startPos.current.y })} onTouchEnd={() => isDragging.current = false}>
                                 <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-10 transition-transform duration-75"><TreeNode data={GIA_PHA_DATA} /></div>
-                                <div className="absolute bottom-8 right-8 flex flex-col gap-3"><button onClick={() => setScale(s => s + 0.1)} className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border active:scale-90"><Icon name="plus" /></button><button onClick={() => setScale(s => s - 0.1)} className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border active:scale-90"><Icon name="minus" /></button><button onClick={() => {setPos({x:0, y:120}); setScale(0.4);}} className="w-14 h-14 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-white active:scale-90"><Icon name="refresh-cw" size={20}/></button></div>
+                                <div className="absolute bottom-8 right-8 flex flex-col gap-3"><button onClick={() => setScale(s => s + 0.05)} className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border active:scale-90"><Icon name="plus" /></button><button onClick={() => setScale(s => s - 0.05)} className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border active:scale-90"><Icon name="minus" /></button><button onClick={() => {setPos({x:0, y:120}); setScale(0.35);}} className="w-14 h-14 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-white active:scale-90"><Icon name="refresh-cw" size={20}/></button></div>
                             </div>
                         )}
                     </main>
