@@ -18,23 +18,85 @@
         body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #fdfaf5; margin: 0; color: #1e293b; width: 100vw; height: 100vh; overflow: hidden; }
         .font-serif { font-family: 'Playfair Display', serif; }
 
-        .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 30px 30px; touch-action: none; position: relative; width: 100%; height: 100%; }
+        .grab-container { cursor: grab; background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px); background-size: 40px 40px; touch-action: none; position: relative; width: 100%; height: 100%; }
         .grab-container:active { cursor: grabbing; }
 
-        .node-card { border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); background: white; border: 1px solid #e2e8f0; transition: all 0.3s; }
-        .node-card.highlight { ring: 4px solid #f59e0b; transform: scale(1.05); z-index: 50; }
+        /* Card trong sơ đồ cây */
+        .node-card {
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+            background: white;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            /* Để huy hiệu có thể nhảy ra ngoài border */
+            overflow: visible !important;
+        }
 
-        .tree-branch { display: flex; padding-top: 40px; position: relative; }
-        .tree-item { position: relative; padding: 0 15px; display: flex; flex-direction: column; align-items: center; }
-        .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 40px; background: #cbd5e1; transform: translateX(-50%); }
+        /* Container riêng cho nội dung cần bo góc và cắt ribbon */
+        .node-content-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        /* Băng đen báo hiếu - Bên trái */
+        .deceased-ribbon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 60px;
+            overflow: hidden;
+            z-index: 30;
+        }
+        .deceased-ribbon::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: -22px;
+            width: 70px;
+            height: 18px;
+            background: #1a1a1a;
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Huy hiệu Trưởng Tộc - Kiểu bảng vàng */
+        .badge-truong-toc {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #92400e 0%, #d97706 50%, #92400e 100%);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            border: 2px solid #fef3c7;
+            box-shadow: 0 4px 10px rgba(146, 64, 14, 0.4);
+            white-space: nowrap;
+            padding: 4px 16px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            z-index: 50;
+        }
+
+        .tree-branch { display: flex; padding-top: 50px; position: relative; }
+        .tree-item { position: relative; padding: 0 25px; display: flex; flex-direction: column; align-items: center; }
+        .tree-item::before { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 50px; background: #cbd5e1; transform: translateX(-50%); }
         .tree-item::after { content: ''; position: absolute; top: 0; width: 100%; height: 2px; background: #cbd5e1; }
         .tree-item:first-child::after { left: 50%; width: 50%; }
         .tree-item:last-child::after { right: 50%; width: 50%; }
         .tree-item:only-child::after { display: none; }
-        .parent-line { position: absolute; bottom: -40px; left: 50%; width: 2px; height: 40px; background: #cbd5e1; transform: translateX(-50%); }
+        .parent-line { position: absolute; bottom: -50px; left: 50%; width: 2px; height: 50px; background: #cbd5e1; transform: translateX(-50%); }
 
         .list-viewport { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; background: #fdfaf5; }
-        .member-card-ml { background: white; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; }
+        .member-card-ml { background: white; border-radius: 16px; border: 1px solid #f1f5f9; margin-bottom: 12px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; overflow: hidden; }
         .node-container-ml { border-left: 2px dashed #cbd5e1; margin-left: 14px; padding-left: 18px; margin-top: 8px; }
 
         .header-glass { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%); z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
@@ -49,7 +111,7 @@
     <script type="text/babel">
         const { useState, useRef, useEffect, useMemo } = React;
 
-        // --- THUẬT TOÁN CHUYỂN ĐỔI DƯƠNG LỊCH -> ÂM LỊCH ---
+        // --- CHUYỂN ĐỔI ÂM LỊCH ---
         const LunarConverter = (() => {
             const INT = Math.floor;
             const getJdn = (d, m, y) => {
@@ -57,33 +119,22 @@
                 const a = INT(y / 100);
                 return INT(365.25 * (y + 4716)) + INT(30.6001 * (m + 1)) + d + (2 - a + INT(a / 4)) - 1524.5;
             };
-
             return {
                 getLunarToday: () => {
                     const now = new Date();
-                    const d = now.getDate();
-                    const m = now.getMonth() + 1;
-                    const y = now.getFullYear();
-
-                    const baseJdn = getJdn(28, 4, 2026);
-                    const currentJdn = getJdn(d, m, y);
-                    const diffDays = currentJdn - baseJdn;
-
-                    let ld = 12 + diffDays;
-                    let lm = 3;
-                    let ly = 2026;
-
+                    const d = now.getDate(), m = now.getMonth() + 1, y = now.getFullYear();
+                    const baseJdn = getJdn(28, 4, 2026), currentJdn = getJdn(d, m, y), diffDays = currentJdn - baseJdn;
+                    let ld = 12 + diffDays, lm = 3, ly = 2026;
                     while (ld > 29) { ld -= 30; lm++; }
                     while (ld <= 0) { ld += 30; lm--; }
                     if (lm > 12) { lm = 1; ly++; }
                     if (lm <= 0) { lm = 12; ly--; }
-
                     return { d: ld, m: lm, y: ly, label: `${ld}/${lm} Âm lịch` };
                 }
             };
         })();
 
-        // --- DỮ LIỆU ĐÃ CẬP NHẬT TÁCH RIÊNG VỢ CHO TẤT CẢ THÀNH VIÊN ---
+        // --- DỮ LIỆU GIA PHẢ (GIỮ NGUYÊN 100%) ---
         const GIA_PHA_DATA = {
             name: "PHẠM HƯƠNG CHỬ", birth: "1891 Tân Mão", death: "20-03-1953 Quý Tỵ", info: "Con út thứ tư trong gia đình", deceased: true,
             children: [
@@ -91,19 +142,19 @@
                     name: "Bà cả: BÙI THỊ VÍCH", birth: "1888 Mậu Tý", death: "23-10-1957 Đinh Dậu", color: "bg-slate-900", deceased: true,
                     children: [
                         {
-                            name: "PHẠM VĂN COỎNG", title: "Trưởng tộc", birth: "1909 Kỷ Dậu", death: "13-09-1949 Kỷ Sửu", deceased: true,
+                            name: "PHẠM VĂN COỎNG", title: "Trưởng họ", birth: "1909 Kỷ Dậu", death: "13-09-1949 Kỷ Sửu", deceased: true,
                             children: [
                                 {
                                     name: "Bà cả: NGUYỄN THỊ PHIỀM", birth: "1908", death: "03-11-2014 Giáp Ngọ", deceased: true,
                                     children: [
                                         {
-                                            name: "PHẠM NGỌC CHƯ", title: "Trưởng tộc", birth: "1932 Nhâm Thân", death: "1998 Mậu Dần", deceased: true,
+                                            name: "PHẠM NGỌC CHƯ", title: "Trưởng họ", birth: "1932 Nhâm Thân", death: "1998 Mậu Dần", deceased: true,
                                             children: [
                                                 {
                                                     name: "Vợ: PHẠM THỊ UYÊN", birth: "1933 Quý Dậu",
                                                     children: [
                                                         {
-                                                            name: "PHẠM NGỌC CHI", title: "Trưởng tộc", birth: "01-05-1956 (21-03 Bính Thân)",
+                                                            name: "PHẠM NGỌC CHI", title: "Trưởng họ", birth: "01-05-1956 (21-03 Bính Thân)",
                                                             children: [
                                                                 { name: "Vợ: NGUYỄN THỊ SEN", birth: "21-10-1959 (19-9 Kỷ hợi)", children: [{name: "PHẠM TUYẾT THU", birth: "07-12-1984 (15-11 Giáp tý)"}, {name: "PHẠM THỊ THƯƠNG HUYỀN", birth: "08-05-1987 (11-04 Đinh Mão)"}] }
                                                             ]
@@ -325,7 +376,6 @@
             ]
         };
 
-        // --- CÔNG CỤ NHẮC GIỖ ---
         const parseDate = (str) => {
             if (!str) return null;
             const match = str.match(/(\d{1,2})[-/](\d{1,2})/);
@@ -342,93 +392,72 @@
             const mainDeath = parseDate(node.death);
             if (mainDeath) {
                 const diff = calcLunarDiff(mainDeath, today);
-                if (diff !== null) list.push({ name: node.name, days: diff, date: node.death, relation: 'Thành viên' });
-            }
-
-            if (node.info && (node.info.toLowerCase().includes("mất") || node.info.toLowerCase().includes("giỗ"))) {
-                const segments = node.info.split(/[.;]/);
-                segments.forEach(seg => {
-                    if (seg.toLowerCase().includes("mất") || seg.toLowerCase().includes("giỗ")) {
-                        const dateInSeg = parseDate(seg);
-                        if (dateInSeg) {
-                            const diff = calcLunarDiff(dateInSeg, today);
-                            if (diff !== null) {
-                                const nameMatch = seg.match(/([A-ZÀ-Ỹ][a-zà-ỹ\s]+){2,}/);
-                                let displayName = nameMatch ? nameMatch[0].trim() : `Người thân cụ ${node.name}`;
-                                let prefix = "";
-                                if (seg.includes("Bà cả")) prefix = "Bà cả ";
-                                if (seg.includes("Bà hai")) prefix = "Bà hai ";
-                                if (seg.includes("Vợ")) prefix = "Vợ ";
-                                list.push({ name: prefix + displayName, days: diff, date: `${dateInSeg.d}/${dateInSeg.m}`, relation: `Ghi chú ${node.name}` });
-                            }
-                        }
-                    }
-                });
+                if (diff !== null) list.push({ name: node.name, days: diff, date: node.death });
             }
             if (node.children) node.children.forEach(c => scanAllReminders(c, today, list));
         };
 
-        // --- COMPONENTS ---
         const Icon = ({ name, size = 16, className = "" }) => {
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
 
         const InfoBox = ({ data }) => (
-            <div className="text-left space-y-1 text-[11px] mt-2 pt-2 border-t border-current/10">
-                <div className="flex items-center gap-2"><Icon name="sun" size={10} className="text-amber-500"/> Sinh: <b>{data.birth}</b></div>
-                {data.death && data.death !== "00-00-0000" && <div className="flex items-center gap-2 text-rose-600"><Icon name="moon" size={10}/> Giỗ: <b>{data.death}</b></div>}
-                {data.info && <div className="bg-black/5 p-1.5 rounded text-[10px] italic mt-1 opacity-80 whitespace-pre-line leading-relaxed">{data.info}</div>}
+            <div className="text-left space-y-1.5 text-[11px] mt-2.5 pt-2.5 border-t border-current/10">
+                <div className="flex items-center gap-2 text-slate-500 font-medium"><Icon name="sun" size={10} className="text-amber-500"/> Sinh: <b>{data.birth}</b></div>
+                {data.death && data.death !== "00-00-0000" && <div className="flex items-center gap-2 text-rose-700 font-bold"><Icon name="moon" size={10}/> Giỗ: <b>{data.death}</b></div>}
+                {data.info && <div className="bg-black/5 p-2 rounded-lg text-[10px] italic mt-2 opacity-80 border border-black/5 leading-relaxed">{data.info}</div>}
             </div>
         );
 
-        const MemberItem = ({ data, level = 0, forceOpen, searchTerm }) => {
+        const MemberItem = ({ data, level = 0, forceOpen }) => {
             const [isOpen, setIsOpen] = useState(level < 1);
             const hasChildren = data.children && data.children.length > 0;
-            const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
             useEffect(() => { if (forceOpen !== null) setIsOpen(forceOpen); }, [forceOpen]);
-
             return (
                 <div className="w-full relative">
-                    <div className={`member-card-ml p-4 flex flex-col ${isMatch ? 'ring-2 ring-amber-500 bg-amber-50' : ''} ${data.color ? 'border-l-4 border-amber-800' : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
-                        <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                                {data.title && <span className="bg-amber-600 text-white text-[9px] font-black px-2 py-0.5 rounded uppercase mb-1 inline-block">{data.title}</span>}
-                                <h3 className={`font-bold ${data.deceased ? 'text-slate-700' : 'text-red-900'} ${level === 0 ? 'text-lg' : 'text-md'}`}>{data.name}</h3>
+                    <div className="member-card-ml p-4 flex flex-col" onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                        {data.deceased && <div className="deceased-ribbon"></div>}
+                        <div className="flex justify-between items-start z-10">
+                            <div className="flex-1 pr-4 pl-4">
+                                {data.title && <span className="badge-truong-toc !relative !top-0 !left-0 !transform-none px-2 py-0.5 mb-2 inline-block shadow-none border-none text-[9px]">{data.title}</span>}
+                                <h3 className={`font-serif font-bold ${data.deceased ? 'text-slate-800' : 'text-red-900'} ${level === 0 ? 'text-lg' : 'text-[15px]'}`}>{data.name}</h3>
                                 <InfoBox data={data} />
                             </div>
-                            {hasChildren && <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={18} className="text-slate-300 ml-2"/>}
+                            {hasChildren && <Icon name={isOpen ? "chevron-up" : "chevron-down"} size={18} className="text-slate-300 ml-2 mt-1"/>}
                         </div>
                     </div>
                     {hasChildren && isOpen && (
                         <div className="node-container-ml">
-                            {data.children.map((child, i) => <MemberItem key={i} data={child} level={level + 1} forceOpen={forceOpen} searchTerm={searchTerm} />)}
+                            {data.children.map((child, i) => <MemberItem key={i} data={child} level={level + 1} forceOpen={forceOpen} />)}
                         </div>
                     )}
                 </div>
             );
         };
 
-        const TreeNode = ({ data, level = 0, searchTerm }) => {
-            const [isOpen, setIsOpen] = useState(level < 4);
+        const TreeNode = ({ data, level = 0 }) => {
+            const [isOpen, setIsOpen] = useState(level < 1);
             const hasChildren = data.children && data.children.length > 0;
-            const isMatch = searchTerm && data.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-            // Màu sắc đặc biệt cho node Vợ để dễ phân biệt
             const isSpouse = data.name.startsWith("Vợ:") || data.name.startsWith("Bà cả:") || data.name.startsWith("Bà hai:");
-
             return (
                 <div className="tree-item">
-                    <div className={`node-card relative p-5 flex flex-col border w-64 ${level === 0 ? 'bg-red-950 text-amber-100 border-amber-600' : (isSpouse ? 'bg-amber-50 border-amber-200 italic' : 'bg-white text-slate-800 border-slate-200')} ${isMatch ? 'highlight' : ''}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
-                        {data.title && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase z-50">{data.title}</div>}
-                        <h3 className={`font-serif font-bold text-center ${level === 0 ? 'text-xl' : 'text-[15px]'} ${isSpouse ? 'text-amber-900' : ''}`}>{data.name}</h3>
-                        <InfoBox data={data} />
-                        {hasChildren && <div className="mt-2 flex justify-center opacity-30"><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
+                    <div className={`node-card p-6 flex flex-col border w-72 ${level === 0 ? 'bg-red-950 text-amber-50 border-amber-600' : (isSpouse ? 'bg-amber-50 border-amber-200 italic' : 'bg-white text-slate-800 border-slate-200')}`} onClick={() => hasChildren && setIsOpen(!isOpen)}>
+                        {data.title && <div className="badge-truong-toc">{data.title}</div>}
+
+                        <div className="node-content-wrapper">
+                            {data.deceased && <div className="deceased-ribbon"></div>}
+                            <div className="z-20 relative px-2">
+                                <h3 className={`font-serif font-bold text-center leading-tight mt-1 mb-1 ${level === 0 ? 'text-2xl' : 'text-[17px]'}`}>{data.name}</h3>
+                                <InfoBox data={data} />
+                                {hasChildren && <div className="mt-4 flex justify-center opacity-30"><Icon name={isOpen ? "chevron-up" : "chevron-down"} size={14} /></div>}
+                            </div>
+                        </div>
                         {hasChildren && isOpen && <div className="parent-line" />}
                     </div>
                     {hasChildren && isOpen && (
                         <div className="tree-branch">
-                            {data.children.map((child, i) => <TreeNode key={i} data={child} level={level + 1} searchTerm={searchTerm} />)}
+                            {data.children.map((child, i) => <TreeNode key={i} data={child} level={level + 1} />)}
                         </div>
                     )}
                 </div>
@@ -437,115 +466,63 @@
 
         const App = () => {
             const [viewMode, setViewMode] = useState('list');
-            const [searchTerm, setSearchTerm] = useState("");
-            const [scale, setScale] = useState(0.35);
-            const [pos, setPos] = useState({ x: 0, y: 80 });
+            const [scale, setScale] = useState(0.4);
+            const [pos, setPos] = useState({ x: 0, y: 120 });
             const [allOpen, setAllOpen] = useState(null);
             const [reminders, setReminders] = useState([]);
             const [showModal, setShowModal] = useState(false);
-
             const isDragging = useRef(false);
             const startPos = useRef({ x: 0, y: 0 });
             const todayLunar = useMemo(() => LunarConverter.getLunarToday(), []);
-
             useEffect(() => {
                 const list = [];
                 scanAllReminders(GIA_PHA_DATA, todayLunar, list);
-                if (list.length > 0) {
-                    const unique = list.reduce((acc, curr) => {
-                        if (!acc.find(i => i.name === curr.name && i.date === curr.date)) acc.push(curr);
-                        return acc;
-                    }, []);
-                    setReminders(unique.sort((a,b) => a.days - b.days));
-                    setShowModal(true);
-                }
+                if (list.length > 0) { setReminders(list.sort((a,b) => a.days - b.days)); setShowModal(true); }
             }, [todayLunar]);
-
             return (
                 <div className="h-screen w-full flex flex-col overflow-hidden bg-[#fdfaf5]">
                     {showModal && (
                         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
                             <div className="bg-white rounded-[32px] w-full max-w-sm overflow-hidden animate-pop shadow-2xl border-t-8 border-rose-800">
                                 <div className="p-8 text-center bg-rose-50">
-                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                        <Icon name="bell-ring" size={32} className="text-rose-600" />
-                                    </div>
-                                    <h2 className="font-serif text-2xl font-black text-slate-800 uppercase">Ngày Giỗ Sắp Tới</h2>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Quét tự động (20 ngày tới)</p>
+                                    <Icon name="bell-ring" size={32} className="text-rose-600 mx-auto mb-4" />
+                                    <h2 className="font-serif text-2xl font-black text-slate-800 uppercase leading-tight">Ngày Giỗ Sắp Tới</h2>
                                 </div>
-                                <div className="p-6 space-y-3 max-h-[45vh] overflow-y-auto">
+                                <div className="p-6 space-y-3 max-h-[40vh] overflow-y-auto">
                                     {reminders.map((item, idx) => (
                                         <div key={idx} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
-                                            <div className="min-w-0">
-                                                <p className="font-bold text-slate-800 text-sm truncate">{item.name}</p>
-                                                <p className="text-[10px] text-rose-600 font-bold">Ngày: {item.date}</p>
-                                                <p className="text-[8px] text-slate-400 italic mt-1 uppercase leading-tight">{item.relation}</p>
-                                            </div>
-                                            <div className={`px-2 py-1.5 rounded-lg text-[9px] font-black uppercase shrink-0 ml-2 ${item.days === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-100 text-amber-900'}`}>
-                                                {item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}
-                                            </div>
+                                            <div><p className="font-bold text-slate-800 text-sm">{item.name}</p><p className="text-[10px] text-rose-600 font-bold">Ngày: {item.date}</p></div>
+                                            <div className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase ${item.days === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-100 text-amber-900'}`}>{item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}</div>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="p-6">
-                                    <button onClick={() => setShowModal(false)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest active:scale-95 shadow-lg">Đóng để xem gia phả</button>
-                                </div>
+                                <div className="p-6"><button onClick={() => setShowModal(false)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg">Đóng để xem gia phả</button></div>
                             </div>
                         </div>
                     )}
-
                     <header className="h-24 header-glass text-white flex items-center justify-between px-6 shrink-0 sticky top-0">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-amber-600 p-2 rounded-xl shadow-inner"><Icon name="scroll" size={20}/></div>
-                            <div>
-                                <h1 className="font-serif text-lg font-black text-amber-200 uppercase leading-none">PHẠM TỘC GIA PHẢ</h1>
-                                <p className="text-white/40 text-[8px] font-bold uppercase mt-1">Hôm nay: {todayLunar.label}</p>
-                            </div>
-                        </div>
-                        <div className="flex bg-white/10 p-1 rounded-xl border border-white/10 shadow-inner">
-                            <button onClick={() => setViewMode('list')} className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${viewMode === 'list' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>Danh sách</button>
-                            <button onClick={() => setViewMode('tree')} className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${viewMode === 'tree' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>Sơ đồ</button>
+                        <div className="flex items-center gap-3"><div className="bg-amber-600 p-2.5 rounded-2xl shadow-inner border border-amber-500/30"><Icon name="scroll" size={22}/></div><div><h1 className="font-serif text-lg font-black text-amber-200 uppercase leading-none tracking-tight">PHẠM TỘC GIA PHẢ</h1><p className="text-white/50 text-[9px] font-bold uppercase mt-1.5 tracking-widest">Âm lịch: {todayLunar.label}</p></div></div>
+                        <div className="flex bg-black/20 p-1.5 rounded-2xl border border-white/10">
+                            <button onClick={() => setViewMode('list')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${viewMode === 'list' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>Danh sách</button>
+                            <button onClick={() => setViewMode('tree')} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${viewMode === 'tree' ? 'bg-amber-600 text-white shadow-lg' : 'text-white/40'}`}>Sơ đồ cây</button>
                         </div>
                     </header>
-
                     <main className="flex-1 relative overflow-hidden">
                         {viewMode === 'list' ? (
                             <div className="list-viewport p-6 max-w-2xl mx-auto pb-32">
-                                <div className="sticky top-0 z-50 mb-6 bg-[#fdfaf5]/90 backdrop-blur-md p-2 rounded-2xl border border-slate-200 shadow-sm flex gap-2">
-                                    <div className="relative flex-1">
-                                        <Icon name="search" size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"/>
-                                        <input type="text" placeholder="Tìm tên thành viên..." className="w-full pl-11 pr-4 py-3 bg-white rounded-xl outline-none text-sm" onChange={e => setSearchTerm(e.target.value)} />
-                                    </div>
-                                    <button onClick={() => setAllOpen(!allOpen)} className="px-4 py-2 bg-slate-900 text-white font-black rounded-xl text-[9px] uppercase shadow-md">{allOpen ? "Thu gọn" : "Mở hết"}</button>
-                                </div>
-                                <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} searchTerm={searchTerm} />
+                                <div className="flex justify-end mb-6"><button onClick={() => setAllOpen(!allOpen)} className="px-6 py-3 bg-slate-900 text-white font-black rounded-2xl text-[10px] uppercase shadow-lg tracking-widest active:scale-95">{allOpen ? "Thu gọn tất cả" : "Mở rộng tất cả"}</button></div>
+                                <MemberItem data={GIA_PHA_DATA} forceOpen={allOpen} />
                             </div>
                         ) : (
-                            <div
-                                className="h-full w-full grab-container"
-                                onWheel={(e) => setScale(s => Math.min(2, Math.max(0.1, s + (e.deltaY > 0 ? -0.05 : 0.05))))}
-                                onMouseDown={e => { isDragging.current = true; startPos.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; }}
-                                onMouseMove={e => isDragging.current && setPos({ x: e.clientX - startPos.current.x, y: e.clientY - startPos.current.y })}
-                                onMouseUp={() => isDragging.current = false}
-                                onTouchStart={e => { isDragging.current = true; startPos.current = { x: e.touches[0].clientX - pos.x, y: e.touches[0].clientY - pos.y }; }}
-                                onTouchMove={e => isDragging.current && setPos({ x: e.touches[0].clientX - startPos.current.x, y: e.touches[0].clientY - startPos.current.y })}
-                                onTouchEnd={() => isDragging.current = false}
-                            >
-                                <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-10 transition-transform duration-75">
-                                    <TreeNode data={GIA_PHA_DATA} searchTerm={searchTerm} />
-                                </div>
-                                <div className="absolute bottom-6 right-6 flex flex-col gap-2">
-                                    <button onClick={() => setScale(s => s + 0.1)} className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800"><Icon name="plus" /></button>
-                                    <button onClick={() => setScale(s => s - 0.1)} className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800"><Icon name="minus" /></button>
-                                    <button onClick={() => {setPos({x:0, y:80}); setScale(0.35);}} className="w-12 h-12 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-white"><Icon name="refresh-cw" size={18}/></button>
-                                </div>
+                            <div className="h-full w-full grab-container" onWheel={(e) => setScale(s => Math.min(2, Math.max(0.1, s + (e.deltaY > 0 ? -0.05 : 0.05))))} onMouseDown={e => { isDragging.current = true; startPos.current = { x: e.clientX - pos.x, y: e.clientY - pos.y }; }} onMouseMove={e => isDragging.current && setPos({ x: e.clientX - startPos.current.x, y: e.clientY - startPos.current.y })} onMouseUp={() => isDragging.current = false} onTouchStart={e => { isDragging.current = true; startPos.current = { x: e.touches[0].clientX - pos.x, y: e.touches[0].clientY - pos.y }; }} onTouchMove={e => isDragging.current && setPos({ x: e.touches[0].clientX - startPos.current.x, y: e.touches[0].clientY - startPos.current.y })} onTouchEnd={() => isDragging.current = false}>
+                                <div style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`, transformOrigin: 'top center' }} className="absolute inset-0 flex justify-center pt-10 transition-transform duration-75"><TreeNode data={GIA_PHA_DATA} /></div>
+                                <div className="absolute bottom-8 right-8 flex flex-col gap-3"><button onClick={() => setScale(s => s + 0.1)} className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border active:scale-90"><Icon name="plus" /></button><button onClick={() => setScale(s => s - 0.1)} className="w-14 h-14 bg-white rounded-2xl shadow-xl flex items-center justify-center text-slate-800 border active:scale-90"><Icon name="minus" /></button><button onClick={() => {setPos({x:0, y:120}); setScale(0.4);}} className="w-14 h-14 bg-amber-600 rounded-2xl shadow-xl flex items-center justify-center text-white active:scale-90"><Icon name="refresh-cw" size={20}/></button></div>
                             </div>
                         )}
                     </main>
                 </div>
             );
         };
-
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
