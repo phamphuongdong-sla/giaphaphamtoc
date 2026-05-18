@@ -441,7 +441,7 @@
             const femaleKeywords = ["THỊ", "BÀ ", "XUYẾN", "NỤ", "NGA", "SEN", "THÙY", "THÁI", "CÚC", "VÂN", "HUYỀN", "THẢO", "NHẠN", "NHIÊN", "XUÂN", "LAM", "LOÁN", "TÚ", "TÂN", "TƯ", "ĐÀO", "ÁNH", "HUỆ", "YẾN", "RỤNG", "NHUNG", "HÀ", "LINH", "TRANG", "THƯ", "TUYỀN", "TIÊN", "PHIẾM", "UYÊN", "VÍCH", "VIÊM", "DINH", "HƯỜNG", "NŨ", "NGÂN"];
             const isFemale = isWife || femaleKeywords.some(k => name.toUpperCase().includes(k));
 
-            if (gen === 1) return isFemale ? "Cụ tổ " : "Cụ tổ";
+            if (gen === 1) return isFemale ? "Cụ tổ bà" : "Cụ tổ ông";
             if (gen === 2) return isFemale ? "Cụ bà" : "Cụ ông";
             if (gen === 3) return isFemale ? "Bà" : "Ông";
             return "";
