@@ -422,7 +422,7 @@
             ]
         };
 
-        // HÀM TÁCH NGÀY VÀ THÁNG DƯƠNG LỊCH ĐỂ SO SÁNH LOGIC MỚI
+        // HÀM TÁCH NGÀY VÀ THÁNG DƯƠNG LỊCH
         const parseBirthDate = (birthStr) => {
             if (!birthStr) return null;
             const match = birthStr.match(/(\d{1,2})[-/](\d{1,2})/);
@@ -435,40 +435,73 @@
             return match ? `${match[1]}/${match[2]}` : "";
         };
 
-        // ĐỆ QUY QUÉT THÀNH VIÊN SINH NHẬT: THÊM CHA/MẸ/ÔNG BÀ ĐỂ NHẬN DIỆN MỐI QUAN HỆ
-        const scanAllBirthdays = (node, parentNode, grandparentNode, list) => {
+        // HÀM XÁC ĐỊNH DANH XƯNG (CỤ TỔ ÔNG/BÀ, CỤ ÔNG/BÀ, ÔNG/BÀ) DỰA VÀO ĐỜI VÀ GIỚI TÍNH
+        const getGenTitle = (name, gen) => {
+            const isWife = name.startsWith("Vợ:") || name.startsWith("Bà cả:") || name.startsWith("Bà hai:") || name.startsWith("Bà ba:");
+            const femaleKeywords = ["THỊ", "BÀ ", "XUYẾN", "NỤ", "NGA", "SEN", "THÙY", "THÁI", "CÚC", "VÂN", "HUYỀN", "THẢO", "NHẠN", "NHIÊN", "XUÂN", "HƯƠNG", "LAM", "LOÁN", "TÚ", "TÂN", "TƯ", "ĐÀO", "ÁNH", "HUỆ", "YẾN", "DỤNG", "NHUNG", "HÀ", "LINH", "TRANG", "THƯ", "TUYỀN", "TIÊN", "PHIẾM", "UYÊN", "VÍCH", "VIÊM", "DINH", "HƯỜNG", "LŨ", "NGÂN"];
+            const isFemale = isWife || femaleKeywords.some(k => name.toUpperCase().includes(k));
+
+            if (gen === 1) return isFemale ? "Cụ tổ bà" : "Cụ tổ ông";
+            if (gen === 2) return isFemale ? "Cụ bà" : "Cụ ông";
+            if (gen === 3) return isFemale ? "Bà" : "Ông";
+            return "";
+        };
+
+        // HÀM DỰNG CHUỖI DIỄN GIẢI THÔNG MINH ĐỒNG BỘ (CẢ SINH NHẬT VÀ GIỖ)
+        const getNodeFullDescription = (node, parentNode, grandparentNode, gen) => {
+            const cleanName = (str) => str.replace(/^(Vợ:|Bà cả:|Bà hai:|Bà ba:)\s*/i, "").trim();
+
+            const titlePrefix = getGenTitle(node.name, gen);
+            const dispName = cleanName(node.name);
+            let relation = "";
+
+            const isWife = node.name.startsWith("Vợ:") || node.name.startsWith("Bà cả:") || node.name.startsWith("Bà hai:") || node.name.startsWith("Bà ba:");
+
+            if (isWife) {
+                if (parentNode) {
+                    const husband = cleanName(parentNode.name);
+                    const husbandTitle = getGenTitle(parentNode.name, gen) || "ông";
+                    relation = `Vợ ${husbandTitle.toLowerCase()} ${husband}`;
+                }
+            } else if (parentNode) {
+                let fatherName = "";
+                let fatherGen = gen - 1;
+                // Nếu cấp trên trực tiếp là vai Vợ, thì bố đẻ thực tế nằm ở cấp ông bà (grandparent)
+                if (parentNode.name.startsWith("Vợ:") || parentNode.name.startsWith("Bà cả:") || parentNode.name.startsWith("Bà hai:") || parentNode.name.startsWith("Bà ba:")) {
+                    fatherName = grandparentNode ? cleanName(grandparentNode.name) : "";
+                    fatherGen = gen - 1;
+                } else {
+                    fatherName = cleanName(parentNode.name);
+                }
+
+                // Không diễn giải "Con bố..." nếu cha là Thủy Tổ cao nhất để tránh trùng lặp
+                if (fatherName && fatherName !== "PHẠM HƯƠNG CHỬ") {
+                    const fatherTitle = getGenTitle(fatherName, fatherGen) || "bố";
+                    relation = `Con ${fatherTitle.toLowerCase()} ${fatherName}`;
+                }
+            }
+
+            let finalStr = titlePrefix ? `${titlePrefix} ${dispName}` : dispName;
+            if (relation) {
+                finalStr += ` (${relation})`;
+            }
+            return finalStr;
+        };
+
+        // ĐỆ QUY QUÉT THÀNH VIÊN SINH NHẬT THEO ĐỜI (TÍNH TOÁN VAI VẾ)
+        const scanAllBirthdays = (node, parentNode, grandparentNode, gen, list) => {
+            const isWife = node.name.startsWith("Vợ:") || node.name.startsWith("Bà cả:") || node.name.startsWith("Bà hai:") || node.name.startsWith("Bà ba:");
+            const currentGen = (parentNode === null) ? 1 : (isWife ? gen : gen + 1);
+
             if (!node.deceased) {
                 const bDate = parseBirthDate(node.birth);
                 if (bDate && bDate.m === CURRENT_SOLAR_MONTH && bDate.d >= CURRENT_SOLAR_DAY) {
-                    let fullRelationName = node.name;
-
-                    // Kiểm tra nếu là VỢ
-                    if (fullRelationName.startsWith("Vợ:") || fullRelationName.startsWith("Bà cả:") || fullRelationName.startsWith("Bà hai:") || fullRelationName.startsWith("Bà ba:")) {
-                        const cleanWife = fullRelationName.replace(/^(Vợ:|Bà cả:|Bà hai:|Bà ba:)\s*/i, "").trim();
-                        const husbandName = parentNode ? parentNode.name : "Ẩn danh";
-                        fullRelationName = `${cleanWife} (Vợ ông ${husbandName})`;
-                    }
-                    // Kiểm tra nếu là CON (Có nút cha/mẹ)
-                    else if (parentNode) {
-                        let fatherName = "";
-                        // Nếu cấp trên trực tiếp là Vợ, thì tên bố sẽ nằm ở cấp ông bà (grandparent)
-                        if (parentNode.name.startsWith("Vợ:") || parentNode.name.startsWith("Bà cả:") || parentNode.name.startsWith("Bà hai:") || parentNode.name.startsWith("Bà ba:")) {
-                            fatherName = grandparentNode ? grandparentNode.name : "";
-                        } else {
-                            fatherName = parentNode.name;
-                        }
-
-                        // Đảm bảo không gắn nhầm nhãn "con bố" cho các cụ tổ không rõ thông tin bố
-                        if (fatherName && !fatherName.startsWith("Vợ:") && !fatherName.startsWith("Bà")) {
-                            fullRelationName = `${fullRelationName} (Con bố ${fatherName})`;
-                        }
-                    }
-
-                    list.push({ name: fullRelationName, birth: node.birth });
+                    const desc = getNodeFullDescription(node, parentNode, grandparentNode, currentGen);
+                    list.push({ fullName: desc, birth: node.birth });
                 }
             }
             if (node.children) {
-                node.children.forEach(c => scanAllBirthdays(c, node, parentNode, list));
+                node.children.forEach(c => scanAllBirthdays(c, node, parentNode, currentGen, list));
             }
         };
 
@@ -484,13 +517,22 @@
             return (diff >= 0 && diff <= 20) ? diff : null;
         };
 
-        const scanAllReminders = (node, today, list) => {
+        // ĐỆ QUY QUÉT NGÀY GIỖ THEO ĐỜI (BỔ SUNG DIỄN GIẢI THÔNG MINH)
+        const scanAllReminders = (node, parentNode, grandparentNode, gen, today, list) => {
+            const isWife = node.name.startsWith("Vợ:") || node.name.startsWith("Bà cả:") || node.name.startsWith("Bà hai:") || node.name.startsWith("Bà ba:");
+            const currentGen = (parentNode === null) ? 1 : (isWife ? gen : gen + 1);
+
             const mainDeath = parseDate(node.death);
             if (mainDeath) {
                 const diff = calcLunarDiff(mainDeath, today);
-                if (diff !== null) list.push({ name: node.name, days: diff, date: node.death });
+                if (diff !== null) {
+                    const desc = getNodeFullDescription(node, parentNode, grandparentNode, currentGen);
+                    list.push({ fullName: desc, days: diff, date: node.death });
+                }
             }
-            if (node.children) node.children.forEach(c => scanAllReminders(c, today, list));
+            if (node.children) {
+                node.children.forEach(c => scanAllReminders(c, node, parentNode, currentGen, today, list));
+            }
         };
 
         const Icon = ({ name, size = 16, className = "" }) => {
@@ -537,7 +579,6 @@
                             </div>
                         )}
 
-                        {/* TĂNG PADDING TRÁI (pl-14) KHI THÀNH VIÊN ĐÃ MẤT ĐỂ TRANH RUY BĂNG ĐEN ĐÈ CHỮ */}
                         <div className={`node-content-wrapper z-10 pt-4 pb-4 pr-4 ${data.deceased ? 'pl-14' : 'pl-6'}`}>
                             <div className="flex justify-between items-start">
                                 <div className={`flex-1 ${isBirthdayActive ? 'mt-2' : 'mt-1'}`}>
@@ -619,17 +660,21 @@
             const startPos = useRef({ x: 0, y: 0 });
             const todayLunar = useMemo(() => LunarConverter.getLunarToday(), []);
 
-            // Quét danh sách sinh nhật theo cấu trúc cây cải tiến mới
+            // Quét danh sách sinh nhật có kèm vai vế đầy đủ
             const birthdayList = useMemo(() => {
                 const list = [];
-                scanAllBirthdays(GIA_PHA_DATA, null, null, list);
+                scanAllBirthdays(GIA_PHA_DATA, null, null, 1, list);
                 return list;
             }, []);
 
+            // Quét ngày giỗ có kèm vai vế đầy đủ
             useEffect(() => {
                 const list = [];
-                scanAllReminders(GIA_PHA_DATA, todayLunar, list);
-                if (list.length > 0) { setReminders(list.sort((a,b) => a.days - b.days)); setShowModal(true); }
+                scanAllReminders(GIA_PHA_DATA, null, null, 1, todayLunar, list);
+                if (list.length > 0) {
+                    setReminders(list.sort((a,b) => a.days - b.days));
+                    setShowModal(true);
+                }
             }, [todayLunar]);
 
             return (
@@ -644,8 +689,11 @@
                                 <div className="p-6 space-y-3 max-h-[40vh] overflow-y-auto">
                                     {reminders.map((item, idx) => (
                                         <div key={idx} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
-                                            <div><p className="font-bold text-slate-800 text-sm">{item.name}</p><p className="text-[10px] text-rose-600 font-bold">Ngày: {item.date}</p></div>
-                                            <div className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase ${item.days === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-100 text-amber-900'}`}>{item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}</div>
+                                            <div>
+                                                <p className="font-bold text-slate-800 text-sm leading-snug">{item.fullName}</p>
+                                                <p className="text-[10px] text-rose-600 font-bold mt-1">Ngày: {item.date}</p>
+                                            </div>
+                                            <div className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase shrink-0 ml-2 ${item.days === 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-100 text-amber-900'}`}>{item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -662,7 +710,6 @@
                         </div>
                     </header>
 
-                    {/* BANNER CHỮ CHẠY BANNER SINH NHẬT HIỂN THỊ RÕ RÀNG MỐI QUAN HỆ */}
                     {birthdayList.length > 0 && (
                         <div className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-900 py-2.5 px-4 shadow-md overflow-hidden flex items-center shrink-0 border-b border-amber-600/30 z-40">
                             <div className="flex items-center gap-1.5 font-black text-[10px] uppercase shrink-0 bg-red-600 text-white px-3 py-1 rounded-full border border-red-700 shadow-sm animate-pulse">
@@ -671,7 +718,7 @@
                             </div>
                             <div className="w-full overflow-hidden relative flex items-center whitespace-nowrap ml-3">
                                 <marquee className="font-bold text-xs text-slate-900 tracking-wide" scrollamount="4">
-                                    {birthdayList.map((m, i) => `🎉 Chúc mừng sinh nhật: ${m.name} (${getShortBirth(m.birth)})`).join(' ✦✦✦ ')}
+                                    {birthdayList.map((m, i) => `🎉 Chúc mừng sinh nhật: ${m.fullName} (${getShortBirth(m.birth)})`).join(' ✦✦✦ ')}
                                 </marquee>
                             </div>
                         </div>
