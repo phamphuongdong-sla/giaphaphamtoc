@@ -311,7 +311,7 @@
                                 }
                             ]
                         },
-                        { name: "PHẠM THỊ LŨ", birth: "1926 Bính Dần", death: "Đã Mất", deceased: true },
+                        { name: "PHẠM THỊ NŨ", birth: "1926 Bính Dần", death: "Đã Mất", deceased: true },
                         { name: "PHẠM NGỌC THỞ", birth: "1929 Kỷ Tỵ", death: "15-08-1945 Ất Dậu", deceased: true },
                         {
                             name: "PHẠM NGỌC NHẬT", birth: "1931 Tân Mùi", death: "03-05-1987 Đinh Mão", deceased: true,
@@ -385,7 +385,7 @@
                             name: "PHẠM NGỌC SINH", birth: "1947 Đinh Hợi",
                             children: [
                                 {
-                                    name: "Vợ: BÙI THỊ DỤNG", birth: "1945 Ất Dậu",
+                                    name: "Vợ: BÙI THỊ RỤNG", birth: "1945 Ất Dậu",
                                     children: [
                                         { name: "PHẠM THỊ NHUNG", birth: "16-05-1996 (10-04 Kỷ Dậu)" },
                                         {
@@ -435,15 +435,41 @@
             return match ? `${match[1]}/${match[2]}` : "";
         };
 
-        // ĐỆ QUY QUÉT THÀNH VIÊN: CHỈ LẤY CÒN SỐNG & CHƯA QUA NGÀY SINH NHẬT TRONG THÁNG
-        const scanAllBirthdays = (node, list) => {
+        // ĐỆ QUY QUÉT THÀNH VIÊN SINH NHẬT: THÊM CHA/MẸ/ÔNG BÀ ĐỂ NHẬN DIỆN MỐI QUAN HỆ
+        const scanAllBirthdays = (node, parentNode, grandparentNode, list) => {
             if (!node.deceased) {
                 const bDate = parseBirthDate(node.birth);
                 if (bDate && bDate.m === CURRENT_SOLAR_MONTH && bDate.d >= CURRENT_SOLAR_DAY) {
-                    list.push({ name: node.name, birth: node.birth });
+                    let fullRelationName = node.name;
+
+                    // Kiểm tra nếu là VỢ
+                    if (fullRelationName.startsWith("Vợ:") || fullRelationName.startsWith("Bà cả:") || fullRelationName.startsWith("Bà hai:") || fullRelationName.startsWith("Bà ba:")) {
+                        const cleanWife = fullRelationName.replace(/^(Vợ:|Bà cả:|Bà hai:|Bà ba:)\s*/i, "").trim();
+                        const husbandName = parentNode ? parentNode.name : "Ẩn danh";
+                        fullRelationName = `${cleanWife} (Vợ ông ${husbandName})`;
+                    }
+                    // Kiểm tra nếu là CON (Có nút cha/mẹ)
+                    else if (parentNode) {
+                        let fatherName = "";
+                        // Nếu cấp trên trực tiếp là Vợ, thì tên bố sẽ nằm ở cấp ông bà (grandparent)
+                        if (parentNode.name.startsWith("Vợ:") || parentNode.name.startsWith("Bà cả:") || parentNode.name.startsWith("Bà hai:") || parentNode.name.startsWith("Bà ba:")) {
+                            fatherName = grandparentNode ? grandparentNode.name : "";
+                        } else {
+                            fatherName = parentNode.name;
+                        }
+
+                        // Đảm bảo không gắn nhầm nhãn "con bố" cho các cụ tổ không rõ thông tin bố
+                        if (fatherName && !fatherName.startsWith("Vợ:") && !fatherName.startsWith("Bà")) {
+                            fullRelationName = `${fullRelationName} (Con bố ${fatherName})`;
+                        }
+                    }
+
+                    list.push({ name: fullRelationName, birth: node.birth });
                 }
             }
-            if (node.children) node.children.forEach(c => scanAllBirthdays(c, list));
+            if (node.children) {
+                node.children.forEach(c => scanAllBirthdays(c, node, parentNode, list));
+            }
         };
 
         const parseDate = (str) => {
@@ -495,7 +521,6 @@
             const hasChildren = data.children && data.children.length > 0;
             const isCustomColor = !!data.color;
 
-            // Áp dụng logic điều kiện mới: Chỉ kích hoạt sinh nhật nếu CHƯA QUA ngày thực tế
             const bDate = parseBirthDate(data.birth);
             const isBirthdayActive = !data.deceased && bDate && bDate.m === CURRENT_SOLAR_MONTH && bDate.d >= CURRENT_SOLAR_DAY;
 
@@ -512,7 +537,8 @@
                             </div>
                         )}
 
-                        <div className="node-content-wrapper z-10 pl-2 pt-2 pb-4 pr-4">
+                        {/* TĂNG PADDING TRÁI (pl-14) KHI THÀNH VIÊN ĐÃ MẤT ĐỂ TRANH RUY BĂNG ĐEN ĐÈ CHỮ */}
+                        <div className={`node-content-wrapper z-10 pt-4 pb-4 pr-4 ${data.deceased ? 'pl-14' : 'pl-6'}`}>
                             <div className="flex justify-between items-start">
                                 <div className={`flex-1 ${isBirthdayActive ? 'mt-2' : 'mt-1'}`}>
                                     {data.title && <span className="bg-amber-600 text-white text-[9px] px-2 py-0.5 rounded-full mb-1.5 inline-block font-black uppercase">{data.title}</span>}
@@ -540,7 +566,6 @@
             const isSpouse = data.name.startsWith("Vợ:") || data.name.startsWith("Bà cả:") || data.name.startsWith("Bà hai:") || data.name.startsWith("Bà ba:");
             const isCustomColor = !!data.color;
 
-            // Áp dụng logic điều kiện mới: Chỉ kích hoạt sinh nhật nếu CHƯA QUA ngày thực tế
             const bDate = parseBirthDate(data.birth);
             const isBirthdayActive = !data.deceased && bDate && bDate.m === CURRENT_SOLAR_MONTH && bDate.d >= CURRENT_SOLAR_DAY;
 
@@ -584,7 +609,7 @@
         };
 
         const App = () => {
-            const [viewMode, setViewMode] = useState('list'); // Ưu tiên hiển thị Danh sách trước
+            const [viewMode, setViewMode] = useState('list');
             const [scale, setScale] = useState(0.45);
             const [pos, setPos] = useState({ x: 0, y: 80 });
             const [allOpen, setAllOpen] = useState(null);
@@ -594,10 +619,10 @@
             const startPos = useRef({ x: 0, y: 0 });
             const todayLunar = useMemo(() => LunarConverter.getLunarToday(), []);
 
-            // Quét danh sách sinh nhật theo logic mới (chỉ lấy hôm nay và sắp tới)
+            // Quét danh sách sinh nhật theo cấu trúc cây cải tiến mới
             const birthdayList = useMemo(() => {
                 const list = [];
-                scanAllBirthdays(GIA_PHA_DATA, list);
+                scanAllBirthdays(GIA_PHA_DATA, null, null, list);
                 return list;
             }, []);
 
@@ -637,7 +662,7 @@
                         </div>
                     </header>
 
-                    {/* BANNER CHỮ CHẠY BANNER SINH NHẬT VIP */}
+                    {/* BANNER CHỮ CHẠY BANNER SINH NHẬT HIỂN THỊ RÕ RÀNG MỐI QUAN HỆ */}
                     {birthdayList.length > 0 && (
                         <div className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-900 py-2.5 px-4 shadow-md overflow-hidden flex items-center shrink-0 border-b border-amber-600/30 z-40">
                             <div className="flex items-center gap-1.5 font-black text-[10px] uppercase shrink-0 bg-red-600 text-white px-3 py-1 rounded-full border border-red-700 shadow-sm animate-pulse">
