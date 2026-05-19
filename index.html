@@ -1225,15 +1225,15 @@
     const isDuplicateCanChiNote = (note, date) => !!(note && date?.y && normalizeText(note) === normalizeText(getCanChiYear(date.y)));
     const formatBirth = (data) => {
       const parts = [];
-      if (data.birthSolar) parts.push(`Dương: ${formatSolarDate(data.birthSolar)}`);
+      if (data.birthSolar) parts.push(`Dương Lịch: ${formatSolarDate(data.birthSolar)}`);
       if (data.birthLunar) parts.push(`Âm: ${formatLunarDate(data.birthLunar)}`);
       if (data.birthNote && !isDuplicateCanChiNote(data.birthNote, data.birthLunar || data.birthSolar)) parts.push(data.birthNote);
       return parts.join(" · ");
     };
     const formatDeath = (data) => {
       const parts = [];
-      if (data.deathLunar) parts.push(`Âm: ${formatLunarDate(data.deathLunar)}`);
-      if (data.deathSolar) parts.push(`Dương: ${formatSolarDate(data.deathSolar)}`);
+      if (data.deathLunar) parts.push(`Âm Lịch: ${formatLunarDate(data.deathLunar)}`);
+      if (data.deathSolar) parts.push(`Dương Lịch: ${formatSolarDate(data.deathSolar)}`);
       if (data.deathNote && !isDuplicateCanChiNote(data.deathNote, data.deathLunar || data.deathSolar)) parts.push(data.deathNote);
       return parts.join(" · ");
     };
