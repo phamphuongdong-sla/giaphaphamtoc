@@ -753,17 +753,28 @@
       font-size: 12px;
       font-weight: 800;
       line-height: 1.55;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
     }
     .lineage-step {
       display: inline-flex;
       align-items: center;
       margin: 3px 0;
     }
-    .lineage-step + .lineage-step::before {
-      content: "/";
-      margin: 0 8px;
+    .lineage-separator {
       color: rgba(115, 58, 53, .38);
       font-weight: 900;
+      margin: 0 4px;
+      font-size: 11px;
+    }
+    .lineage-heart {
+      color: #e11d48; /* Màu đỏ cho trái tim */
+      font-size: 11px;
+      margin: 0 4px;
+      display: inline-flex;
+      align-items: center;
     }
     .child-list {
       margin-top: 10px;
@@ -1226,7 +1237,7 @@
     const formatBirth = (data) => {
       const parts = [];
       if (data.birthSolar) parts.push(`Dương Lịch: ${formatSolarDate(data.birthSolar)}`);
-      if (data.birthLunar) parts.push(`Âm: ${formatLunarDate(data.birthLunar)}`);
+      if (data.birthLunar) parts.push(`Âm Lịch: ${formatLunarDate(data.birthLunar)}`);
       if (data.birthNote && !isDuplicateCanChiNote(data.birthNote, data.birthLunar || data.birthSolar)) parts.push(data.birthNote);
       return parts.join(" · ");
     };
@@ -1365,7 +1376,8 @@
         gender: node.gender || deriveGender(node.name),
         role: node.role || getNormalizedRole({ ...node, isCurrentHead }),
         branchLine,
-        isCurrentHead
+        isCurrentHead,
+        isSpouse: isSpouse(node.name) // Lưu thuộc tính này để dùng cho việc hiển thị
       };
       normalized.children = node.children?.map((child) => normalizeGenealogy(child, branchLine));
       return normalized;
@@ -1412,11 +1424,18 @@
         .toLowerCase();
     const buildMemberEntries = (treeData) => {
       const entries = [];
-      const walk = (node, parentNode, grandparentNode, gen, branchName, pathNames) => {
+      const walk = (node, parentNode, grandparentNode, gen, branchName, pathNodes) => {
         const currentGen = parentNode === null ? 1 : (isSpouse(node.name) ? gen : gen + 1);
         const currentBranch = node.branchLine || node.branch || branchName || "";
-        const currentPath = [...pathNames, cleanName(node.name)];
+
+        // Lưu trữ cả object node thay vì chỉ tên để có thể kiểm tra isSpouse lúc render
+        const currentPath = [...pathNodes, node];
+
         const fullName = describeNode(node, parentNode, grandparentNode, currentGen);
+
+        // Tạo mảng pathNames (chỉ chứa tên) để phục vụ cho tìm kiếm
+        const pathNames = currentPath.map(n => cleanName(n.name));
+
         const searchText = normalizeText([
           node.name,
           cleanName(node.name),
@@ -1430,17 +1449,18 @@
           node.info,
           getGenderLabel(node.gender),
           currentBranch,
-          currentPath.join(" "),
+          pathNames.join(" "),
           fullName
         ].filter(Boolean).join(" "));
         entries.push({
-          id: currentPath.join(" > "),
+          id: pathNames.join(" > "),
           data: node,
           parentNode,
           grandparentNode,
           gen: currentGen,
           branchName: currentBranch,
-          pathNames: currentPath,
+          pathNodes: currentPath, // Lưu pathNodes để dùng khi render
+          pathNames: pathNames, // Lưu pathNames cho search result
           fullName,
           searchText
         });
@@ -1496,7 +1516,7 @@
     );
     const PersonDetailModal = ({ person, onClose }) => {
       if (!person) return null;
-      const { data, parentNode, grandparentNode, gen, branchName, pathNames } = person;
+      const { data, parentNode, grandparentNode, gen, branchName, pathNodes } = person;
       const children = data.children || [];
       const status = data.deceased ? "Đã mất" : "Còn sống";
       const actualParent = parentNode && isSpouse(parentNode.name) ? grandparentNode : parentNode;
@@ -1561,7 +1581,30 @@
               <div className="lineage-box">
                 <p className="detail-label"><Icon name="route" size={13} /> Tuyến quan hệ</p>
                 <p className="lineage-path">
-                  {pathNames.map((name, idx) => <span className="lineage-step" key={`${name}-${idx}`}>{name}</span>)}
+                  {pathNodes.map((node, idx) => {
+                    const nodeName = cleanName(node.name);
+                    // Nếu là phần tử đầu tiên, không in dấu gì phía trước
+                    if (idx === 0) {
+                      return <span className="lineage-step" key={`${nodeName}-${idx}`}>{nodeName}</span>;
+                    }
+
+                    // Nếu node hiện tại là vợ/chồng thì in trái tim trước nó, ngược lại in dấu "/"
+                    if (node.isSpouse) {
+                      return (
+                        <React.Fragment key={`${nodeName}-${idx}`}>
+                          <span className="lineage-heart">❤️</span>
+                          <span className="lineage-step">{nodeName}</span>
+                        </React.Fragment>
+                      );
+                    } else {
+                      return (
+                        <React.Fragment key={`${nodeName}-${idx}`}>
+                          <span className="lineage-separator">➡️</span>
+                          <span className="lineage-step">{nodeName}</span>
+                        </React.Fragment>
+                      );
+                    }
+                  })}
                 </p>
               </div>
               {data.info && (
@@ -1632,7 +1675,7 @@
         )}
       </section>
     );
-    const MemberItem = ({ data, level = 0, forceOpen, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNames = [] }) => {
+    const MemberItem = ({ data, level = 0, forceOpen, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
       const [open, setOpen] = useState(level < 1);
       const hasChildren = data.children?.length > 0;
       const bDate = data.birthSolar;
@@ -1641,14 +1684,14 @@
       const branch = !!data.branchRoot;
       const currentGen = parentNode === null ? 1 : (isSpouse(data.name) ? gen : gen + 1);
       const currentBranch = data.branchLine || data.branch || branchName || "";
-      const currentPath = [...pathNames, cleanName(data.name)];
+      const currentPath = [...pathNodes, data];
       const person = {
         data,
         parentNode,
         grandparentNode,
         gen: currentGen,
         branchName: currentBranch,
-        pathNames: currentPath,
+        pathNodes: currentPath,
         fullName: describeNode(data, parentNode, grandparentNode, currentGen)
       };
       useEffect(() => { if (forceOpen !== null) setOpen(forceOpen); }, [forceOpen]);
@@ -1683,7 +1726,7 @@
                   grandparentNode={parentNode}
                   gen={currentGen}
                   branchName={currentBranch}
-                  pathNames={currentPath}
+                  pathNodes={currentPath}
                 />
               ))}
             </div>
@@ -1691,7 +1734,7 @@
         </div>
       );
     };
-    const TreeNode = ({ data, level = 0, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNames = [] }) => {
+    const TreeNode = ({ data, level = 0, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
       const [open, setOpen] = useState(level < 1);
       const hasChildren = data.children?.length > 0;
       const bDate = data.birthSolar;
@@ -1700,14 +1743,14 @@
       const branch = !!data.branchRoot;
       const currentGen = parentNode === null ? 1 : (isSpouse(data.name) ? gen : gen + 1);
       const currentBranch = data.branchLine || data.branch || branchName || "";
-      const currentPath = [...pathNames, cleanName(data.name)];
+      const currentPath = [...pathNodes, data];
       const person = {
         data,
         parentNode,
         grandparentNode,
         gen: currentGen,
         branchName: currentBranch,
-        pathNames: currentPath,
+        pathNodes: currentPath,
         fullName: describeNode(data, parentNode, grandparentNode, currentGen)
       };
       return (
@@ -1739,7 +1782,7 @@
                   grandparentNode={parentNode}
                   gen={currentGen}
                   branchName={currentBranch}
-                  pathNames={currentPath}
+                  pathNodes={currentPath}
                 />
               ))}
             </div>
