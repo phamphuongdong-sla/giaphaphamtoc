@@ -770,12 +770,28 @@
       font-size: 11px;
     }
     .lineage-heart {
-      color: #e11d48; /* Màu đỏ cho trái tim */
+      color: #e11d48;
       font-size: 11px;
       margin: 0 4px;
       display: inline-flex;
       align-items: center;
     }
+    .bio-content {
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.7;
+      color: #29241f;
+      white-space: pre-wrap;
+      max-height: 180px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    .bio-content::-webkit-scrollbar { width: 4px; }
+    .bio-content::-webkit-scrollbar-track { background: rgba(115, 58, 53, .05); border-radius: 4px; }
+    .bio-content::-webkit-scrollbar-thumb { background: rgba(115, 58, 53, .25); border-radius: 4px; }
+    .bio-content::-webkit-scrollbar-thumb:hover { background: rgba(115, 58, 53, .45); }
+
     .child-list {
       margin-top: 10px;
       display: flex;
@@ -943,16 +959,19 @@
                       birth: "18-10-1953 Quý Tỵ",
                       death: "02-08-2022 Nhâm Dần",
                       deceased: true,
+                      bio: "Từ năm 1953 - 1962: còn nhỏ sống phụ thuộc gia đình\nTừ năm 1963 - 1967: là học sinh trường Thái Xuyên tại Xã Thái Xuyên – Thái Thụy – Thái Bình.\nTừ năm 11/1970 – 5/1975: là bộ đội chiến đấu tại Chiến trường B Thành cổ Quảng trị.\nTừ năm 6/1975 – 3/1977: là bộ đội phục viên tham gia hợp tác xã nông nghiệp xã Thái Xuyên.\nTừ 4/1977 – 12/1981: là cán bộ tại trường Kế hoạch tỉnh Sơn La.\nTừ 01/1982 – 6/1986: là cán bộ tại Ban quản lý đất đai (nay là Sở Tài nguyên và Môi trường).\nTừ 7/1986 đến 2022: nghỉ mất sức và hưởng chế độ thương binh",
                       children: [
                         {
                           name: "Vợ: HOÀNG THỊ XUYẾN",
                           birth: "01-10-1949 Kỷ Sửu",
                           death: "24-02-2025 Ất Tỵ",
                           deceased: true,
+                          bio: "Từ năm 1952 đến 1962: còn nhỏ sống phụ thuộc gia đình\nTừ năm 1963 đến 1967: là học sinh Trường Thanh Niên huyện Quỳnh Nhai.\nTừ năm 6/1968 đến 5/1972: là bộ đội và công tác tại Tỉnh Đội Sơn La (nay là Bộ Chỉ huy Quân sự Tỉnh Sơn La).\nTừ năm 6/1973 đến 3/1993: là cán bộ công chức tại Ban tổ chức chính quyền tỉnh Sơn La (nay là Sở Nội Vụ).\nTừ năm 4/1993 đến 2025: Hưu trí tại Tổ 09 Phường Tô Hiệu – Thành Phố Sơn La – tỉnh Sơn La.",
+
                           children: [
-                            { name: "PHẠM THỊ KIM XUÂN", birth: "02-08-1979 (10-06 Kỷ Mùi)" },
-                            { name: "PHẠM PHƯƠNG ĐÔNG", birth: "29-12-1981 (04-12 Tân Dậu)", children: [{ name: "Vợ: HOÀNG THANH HUYỀN", birth: "02-09-1985 (Ất Sửu)", children: [{ name: "PHẠM HOÀNG DƯƠNG", birth: "14-06-2011 (Tân Mão)" }] }] },
-                            { name: "PHẠM PHƯƠNG NAM", birth: "20-10-1984 (26-09 Giáp tý)", children: [{ name: "Vợ: PHAN THỊ HỒNG", birth: "04-10-1989 (Kỷ Tỵ)", children: [{ name: "PHẠM THỦY PHƯƠNG ANH", birth: "07-12-2012 (04-11 Nhâm Thìn)" }, { name: "PHẠM NAM ANH", birth: "29-08-2016 (27-07 Bính Thân)" }] }] }
+                            { name: "PHẠM THỊ KIM XUÂN", birth: "02-08-1979 (10-06 Kỷ Mùi)", bio: "Từ năm 1979 đến năm 1985 học trường mẫu giáo Tô Hiệu thành phố Sơn La tỉnh Sơn La.\nTừ năm 1986 đến năm 1990 là học sinh trường tiểu học Tô Hiệu thành phố Sơn La tỉnh Sơn La.\nTừ năm 1991 đến năm 1994 là học sinh trường trung học cơ sở Tô Hiệu thành phố Sơn La tỉnh Sơn La. \nTừ năm 1995 đến năm 1998 là học sinh trường phổ thông chuyên ban Tô Hiệu thành phố Sơn La tỉnh Sơn La. \n Từ năm 1999 đến năm 2005 học đại học tại trường đại học quốc gia Hà Nội. \nTừ năm 2006 đến năm 2018 công tác tại sở Thông tin và Truyền thông tỉnh Sơn La\nTừ ngày 29 tháng 1 năm 2018 công tác tại trung tâm công nghệ và truyền thông tỉnh Sơn La." },
+                            { name: "PHẠM PHƯƠNG ĐÔNG", birth: "29-12-1981 (04-12 Tân Dậu)", bio: "Từ 1981-1986: là học sinh Trường Mẫu giáo Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1987– 5/1993: là học sinh Trường Tiểu học Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1993 – 5/1997: là học sinh Trường Trung học cơ sở Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1997 – 5/2000: là học sinh Trường Trung học phổ thông Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 12/2001 – 5/2006: là sinh viên Trường Đại Học Quốc Gia Hà Nội - Khoa Công nghệ Điện tử Viễn thông\nTừ 6/2006 – 9/2007:  ở nhà giúp gia đình\nTừ 10/2007 đến nay: Công tác tại công ty cổ phần cấp nước Sơn La", children: [{ name: "Vợ: HOÀNG THANH HUYỀN", birth: "02-09-1985 (Ất Sửu)",bio:"Quê quán: xã Đông La huyện Đông Hưng tỉnh Thái Bình.\nTừ năm 1996 đến năm 2000 học cấp 2 tại trường trung học cơ sở Nguyễn Trãi thành phố Sơn La tỉnh Sơn La. \n Từ năm 2000 đến năm 2003 học cấp 3 tại trường Trung học phổ thông Chuyên Sơn La thành phố Sơn La tỉnh Sơn La. \n Từ năm 2003 đến năm 2007 học đại học tại Trường đại học sư phạm Thái Nguyên tỉnh Thái Nguyên. \n Từ năm 2007 đến năm 2009 ở nhà giúp gia đình. \n Từ năm 2009 đến nay công tác tại sở văn hóa thể thao và Du lịch Tỉnh Sơn La.", children: [{ name: "PHẠM HOÀNG DƯƠNG", birth: "14-06-2011 (Tân Mão)"}] }] },
+                            { name: "PHẠM PHƯƠNG NAM", birth: "20-10-1984 (26-09 Giáp tý)", bio: "Từ 1984 - 1988: là học sinh Trường Mẫu giáo Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La;\nTừ 9/1990 – 5/1995: là học sinh Trường Tiểu học Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La; \nTừ 9/1995 – 5/1999: là học sinh Trường Trung học cơ sở Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La; \nTừ 9/2000 – 5/2002: là học sinh Trường Trung học phổ thông chuyên ban Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La; \nTừ 9/2002 – 5/2007: là sinh viên Trường Đại Học Kỹ thuật Công nghiệp Thái Nguyên \nTừ 9/2009 đến nay: là cán bộ tại Phân xưởng sửa chữa điện - Ban dự án Thủy điện Sơn La",children: [{ name: "Vợ: PHAN THỊ HỒNG", birth: "04-10-1989 (Kỷ Tỵ)", children: [{ name: "PHẠM THỦY PHƯƠNG ANH", birth: "07-12-2012 (04-11 Nhâm Thìn)" }, { name: "PHẠM NAM ANH", birth: "29-08-2016 (27-07 Bính Thân)" }] }] }
                           ]
                         }
                       ]
@@ -1287,9 +1306,6 @@
         birthSolar = { d: leadingDate.d, m: leadingDate.m, y: leadingDate.y, source: "recorded" };
         const computed = VietnameseLunarCalendar.solarToLunar(leadingDate.d, leadingDate.m, leadingDate.y, VN_TIMEZONE);
         birthLunar = { ...computed, source: "computed-from-solar" };
-        if (parentDate && (parentDate.d !== computed.d || parentDate.m !== computed.m)) {
-          warnings.push(`Dữ liệu gốc ghi âm lịch ${pad2(parentDate.d)}/${pad2(parentDate.m)} trong "${source}", đã đối chiếu theo dương lịch ${formatSolarDate(birthSolar)} thành ${formatLunarDate(birthLunar)}.`);
-        }
       } else if (leadingDate) {
         birthSolar = { d: leadingDate.d, m: leadingDate.m, source: "recorded-no-year" };
       } else if (yearOnly) {
@@ -1306,7 +1322,7 @@
         birthSolar,
         birthLunar,
         birthNote: [...new Set(noteParts)].join(" · "),
-        dateWarnings: warnings
+        dateWarnings: [] // Đã tắt cảnh báo
       };
     };
     const splitDeathDate = (raw = "") => {
@@ -1321,7 +1337,7 @@
         deathSolar: null,
         deathLunar: { d: parsed.d, m: parsed.m, y: parsed.y || null, source: "recorded-anniversary" },
         deathNote: note,
-        dateWarnings: []
+        dateWarnings: [] // Đã tắt cảnh báo
       };
     };
     const GENDER_OVERRIDES = {
@@ -1336,7 +1352,6 @@
       "PHẠM MINH ANH": "female"
     };
 
-    // Đảm bảo chính xác 100% logic cũ, được tinh chỉnh lại ở getGenTitle thay vì gỡ logic như phiên bản trước
     const deriveGender = (name = "") => {
       const displayName = cleanName(name).toUpperCase();
       if (GENDER_OVERRIDES[displayName]) return GENDER_OVERRIDES[displayName];
@@ -1350,7 +1365,6 @@
     };
     const getGenderLabel = (gender) => gender === "male" ? "Nam" : gender === "female" ? "Nữ" : "Chưa rõ";
 
-    // giữ nguyên logic gốc của toàn bộ code
     const getNormalizedRole = (node) => {
       const roleName = getNameRole(node.name);
       if (node.isCurrentHead) return "Trưởng họ";
@@ -1372,18 +1386,17 @@
         ...deathParts,
         branch: branchLine,
         branchRoot: ownBranch,
-        dateWarnings: [...(birthParts.dateWarnings || []), ...(deathParts.dateWarnings || [])],
+        dateWarnings: [], // Đã tắt cảnh báo
         gender: node.gender || deriveGender(node.name),
         role: node.role || getNormalizedRole({ ...node, isCurrentHead }),
         branchLine,
         isCurrentHead,
-        isSpouse: isSpouse(node.name) // Lưu thuộc tính này để dùng cho việc hiển thị
+        isSpouse: isSpouse(node.name)
       };
       normalized.children = node.children?.map((child) => normalizeGenealogy(child, branchLine));
       return normalized;
     };
 
-    // Phục hồi cụm từ khóa nữ, ngoại trừ cụ "PHẠM HƯƠNG CHỬ"
     const getGenTitle = (person, gen) => {
       const name = typeof person === "string" ? person : person.name;
       const gender = typeof person === "string" ? deriveGender(person) : (person.gender || deriveGender(person.name));
@@ -1428,12 +1441,8 @@
         const currentGen = parentNode === null ? 1 : (isSpouse(node.name) ? gen : gen + 1);
         const currentBranch = node.branchLine || node.branch || branchName || "";
 
-        // Lưu trữ cả object node thay vì chỉ tên để có thể kiểm tra isSpouse lúc render
         const currentPath = [...pathNodes, node];
-
         const fullName = describeNode(node, parentNode, grandparentNode, currentGen);
-
-        // Tạo mảng pathNames (chỉ chứa tên) để phục vụ cho tìm kiếm
         const pathNames = currentPath.map(n => cleanName(n.name));
 
         const searchText = normalizeText([
@@ -1447,6 +1456,7 @@
           formatBirth(node),
           formatDeath(node),
           node.info,
+          node.bio, // Lọc theo bio
           getGenderLabel(node.gender),
           currentBranch,
           pathNames.join(" "),
@@ -1459,8 +1469,8 @@
           grandparentNode,
           gen: currentGen,
           branchName: currentBranch,
-          pathNodes: currentPath, // Lưu pathNodes để dùng khi render
-          pathNames: pathNames, // Lưu pathNames cho search result
+          pathNodes: currentPath,
+          pathNames: pathNames,
           fullName,
           searchText
         });
@@ -1528,10 +1538,9 @@
         ? (isSpouse(data.name) ? `${roleName || "Vợ"} của ${cleanName(parentNode.name)}` : `Con của ${actualParent ? cleanName(actualParent.name) : cleanName(parentNode.name)}`)
         : "Thủy tổ của gia phả";
 
-      // Sửa lỗi lặp từ bằng cách loại bỏ các từ trùng lặp
       const titleLabel = [...new Set([genTitle, roleName, data.role])].filter(Boolean).join(" - ");
-
       const branchLabel = data.branchLine || branchName || "Gốc gia phả";
+
       return (
         <div className="modal-backdrop" onClick={onClose}>
           <section className="modal detail-modal" onClick={(e) => e.stopPropagation()}>
@@ -1579,16 +1588,13 @@
                 </div>
               </div>
               <div className="lineage-box">
-                <p className="detail-label"><Icon name="route" size={13} /> Ông Bà / Bố Mẹ</p>
+                <p className="detail-label"><Icon name="route" size={13} /> ÔNG BÀ/ BỐ MẸ</p>
                 <p className="lineage-path">
                   {pathNodes.map((node, idx) => {
                     const nodeName = cleanName(node.name);
-                    // Nếu là phần tử đầu tiên, không in dấu gì phía trước
                     if (idx === 0) {
                       return <span className="lineage-step" key={`${nodeName}-${idx}`}>{nodeName}</span>;
                     }
-
-                    // Nếu node hiện tại là vợ/chồng thì in trái tim trước nó, ngược lại in dấu "/"
                     if (node.isSpouse) {
                       return (
                         <React.Fragment key={`${nodeName}-${idx}`}>
@@ -1607,14 +1613,25 @@
                   })}
                 </p>
               </div>
+
+              {data.bio && (
+                <div className="lineage-box">
+                  <p className="detail-label"><Icon name="book-open" size={13} /> Lý lịch / Tiểu sử</p>
+                  <div className="bio-content">
+                    {data.bio}
+                  </div>
+                </div>
+              )}
+
               {data.info && (
                 <div className="lineage-box">
                   <p className="detail-label"><Icon name="notebook-text" size={13} /> Ghi chú</p>
                   <p className="lineage-path">{data.info}</p>
                 </div>
               )}
+
               <div className="lineage-box">
-                <p className="detail-label"><Icon name="users" size={13} /> Vợ Con</p>
+                <p className="detail-label"><Icon name="users" size={13} /> VỢ CHỒNG/ CON CÁI</p>
                 {children.length ? (
                   <div className="child-list">
                     {children.map((child, idx) => <span className="child-chip" key={`${child.name}-${idx}`}>{formatPersonName(child)}</span>)}
@@ -1847,7 +1864,7 @@
             <div className="flex items-center gap-4 min-w-0">
               <div className="crest"><Icon name="scroll-text" size={27} /></div>
               <div className="min-w-0">
-                <h1 className="font-serif text-[22px] sm:text-[28px] font-black leading-tight brand-title">GIA PHẢ PHẠM TỘC </h1>
+                <h1 className="font-serif text-[22px] sm:text-[28px] font-black leading-tight brand-title">GIA PHẢ PHẠM TỘC</h1>
                 <p className="mt-1 text-xs font-bold brand-sub">{todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch</p>
               </div>
             </div>
