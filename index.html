@@ -1579,7 +1579,7 @@
                 </div>
               </div>
               <div className="lineage-box">
-                <p className="detail-label"><Icon name="route" size={13} /> Tuyến quan hệ</p>
+                <p className="detail-label"><Icon name="route" size={13} /> Ông Bà / Bố Mẹ</p>
                 <p className="lineage-path">
                   {pathNodes.map((node, idx) => {
                     const nodeName = cleanName(node.name);
@@ -1599,7 +1599,7 @@
                     } else {
                       return (
                         <React.Fragment key={`${nodeName}-${idx}`}>
-                          <span className="lineage-separator">➡️</span>
+                          <span className="lineage-separator">/</span>
                           <span className="lineage-step">{nodeName}</span>
                         </React.Fragment>
                       );
@@ -1613,20 +1613,14 @@
                   <p className="lineage-path">{data.info}</p>
                 </div>
               )}
-              {data.dateWarnings?.length > 0 && (
-                <div className="lineage-box">
-                  <p className="detail-label"><Icon name="triangle-alert" size={13} /> Đối chiếu ngày tháng</p>
-                  {data.dateWarnings.map((warning, idx) => <p className="lineage-path" key={idx}>{warning}</p>)}
-                </div>
-              )}
               <div className="lineage-box">
-                <p className="detail-label"><Icon name="users" size={13} /> Nhánh kế tiếp</p>
+                <p className="detail-label"><Icon name="users" size={13} /> Vợ Con</p>
                 {children.length ? (
                   <div className="child-list">
                     {children.map((child, idx) => <span className="child-chip" key={`${child.name}-${idx}`}>{formatPersonName(child)}</span>)}
                   </div>
                 ) : (
-                  <p className="lineage-path">Chưa có dữ liệu nhánh kế tiếp.</p>
+                  <p className="lineage-path">Chưa có dữ liệu vợ chồng & con cái.</p>
                 )}
               </div>
             </div>
@@ -1853,7 +1847,7 @@
             <div className="flex items-center gap-4 min-w-0">
               <div className="crest"><Icon name="scroll-text" size={27} /></div>
               <div className="min-w-0">
-                <h1 className="font-serif text-[22px] sm:text-[28px] font-black leading-tight brand-title">Gia Phả Phạm Tộc </h1>
+                <h1 className="font-serif text-[22px] sm:text-[28px] font-black leading-tight brand-title">GIA PHẢ PHẠM TỘC </h1>
                 <p className="mt-1 text-xs font-bold brand-sub">{todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch</p>
               </div>
             </div>
