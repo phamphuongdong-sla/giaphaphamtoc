@@ -1017,7 +1017,7 @@
                     { name: "PHẠM HỒNG THẮNG", birth: "31-08-1976 (14-07 Bính Thìn)", children: [{ name: "Vợ: DƯƠNG THỊ TUYẾT HUỆ", birth: "23-11-1985 (12-10 Ất Sửu)", children: [{ name: "PHẠM KHÁNH DUY", birth: "12-03-2007 (23-01 Đinh Hợi)" }, { name: "PHẠM HẢI YẾN", birth: "15-02-2009 (21-01 Kỷ Sửu)" }] }] }
                   ]
                 },
-                { name: "Bà hai: PHẠM THỊ THU", birth: "1952 Nhâm Thìn", children: [{ name: "PHẠM THỊ ANH ANH", birth: "1955 Ất Hợi", info: "Con bà hai" }] }
+                { name: "Bà hai: PHẠM THỊ THU", birth: "1952 Nhâm Thìn", children: [{ name: "PHẠM THỊ ANH ANH", birth: "1995 Ất Hợi", info: "Phổ Yên - Thái Nguyên" }] }
               ]
             }
           ]
@@ -1489,7 +1489,7 @@
       <>
         <div className="meta">
           {(data.birthSolar || data.birthLunar || data.birthNote) && <span className="meta-item"><Icon name="sun" size={13} /> Sinh: <b>{formatBirth(data)}</b></span>}
-          {data.deceased && (data.deathLunar || data.deathSolar || data.deathNote) && <span className="meta-item death"><Icon name="moon" size={13} /> Giỗ: <b>{formatDeath(data)}</b></span>}
+          {data.deceased && (data.deathLunar || data.deathSolar || data.deathNote) && <span className="meta-item death"><Icon name="moon" size={13} /> : <b>{formatDeath(data)}</b></span>}
         </div>
         {data.info && <div className="info">{data.info}</div>}
       </>
@@ -1541,7 +1541,7 @@
                 </div>
                 {data.deceased && (
                   <div className="detail-field">
-                    <p className="detail-label"><Icon name="moon" size={13} /> Ngày giỗ</p>
+                    <p className="detail-label"><Icon name="moon" size={13} /> Ngày Mất</p>
                     <p className="detail-value">{formatDeath(data) || "Chưa có dữ liệu"}</p>
                   </div>
                 )}
