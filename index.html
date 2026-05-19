@@ -1,11 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Gia Phả Phạm Tộc</title>
-
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -14,7 +12,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Noto+Serif:wght@600;700;800;900&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --lacquer: #733a35;
@@ -28,7 +25,6 @@
       --muted: #756b61;
       --line: #b89a68;
     }
-
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body, #root { width: 100%; height: 100%; margin: 0; }
     body {
@@ -41,7 +37,6 @@
       overflow: hidden;
     }
     .font-serif { font-family: "Noto Serif", serif; }
-
     .shell {
       height: 100vh;
       display: flex;
@@ -52,7 +47,6 @@
         linear-gradient(90deg, rgba(115, 58, 53, .02) 1px, transparent 1px);
       background-size: 34px 34px;
     }
-
     .topbar {
       position: relative;
       z-index: 80;
@@ -69,7 +63,6 @@
       box-shadow: 0 14px 34px rgba(59, 27, 25, .18);
       border-bottom: 1px solid rgba(213, 185, 135, .34);
     }
-
     .crest {
       width: 52px;
       height: 52px;
@@ -81,7 +74,6 @@
       color: #fff8ed;
       box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .2), 0 10px 22px rgba(59, 27, 25, .17);
     }
-
     .segmented {
       display: flex;
       gap: 4px;
@@ -107,7 +99,6 @@
       background: linear-gradient(180deg, #efdaa8, #c9a063);
       box-shadow: 0 8px 16px rgba(45, 20, 16, .14);
     }
-
     .notice {
       position: relative;
       z-index: 50;
@@ -121,7 +112,6 @@
       border-bottom: 1px solid rgba(102, 70, 37, .18);
       box-shadow: 0 8px 20px rgba(102, 70, 37, .08);
     }
-
     .notice-label {
       display: inline-flex;
       align-items: center;
@@ -137,9 +127,7 @@
       white-space: nowrap;
       box-shadow: 0 6px 12px rgba(61, 23, 22, .18);
     }
-
     main { position: relative; flex: 1; min-height: 0; overflow: hidden; }
-
     .list-scroll {
       position: absolute;
       inset: 0;
@@ -148,7 +136,6 @@
       -webkit-overflow-scrolling: touch;
     }
     .list-inner { width: min(820px, 100%); margin: 0 auto; }
-
     .toolbar {
       position: sticky;
       top: 0;
@@ -176,7 +163,6 @@
       text-transform: uppercase;
       box-shadow: 0 8px 18px rgba(61, 23, 22, .06);
     }
-
     .search-panel {
       margin: 0 0 14px;
       padding: 12px;
@@ -271,7 +257,6 @@
       font-weight: 700;
       text-align: center;
     }
-
     .family-card {
       position: relative;
       min-height: 118px;
@@ -310,12 +295,10 @@
       height: 4px;
       background: linear-gradient(90deg, #733a35, #c5a06a 48%, rgba(115, 58, 53, .18));
     }
-
     .family-card.birthday {
       border-color: #b58b4d;
       box-shadow: 0 0 0 1px rgba(181, 139, 77, .18), 0 16px 34px rgba(156, 116, 66, .11);
     }
-
     .card-body {
       position: relative;
       z-index: 2;
@@ -324,7 +307,6 @@
       gap: 14px;
       padding: 18px 18px 16px 22px;
     }
-
     .deceased-mark {
       position: absolute;
       inset: 0 auto auto 0;
@@ -345,7 +327,6 @@
       background: #24201d;
       box-shadow: 0 2px 5px rgba(0,0,0,.26);
     }
-
     .birthday-ribbon {
       position: absolute;
       top: 0;
@@ -364,7 +345,6 @@
       text-transform: uppercase;
       pointer-events: none;
     }
-
     .title-pill {
       display: inline-flex;
       align-items: center;
@@ -379,7 +359,6 @@
       text-transform: uppercase;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
     }
-
     .name {
       margin-top: 7px;
       font-size: clamp(17px, 2vw, 23px);
@@ -388,7 +367,6 @@
       color: #733a35;
     }
     .dark .name { color: #efdcae; }
-
     .meta {
       display: flex;
       flex-wrap: wrap;
@@ -414,7 +392,6 @@
     }
     .death { color: #8d4a40; font-weight: 800; }
     .dark .death { color: #efdcae; }
-
     .info {
       margin-top: 10px;
       width: fit-content;
@@ -428,7 +405,6 @@
       font-style: italic;
     }
     .dark .info { background: rgba(255,255,255,.09); color: rgba(255,246,232,.86); }
-
     .branch-list {
       margin: 0 0 8px 16px;
       padding-left: 14px;
@@ -439,7 +415,6 @@
       padding-left: 10px;
       border-left-style: dashed;
     }
-
     .tree-stage {
       position: absolute;
       inset: 0;
@@ -462,7 +437,6 @@
       transform-origin: top center;
       transition: transform .06s linear;
     }
-
     .tree-branch {
       position: relative;
       display: flex;
@@ -523,7 +497,6 @@
     }
     .root-node { padding-top: 0; }
     .root-node::before, .root-node::after { display: none; }
-
     .tree-card {
       position: relative;
       width: 304px;
@@ -594,7 +567,6 @@
       background: #9d7745;
       box-shadow: 0 0 0 4px rgba(156, 116, 66, .14);
     }
-
     .tree-controls {
       position: absolute;
       right: 18px;
@@ -621,7 +593,6 @@
       color: #fff6e8;
       border-color: rgba(213, 185, 135, .26);
     }
-
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -679,7 +650,6 @@
       white-space: nowrap;
     }
     .days-pill.today { background: #733a35; color: #fff6e8; }
-
     .modal-icon { color: #e4ca91; }
     .modal-date { color: #8d4a40; }
     .modal-close {
@@ -815,7 +785,6 @@
     .brand-sub { color: rgba(255, 246, 232, .62); }
     .section-kicker { color: rgba(115, 58, 53, .64); }
     .section-title { color: #4a2522; }
-
     @media (max-width: 700px) {
       .topbar {
         min-height: 116px;
@@ -835,14 +804,11 @@
 </head>
 <body>
   <div id="root"></div>
-
   <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
-
     const now = new Date();
     const CURRENT_SOLAR_MONTH = now.getMonth() + 1;
     const CURRENT_SOLAR_DAY = now.getDate();
-
     const GIA_PHA_DATA = {
       name: "PHẠM HƯƠNG CHỬ",
       birth: "1891 Tân Mão",
@@ -960,7 +926,7 @@
                     { name: "PHẠM THỊ HƯỜNG", death: "Đã mất", deceased: true },
                     { name: "PHẠM THỊ NHẠN", birth: "1944 Giáp Thân", info: "Có 2 con sống cùng con gái ở Vĩnh Phúc" },
                     { name: "PHẠM THỊ NHIÊN", birth: "1948 Mậu Tý", info: "Có 5 người con sống ở Diêm Điền" },
-                    { name: "Con trai vô danh", death: "Mất sớm, chưa đặt tên", deceased: true },
+                    { name: "CON TRAI (THỨ 6)", death: "Mất sớm, chưa đặt tên", deceased: true },
                     {
                       name: "PHẠM MINH ĐỨC",
                       birth: "18-10-1953 Quý Tỵ",
@@ -996,7 +962,8 @@
                           ]
                         }
                       ]
-                    }
+                    },
+                    { name: "CON TRAI (ÚT)", death: "Mất sớm, chưa đặt tên", deceased: true },
                   ]
                 }
               ]
@@ -1084,7 +1051,6 @@
         }
       ]
     };
-
     const isSpouse = (name = "") => /^(Vợ:|Bà cả:|Bà hai:|Bà ba:)/i.test(name);
     const cleanName = (name = "") => name.replace(/^(Vợ:|Bà cả:|Bà hai:|Bà ba:)\s*/i, "").trim();
     const getNameRole = (name = "") => {
@@ -1099,10 +1065,8 @@
     const CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
     const VN_TIMEZONE = 7;
     const INT = Math.floor;
-
     const VietnameseLunarCalendar = (() => {
       const PI = Math.PI;
-
       const jdFromDate = (dd, mm, yy) => {
         const a = INT((14 - mm) / 12);
         const y = yy + 4800 - a;
@@ -1113,7 +1077,6 @@
         }
         return jd;
       };
-
       const jdToDate = (jd) => {
         let a, b, c;
         if (jd > 2299160) {
@@ -1132,7 +1095,6 @@
         const year = b * 100 + d - 4800 + INT(m / 10);
         return { d: day, m: month, y: year };
       };
-
       const newMoon = (k) => {
         const t = k / 1236.85;
         const t2 = t * t;
@@ -1155,9 +1117,7 @@
           : -0.000278 + 0.000265 * t + 0.000262 * t2;
         return jd1 + c1 - deltaT;
       };
-
       const getNewMoonDay = (k, timeZone) => INT(newMoon(k) + 0.5 + timeZone / 24);
-
       const getSunLongitude = (jdn, timeZone) => {
         const t = (jdn - 2451545.5 - timeZone / 24) / 36525;
         const t2 = t * t;
@@ -1170,7 +1130,6 @@
         l -= PI * 2 * INT(l / (PI * 2));
         return INT(l / PI * 6);
       };
-
       const getLunarMonth11 = (yy, timeZone) => {
         const off = jdFromDate(31, 12, yy) - 2415021;
         const k = INT(off / 29.530588853);
@@ -1179,7 +1138,6 @@
         if (sunLong >= 9) nm = getNewMoonDay(k - 1, timeZone);
         return nm;
       };
-
       const getLeapMonthOffset = (a11, timeZone) => {
         const k = INT((a11 - 2415021.076998695) / 29.530588853 + 0.5);
         let last = 0;
@@ -1192,7 +1150,6 @@
         } while (arc !== last && i < 14);
         return i - 1;
       };
-
       const solarToLunar = (dd, mm, yy, timeZone = VN_TIMEZONE) => {
         const dayNumber = jdFromDate(dd, mm, yy);
         const k = INT((dayNumber - 2415021.076998695) / 29.530588853);
@@ -1223,7 +1180,6 @@
         if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
         return { d: lunarDay, m: lunarMonth, y: lunarYear, leap: lunarLeap };
       };
-
       const lunarToSolar = (lunarDay, lunarMonth, lunarYear, lunarLeap = false, timeZone = VN_TIMEZONE) => {
         let a11, b11;
         if (lunarMonth < 11) {
@@ -1245,16 +1201,13 @@
         }
         return jdToDate(getNewMoonDay(k + off, timeZone) + lunarDay - 1);
       };
-
       const getLunarToday = () => {
         const current = new Date();
         const lunar = solarToLunar(current.getDate(), current.getMonth() + 1, current.getFullYear(), VN_TIMEZONE);
         return { ...lunar, label: `${lunar.d}/${lunar.m}${lunar.leap ? " nhuận" : ""}/${lunar.y} Âm lịch` };
       };
-
       return { jdFromDate, jdToDate, solarToLunar, lunarToSolar, getLunarToday };
     })();
-
     const getCanChiYear = (year) => `${CAN[(year + 6) % 10]} ${CHI[(year + 8) % 12]}`;
     const pad2 = (value) => String(value).padStart(2, "0");
     const formatSolarDate = (date) => {
@@ -1285,7 +1238,6 @@
       return parts.join(" · ");
     };
     const shortSolarDate = (date) => date?.d && date?.m ? `${pad2(date.d)}/${pad2(date.m)}` : "";
-
     const parseDateToken = (text = "") => {
       const match = String(text).match(/(\d{1,2})[-/](\d{1,2})(?:[-/](\d{2,4}))?/);
       if (!match) return null;
@@ -1307,12 +1259,10 @@
       const value = String(text).trim();
       return !value || /^[.\s]+$/.test(value) || /^(đã\s*mất|mất\s*sớm|chưa\s*rõ)$/i.test(value);
     };
-
     const splitBirthDate = (raw = "", personName = "") => {
       const source = String(raw || "").trim();
       const warnings = [];
       if (!source) return { birthSolar: null, birthLunar: null, birthNote: "", dateWarnings: warnings };
-
       const parenthetical = source.match(/\(([^)]*)\)/);
       const parentText = parenthetical ? parenthetical[1] : "";
       const parentDate = parseDateToken(parentText);
@@ -1322,7 +1272,6 @@
       let birthSolar = null;
       let birthLunar = null;
       const noteParts = [];
-
       if (leadingDate?.y) {
         birthSolar = { d: leadingDate.d, m: leadingDate.m, y: leadingDate.y, source: "recorded" };
         const computed = VietnameseLunarCalendar.solarToLunar(leadingDate.d, leadingDate.m, leadingDate.y, VN_TIMEZONE);
@@ -1335,16 +1284,13 @@
       } else if (yearOnly) {
         birthSolar = { y: yearOnly, source: "year-only" };
       }
-
       if (!birthLunar && parentDate) {
         birthLunar = { d: parentDate.d, m: parentDate.m, y: parentDate.y || null, source: "recorded" };
       }
-
       const parentNote = cleanDateNote(parentText);
       const leadingNote = cleanDateNote(leadingText);
       if (parentNote && !/^(Âm|AL)$/i.test(parentNote)) noteParts.push(parentNote);
       if (leadingNote) noteParts.push(leadingNote);
-
       return {
         birthSolar,
         birthLunar,
@@ -1352,7 +1298,6 @@
         dateWarnings: warnings
       };
     };
-
     const splitDeathDate = (raw = "") => {
       const source = String(raw || "").trim();
       if (!source) return { deathSolar: null, deathLunar: null, deathNote: "", dateWarnings: [] };
@@ -1368,8 +1313,8 @@
         dateWarnings: []
       };
     };
-
     const GENDER_OVERRIDES = {
+      "PHẠM HƯƠNG CHỬ": "male",
       "PHẠM TRÚC LAM": "female",
       "PHẠM MINH QUÂN": "male",
       "PHẠM MINH DƯƠNG": "male",
@@ -1379,6 +1324,8 @@
       "PHẠM TRÂN TUÂN": "male",
       "PHẠM MINH ANH": "female"
     };
+
+    // Đảm bảo chính xác 100% logic cũ, được tinh chỉnh lại ở getGenTitle thay vì gỡ logic như phiên bản trước
     const deriveGender = (name = "") => {
       const displayName = cleanName(name).toUpperCase();
       if (GENDER_OVERRIDES[displayName]) return GENDER_OVERRIDES[displayName];
@@ -1391,12 +1338,14 @@
       return "unknown";
     };
     const getGenderLabel = (gender) => gender === "male" ? "Nam" : gender === "female" ? "Nữ" : "Chưa rõ";
+
+    // giữ nguyên logic gốc của toàn bộ code
     const getNormalizedRole = (node) => {
       const roleName = getNameRole(node.name);
-      if (node.isCurrentHead) return "Trưởng họ hiện tại";
-      if (node.title === "Trưởng họ" && node.deceased) return "Nguyên trưởng họ";
+      if (node.isCurrentHead) return "Trưởng họ";
+      if (node.title === "Trưởng họ" && node.deceased) return "Trưởng họ";
       if (node.title) return node.title;
-      if (roleName) return "Phối ngẫu";
+      if (roleName) return roleName;
       return "";
     };
     const normalizeGenealogy = (node, inheritedBranch = "") => {
@@ -1422,22 +1371,21 @@
       return normalized;
     };
 
+    // Phục hồi cụm từ khóa nữ, ngoại trừ cụ "PHẠM HƯƠNG CHỬ"
     const getGenTitle = (person, gen) => {
       const name = typeof person === "string" ? person : person.name;
       const gender = typeof person === "string" ? deriveGender(person) : (person.gender || deriveGender(person.name));
       const femaleKeywords = ["THỊ", "BÀ ", "XUYẾN", "NỤ", "NGA", "SEN", "THÙY", "THÁI", "CÚC", "VÂN", "HUYỀN", "THẢO", "NHẠN", "NHIÊN", "XUÂN", "LAM", "LOÁN", "TÚ", "TÂN", "TƯ", "ĐÀO", "ÁNH", "HUỆ", "YẾN", "RỤNG", "NHUNG", "HÀ", "LINH", "TRANG", "THƯ", "TUYỀN", "TIÊN", "PHIẾM", "UYÊN", "VÍCH", "VIÊM", "DINH", "HƯỜNG", "NŨ", "NGÂN"];
-      const isFemale = gender === "female" || isSpouse(name) || femaleKeywords.some((k) => name.toUpperCase().includes(k));
+      const isFemale = cleanName(name) !== "PHẠM HƯƠNG CHỬ" && (gender === "female" || isSpouse(name) || femaleKeywords.some((k) => name.toUpperCase().includes(k)));
       if (gen === 1) return isFemale ? "Cụ tổ bà" : "Cụ tổ ông";
       if (gen === 2) return isFemale ? "Cụ bà" : "Cụ ông";
       if (gen === 3) return isFemale ? "Bà" : "Ông";
       return "";
     };
-
     const describeNode = (node, parentNode, grandparentNode, gen) => {
       const titlePrefix = getGenTitle(node, gen);
       const displayName = cleanName(node.name);
       let relation = "";
-
       if (isSpouse(node.name) && parentNode) {
         const husbandTitle = getGenTitle(parentNode, gen) || "ông";
         relation = `Vợ ${husbandTitle.toLowerCase()} ${cleanName(parentNode.name)}`;
@@ -1448,16 +1396,13 @@
           relation = `Con ${fatherTitle.toLowerCase()} ${cleanName(father.name)}`;
         }
       }
-
       return `${titlePrefix ? `${titlePrefix} ` : ""}${displayName}${relation ? ` (${relation})` : ""}`;
     };
-
     const visitTree = (node, parentNode, grandparentNode, gen, visitor) => {
       const currentGen = parentNode === null ? 1 : (isSpouse(node.name) ? gen : gen + 1);
       visitor(node, parentNode, grandparentNode, currentGen);
       node.children?.forEach((child) => visitTree(child, node, parentNode, currentGen, visitor));
     };
-
     const normalizeText = (value = "") =>
       String(value)
         .normalize("NFD")
@@ -1465,7 +1410,6 @@
         .replace(/đ/g, "d")
         .replace(/Đ/g, "D")
         .toLowerCase();
-
     const buildMemberEntries = (treeData) => {
       const entries = [];
       const walk = (node, parentNode, grandparentNode, gen, branchName, pathNames) => {
@@ -1489,7 +1433,6 @@
           currentPath.join(" "),
           fullName
         ].filter(Boolean).join(" "));
-
         entries.push({
           id: currentPath.join(" > "),
           data: node,
@@ -1501,13 +1444,11 @@
           fullName,
           searchText
         });
-
         node.children?.forEach((child) => walk(child, node, parentNode, currentGen, currentBranch, currentPath));
       };
       walk(treeData, null, null, 1, "", []);
       return entries;
     };
-
     const getBirthdays = (treeData) => {
       const list = [];
       visitTree(treeData, null, null, 1, (node, parentNode, grandparentNode, gen) => {
@@ -1518,7 +1459,6 @@
       });
       return list.sort((a, b) => a.day - b.day);
     };
-
     const getReminders = (treeData, todayLunar) => {
       const list = [];
       const current = new Date();
@@ -1541,12 +1481,10 @@
       });
       return list.sort((a, b) => a.days - b.days);
     };
-
     const Icon = ({ name, size = 16, className = "" }) => {
       useEffect(() => { window.lucide?.createIcons(); }, [name]);
       return <i data-lucide={name} className={className} style={{ width: size, height: size }} />;
     };
-
     const Meta = ({ data, dark = false }) => (
       <>
         <div className="meta">
@@ -1556,7 +1494,6 @@
         {data.info && <div className="info">{data.info}</div>}
       </>
     );
-
     const PersonDetailModal = ({ person, onClose }) => {
       if (!person) return null;
       const { data, parentNode, grandparentNode, gen, branchName, pathNames } = person;
@@ -1570,9 +1507,11 @@
       const relation = parentNode
         ? (isSpouse(data.name) ? `${roleName || "Vợ"} của ${cleanName(parentNode.name)}` : `Con của ${actualParent ? cleanName(actualParent.name) : cleanName(parentNode.name)}`)
         : "Thủy tổ của gia phả";
-      const branchLabel = data.branchLine || branchName || "Gốc gia phả";
-      const titleLabel = [genTitle, roleName, data.role].filter(Boolean).join(" - ");
 
+      // Sửa lỗi lặp từ bằng cách loại bỏ các từ trùng lặp
+      const titleLabel = [...new Set([genTitle, roleName, data.role])].filter(Boolean).join(" - ");
+
+      const branchLabel = data.branchLine || branchName || "Gốc gia phả";
       return (
         <div className="modal-backdrop" onClick={onClose}>
           <section className="modal detail-modal" onClick={(e) => e.stopPropagation()}>
@@ -1619,28 +1558,24 @@
                   <p className="detail-value">{branchLabel}</p>
                 </div>
               </div>
-
               <div className="lineage-box">
                 <p className="detail-label"><Icon name="route" size={13} /> Tuyến quan hệ</p>
                 <p className="lineage-path">
                   {pathNames.map((name, idx) => <span className="lineage-step" key={`${name}-${idx}`}>{name}</span>)}
                 </p>
               </div>
-
               {data.info && (
                 <div className="lineage-box">
                   <p className="detail-label"><Icon name="notebook-text" size={13} /> Ghi chú</p>
                   <p className="lineage-path">{data.info}</p>
                 </div>
               )}
-
               {data.dateWarnings?.length > 0 && (
                 <div className="lineage-box">
                   <p className="detail-label"><Icon name="triangle-alert" size={13} /> Đối chiếu ngày tháng</p>
                   {data.dateWarnings.map((warning, idx) => <p className="lineage-path" key={idx}>{warning}</p>)}
                 </div>
               )}
-
               <div className="lineage-box">
                 <p className="detail-label"><Icon name="users" size={13} /> Nhánh kế tiếp</p>
                 {children.length ? (
@@ -1659,7 +1594,6 @@
         </div>
       );
     };
-
     const SearchPanel = ({ query, onQueryChange, results, total, onSelect }) => (
       <section className="search-panel">
         <div className="search-box">
@@ -1698,7 +1632,6 @@
         )}
       </section>
     );
-
     const MemberItem = ({ data, level = 0, forceOpen, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNames = [] }) => {
       const [open, setOpen] = useState(level < 1);
       const hasChildren = data.children?.length > 0;
@@ -1718,9 +1651,7 @@
         pathNames: currentPath,
         fullName: describeNode(data, parentNode, grandparentNode, currentGen)
       };
-
       useEffect(() => { if (forceOpen !== null) setOpen(forceOpen); }, [forceOpen]);
-
       return (
         <div>
           <article className={`family-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isBirthday ? "birthday" : ""}`} onClick={() => onSelect(person)}>
@@ -1760,7 +1691,6 @@
         </div>
       );
     };
-
     const TreeNode = ({ data, level = 0, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNames = [] }) => {
       const [open, setOpen] = useState(level < 1);
       const hasChildren = data.children?.length > 0;
@@ -1780,7 +1710,6 @@
         pathNames: currentPath,
         fullName: describeNode(data, parentNode, grandparentNode, currentGen)
       };
-
       return (
         <div className={`tree-item ${level === 0 ? "root-node" : ""}`}>
           <article className={`tree-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isSpouse(data.name) ? "spouse" : ""} ${isBirthday ? "birthday" : ""}`} onClick={() => onSelect(person)}>
@@ -1818,7 +1747,6 @@
         </div>
       );
     };
-
     const App = () => {
       const [viewMode, setViewMode] = useState("list");
       const [scale, setScale] = useState(.48);
@@ -1839,11 +1767,9 @@
         if (!terms.length) return [];
         return memberEntries.filter((item) => terms.every((term) => item.searchText.includes(term)));
       }, [memberEntries, searchQuery]);
-
       useEffect(() => {
         if (reminders.length) setShowModal(true);
       }, [reminders.length]);
-
       const beginDrag = (x, y) => {
         dragging.current = true;
         start.current = { x: x - pos.x, y: y - pos.y };
@@ -1852,11 +1778,9 @@
         if (!dragging.current) return;
         setPos({ x: x - start.current.x, y: y - start.current.y });
       };
-
       return (
         <div className="shell">
           <PersonDetailModal person={selectedPerson} onClose={() => setSelectedPerson(null)} />
-
           {showModal && (
             <div className="modal-backdrop">
               <section className="modal">
@@ -1882,12 +1806,10 @@
               </section>
             </div>
           )}
-
           <header className="topbar">
             <div className="flex items-center gap-4 min-w-0">
               <div className="crest"><Icon name="scroll-text" size={27} /></div>
               <div className="min-w-0">
-
                 <h1 className="font-serif text-[22px] sm:text-[28px] font-black leading-tight brand-title">Gia Phả Phạm Tộc </h1>
                 <p className="mt-1 text-xs font-bold brand-sub">{todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch</p>
               </div>
@@ -1897,7 +1819,6 @@
               <button className={viewMode === "tree" ? "active" : ""} onClick={() => setViewMode("tree")}>Sơ đồ cây</button>
             </nav>
           </header>
-
           {birthdays.length > 0 && (
             <section className="notice">
               <span className="notice-label"><Icon name="cake" size={13} /> Sinh nhật tháng {CURRENT_SOLAR_MONTH}</span>
@@ -1906,7 +1827,6 @@
               </marquee>
             </section>
           )}
-
           <main>
             {viewMode === "list" ? (
               <div className="list-scroll">
@@ -1957,7 +1877,6 @@
         </div>
       );
     };
-
     ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 </body>
