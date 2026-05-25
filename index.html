@@ -1821,9 +1821,16 @@
         if (!terms.length) return [];
         return memberEntries.filter((item) => terms.every((term) => item.searchText.includes(term)));
       }, [memberEntries, searchQuery]);
-      useEffect(() => {
-        if (reminders.length) setShowModal(true);
-      }, [reminders.length]);
+      // Tìm đoạn này trong file index.html trên GitHub của anh:
+useEffect(() => {
+  if (reminders.length) setShowModal(true);
+  
+  // THÊM ĐOẠN NÀY VÀO DƯỚI ĐÂY:
+  if (window.ToanAppGiaPha) {
+    // Gửi số lượng ngày giỗ sang App Flutter
+    window.ToanAppGiaPha.postMessage(reminders.length.toString());
+  }
+}, [reminders.length]);
       const beginDrag = (x, y) => {
         dragging.current = true;
         start.current = { x: x - pos.x, y: y - pos.y };
