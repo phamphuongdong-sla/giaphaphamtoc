@@ -896,7 +896,7 @@
                               name: "PHẠM ANH TIẾN",
                               birth: "26-09-1969 (15-08 Kỷ Dậu)",
                               children: [
-                                { name: "Vợ: PHÌN THỊ THÙY", birth: "26-07-1977 (12-06 Đinh Tỵ)", children: [{ name: "PHẠM THÁI BÌNH", birth: "24-11-2003 (01-10 Quý Mùi)" }, { name: "PHẠM NGỌC DIỆU GIANG", birth: "12-07-2011 (11-06 Tân Mão)" }] }
+                                { name: "Vợ: PHÌN THỊ THÙY", birth: "26-07-1977 (12-06 Đinh Tỵ)", children: [{ name: "PHẠM THÁ thái BÌNH", birth: "24-11-2003 (01-10 Quý Mùi)" }, { name: "PHẠM NGỌC DIỆU GIANG", birth: "12-07-2011 (11-06 Tân Mão)" }] }
                               ]
                             },
                             { name: "PHẠM MINH CHÁNH", birth: "01-05-1971", death: "Đã Mất", info: "Chưa vợ", deceased: true },
@@ -1011,7 +1011,7 @@
                   death: "17-02-1982 Nhâm Tuất",
                   deceased: true,
                   children: [
-                    { name: "PHẠM NGỌC TUẤN", birth: "30-10-1960 (11-09 Canh tý)", children: [{ name: "Vợ: TRẦN THỊ PHƯƠNG", birth: "31-08-1959 (27-07 Kỷ Hợi)", children: [{ name: "PHẠM NGỌC ANH", birth: "18-01-1987 (18-12 Bính Dần)" }, { name: "PHẠM TRÂN TUÂN", birth: "27-12-1999 (20-11 Kỷ Mão)" }, { name: "PHẠM THỊ HƯƠNG LAN", birth: "25-07-2002 (20-06 Nhâm Ngọ)" }] }] },
+                    { name: "PHẠM NGỌC TUẤN", birth: "30-10-1960 (11-09 Canh tí)", children: [{ name: "Vợ: TRẦN THỊ PHƯƠNG", birth: "31-08-1959 (27-07 Kỷ Hợi)", children: [{ name: "PHẠM NGỌC ANH", birth: "18-01-1987 (18-12 Bính Dần)" }, { name: "PHẠM TRÂN TUÂN", birth: "27-12-1999 (20-11 Kỷ Mão)" }, { name: "PHẠM THỊ HƯƠNG LAN", birth: "25-07-2002 (20-06 Nhâm Ngọ)" }] }] },
                     { name: "PHẠM THỊ TÚ", birth: "1962 Nhâm Dần" },
                     { name: "PHẠM THỊ TÂN", birth: "01-06-1965 (02-05 Ất tỵ)" },
                     { name: "PHẠM THỊ TƯ", birth: "1968 Mậu Thân", death: "28-03-1978 Mậu Ngọ", deceased: true },
@@ -1253,7 +1253,6 @@
     };
     const isDuplicateCanChiNote = (note, date) => !!(note && date?.y && normalizeText(note) === normalizeText(getCanChiYear(date.y)));
 
-    // TÍNH TUỔI MỤ TÂM LINH (HƯỞNG THỌ / HƯỞNG DƯƠNG)
     const getThoDuongLabel = (birthSolar, birthLunar, deathSolar, deathLunar) => {
       const bY = birthLunar?.y || birthSolar?.y;
       const dY = deathLunar?.y || deathSolar?.y;
@@ -1262,10 +1261,10 @@
       return age >= 60 ? `Hưởng Thọ ${age} tuổi` : `Hưởng Dương ${age} tuổi`;
     };
 
+    // ĐÃ LOẠI BỎ HOÀN TOÀN HIỂN THỊ NGÀY ÂM LỊCH TẠI MỤC NGÀY SINH CỦA THÀNH VIÊN
     const formatBirth = (data) => {
       const parts = [];
-      if (data.birthSolar) parts.push(`Dương Lịch: ${formatSolarDate(data.birthSolar)}`);
-      if (data.birthLunar) parts.push(`Âm Lịch: ${formatLunarDate(data.birthLunar)}`);
+      if (data.birthSolar) parts.push(`${formatSolarDate(data.birthSolar)}`);
       if (data.birthNote && !isDuplicateCanChiNote(data.birthNote, data.birthLunar || data.birthSolar)) parts.push(data.birthNote);
       return parts.join(" · ");
     };
@@ -1275,7 +1274,6 @@
       if (data.deathSolar) parts.push(`Dương Lịch: ${formatSolarDate(data.deathSolar)}`);
       if (data.deathNote && !isDuplicateCanChiNote(data.deathNote, data.deathLunar || data.deathSolar)) parts.push(data.deathNote);
 
-      // Bổ sung Hưởng thọ/Hưởng dương vào luồng text ngày mất ngoài danh sách
       const thoDuong = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
       if (thoDuong) parts.push(thoDuong);
 
@@ -1324,14 +1322,12 @@
         birthSolar = { d: leadingDate.d, m: leadingDate.m, source: "recorded-no-year" };
       } else if (yearOnly) {
         birthSolar = { y: yearOnly, source: "year-only" };
-        // Tự động bổ sung Can Chi cho cấu trúc năm âm lịch nếu chỉ có năm Dương Lịch
         birthLunar = { y: yearOnly, canChi: getCanChiYear(yearOnly), source: "year-only-lunar" };
       }
       if (!birthLunar && parentDate) {
         birthLunar = { d: parentDate.d, m: parentDate.m, y: parentDate.y || null, source: "recorded" };
       }
 
-      // Đồng bộ quét ghi chú text gốc (Ví dụ: "1891 Tân Mão") để cấu trúc lại object năm Âm lịch chuẩn xác
       if (!birthLunar?.canChi && /\b(Tân Mão|Mậu Tý|Kỷ Dậu|Nhâm Thân|Quý Dậu|Bính Thân|Kỷ hợi|Giáp tý|Đinh Mão|Nhâm Dần|Kỷ Mão|Ất tỵ|Kỷ Dậu|Đinh Tỵ|Quý Mùi|Tân Mão|Mậu tý|Nhâm Thìn|Canh Thìn|Nhâm Ngọ|Bính Tuất|Canh Tuất|Bính Thìn|Đinh Mão|Canh Thân|Ất Dậu|Nhâm Tuất|Quý Hợi|Quý Mão|Giáp Thân|Mậu Tý|Quý Tỵ|Kỷ Sửu|Ất Tỵ|Kỷ Mùi|Tân Mão|Giáp tý|Bính Thân|Kỷ Tỵ|Nhâm Thìn|Kỷ Hợi|Canh tý|Quý Hợi|Bính Dần|Canh Ngọ|Đinh Dậu|Canh Tý|Giáp Thìn|Bính Dần|Tân Mùi|Đinh Mão|Nhâm Tuất|Canh tý|Kỷ Hợi|Bính Dần|Kỷ Mão|Nhâm Ngọ|Tân Hợi|Quý Sửu|Ất Hợi|Canh Thìn|Ất Mùi|Đinh Sửu|Giáp Thìn|Giáp Dần|Bính Thìn|Đinh Hợi|Kỷ Sửu|Tân tỵ|Đinh Hợi|Ất Dậu|Kỷ Dậu|Quý Sửu|Ất mão|Mậu Dần|Ất Mão|Quý Mùi|Quý Tỵ|Mậu Ngọ|Quý Hợi|Canh Dần|Canh Thân|Mậu THìn|Tân Mão|Bính Thân)\b/i.test(source)) {
         const matchedCanChi = source.match(/\b(Tân Mão|Mậu Tý|Kỷ Dậu|Nhâm Thân|Quý Dậu|Bính Thân|Kỷ hợi|Giáp tý|Đinh Mão|Nhâm Dần|Kỷ Mão|Ất tỵ|Kỷ Dậu|Đinh Tỵ|Quý Mùi|Tân Mão|Mậu tý|Nhâm Thìn|Canh Thìn|Nhâm Ngọ|Bính Tuất|Canh Tuất|Bính Thìn|Đinh Mão|Canh Thân|Ất Dậu|Nhâm Tuất|Quý Hợi|Quý Mão|Giáp Thân|Mậu Tý|Quý Tỵ|Kỷ Sửu|Ất Tỵ|Kỷ Mùi|Tân Mão|Giáp tý|Bính Thân|Kỷ Tỵ|Nhâm Thìn|Kỷ Hợi|Canh tý|Quý Hợi|Bính Dần|Canh Ngọ|Đinh Dậu|Canh Tý|Giáp Thìn|Bính Dần|Tân Mùi|Đinh Mão|Nhâm Tuất|Canh tý|Kỷ Hợi|Bính Dần|Kỷ Mão|Nhâm Ngọ|Tân Hợi|Quý Sửu|Ất Hợi|Canh Thìn|Ất Mùi|Đinh Sửu|Giáp Thìn|Giáp Dần|Bính Thìn|Đinh Hợi|Kỷ Sửu|Tân tỵ|Đinh Hợi|Ất Dậu|Kỷ Dậu|Quý Sửu|Ất mão|Mậu Dần|Ất Mão|Quý Mùi|Quý Tỵ|Mậu Ngọ|Quý Hợi|Canh Dần|Canh Thân|Mậu THìn|Tân Mão|Bính Thân)\b/i);
         if (birthLunar) birthLunar.canChi = matchedCanChi[0];
@@ -1339,9 +1335,9 @@
       }
 
       const parentNote = cleanDateNote(parentText);
-      const leadingNote = cleanDateNote(leadingNote);
+      const leadingNoteClean = cleanDateNote(leadingText);
       if (parentNote && !/^(Âm|AL)$/i.test(parentNote)) noteParts.push(parentNote);
-      if (leadingNote) noteParts.push(leadingNote);
+      if (leadingNoteClean) noteParts.push(leadingNoteClean);
       return {
         birthSolar,
         birthLunar,
@@ -1362,7 +1358,6 @@
         deathLunar = { d: parsed.d, m: parsed.m, y: parsed.y || null, source: "recorded-anniversary" };
       }
 
-      // Đồng bộ quét chuỗi năm mất Âm Lịch (ví dụ: "Quý Tỵ", "Đinh Dậu") để tự động điền Can Chi
       if (/\b(Quý Tỵ|Đinh Dậu|Kỷ Sửu|Giáp Ngọ|Mậu Dần|Bính Dần|Quý Hợi|Kỷ Mão|Ất Dậu|Đinh Tỵ|Quý Mão|Nhâm Dần|Ất Tỵ|Mậu Tý|Nhâm Tuất|Mậu Ngọ|Ất Mùi|Tân tỵ)\b/i.test(source)) {
         const matchedCanChi = source.match(/\b(Quý Tỵ|Đinh Dậu|Kỷ Sửu|Giáp Ngọ|Mậu Dần|Bính Dần|Quý Hợi|Kỷ Mão|Ất Dậu|Đinh Tỵ|Quý Mão|Nhâm Dần|Ất Tỵ|Mậu Tý|Nhâm Tuất|Mậu Ngọ|Ất Mùi|Tân tỵ)\b/i);
         if (deathLunar) deathLunar.canChi = matchedCanChi[0];
@@ -1568,7 +1563,6 @@
       const { data, parentNode, grandparentNode, gen, branchName, pathNodes } = person;
       const children = data.children || [];
 
-      // BỐ TRÍ HỢP LÝ NHẤT VÀO MODAL CHI TIẾT
       const thoDuongText = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
       const status = data.deceased ? (thoDuongText ? `Đã mất (${thoDuongText})` : "Đã mất") : "Còn sống";
 
