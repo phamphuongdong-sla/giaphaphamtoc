@@ -967,7 +967,6 @@
                           death: "24-02-2025 Ất Tỵ",
                           deceased: true,
                           bio: "Từ năm 1952 đến 1962: còn nhỏ sống phụ thuộc gia đình\nTừ năm 1963 đến 1967: là học sinh Trường Thanh Niên huyện Quỳnh Nhai.\nTừ năm 6/1968 đến 5/1972: là bộ đội và công tác tại Tỉnh Đội Sơn La (nay là Bộ Chỉ huy Quân sự Tỉnh Sơn La).\nTừ năm 6/1973 đến 3/1993: là cán bộ công chức tại Ban tổ chức chính quyền tỉnh Sơn La (nay là Sở Nội Vụ).\nTừ năm 4/1993 đến 2025: Hưu trí tại Tổ 09 Phường Tô Hiệu – Thành Phố Sơn La – tỉnh Sơn La.",
-
                           children: [
                             { name: "PHẠM THỊ KIM XUÂN", birth: "02-08-1979 (10-06 Kỷ Mùi)", bio: "Từ năm 1979 đến năm 1985 học trường mẫu giáo Tô Hiệu thành phố Sơn La tỉnh Sơn La.\nTừ năm 1986 đến năm 1990 là học sinh trường tiểu học Tô Hiệu thành phố Sơn La tỉnh Sơn La.\nTừ năm 1991 đến năm 1994 là học sinh trường trung học cơ sở Tô Hiệu thành phố Sơn La tỉnh Sơn La. \nTừ năm 1995 đến năm 1998 là học sinh trường phổ thông chuyên ban Tô Hiệu thành phố Sơn La tỉnh Sơn La. \n Từ năm 1999 đến năm 2005 học đại học tại trường đại học quốc gia Hà Nội. \nTừ năm 2006 đến năm 2018 công tác tại sở Thông tin và Truyền thông tỉnh Sơn La\nTừ ngày 29 tháng 1 năm 2018 công tác tại trung tâm công nghệ và truyền thông tỉnh Sơn La." },
                             { name: "PHẠM PHƯƠNG ĐÔNG", birth: "29-12-1981 (04-12 Tân Dậu)", bio: "Từ 1981-1986: là học sinh Trường Mẫu giáo Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1987– 5/1993: là học sinh Trường Tiểu học Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1993 – 5/1997: là học sinh Trường Trung học cơ sở Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1997 – 5/2000: là học sinh Trường Trung học phổ thông Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 12/2001 – 5/2006: là sinh viên Trường Đại Học Quốc Gia Hà Nội - Khoa Công nghệ Điện tử Viễn thông\nTừ 6/2006 – 9/2007:  ở nhà giúp gia đình\nTừ 10/2007 đến nay: Công tác tại công ty cổ phần cấp nước Sơn La", children: [{ name: "Vợ: HOÀNG THANH HUYỀN", birth: "02-09-1985 (Ất Sửu)",bio:"Quê quán: xã Đông La huyện Đông Hưng tỉnh Thái Bình.\nTừ năm 1996 đến năm 2000 học cấp 2 tại trường trung học cơ sở Nguyễn Trãi thành phố Sơn La tỉnh Sơn La. \n Từ năm 2000 đến năm 2003 học cấp 3 tại trường Trung học phổ thông Chuyên Sơn La thành phố Sơn La tỉnh Sơn La. \n Từ năm 2003 đến năm 2007 học đại học tại Trường đại học sư phạm Thái Nguyên tỉnh Thái Nguyên. \n Từ năm 2007 đến năm 2009 ở nhà giúp gia đình. \n Từ năm 2009 đến nay công tác tại sở văn hóa thể thao và Du lịch Tỉnh Sơn La.", children: [{ name: "PHẠM HOÀNG DƯƠNG", birth: "14-06-2011 (Tân Mão)"}] }] },
@@ -984,7 +983,7 @@
                       children: [
                         {
                           name: "Vợ: ĐẶNG PHƯƠNG DUNG",
-                          birth: "21-10-1960 (01-09 Canh tý)",
+                          birth: "21-10-1960 (01-09 Canh tí)",
                           children: [
                             { name: "PHẠM DIỆU HƯƠNG", birth: "20-11-1983 (16-10 Quý Hợi)" },
                             { name: "PHẠM DIỆU VÂN", birth: "31-07-1986 (25-06 Bính Dần)" },
@@ -993,7 +992,7 @@
                         }
                       ]
                     },
-                    { name: "CON TRAI (ÚT)", death: "Mất sớm, chưa đặt tên", deceased: true },
+                    { name: "CON TRAI (ÚT)", death: "Mất sớm, chưa đặt tên", deceased: true }
                   ]
                 }
               ]
@@ -1253,6 +1252,16 @@
       return `${base}${date.leap ? " nhuận" : ""}${suffix}`.trim();
     };
     const isDuplicateCanChiNote = (note, date) => !!(note && date?.y && normalizeText(note) === normalizeText(getCanChiYear(date.y)));
+
+    // TÍNH TUỔI MỤ TÂM LINH (HƯỞNG THỌ / HƯỞNG DƯƠNG)
+    const getThoDuongLabel = (birthSolar, birthLunar, deathSolar, deathLunar) => {
+      const bY = birthLunar?.y || birthSolar?.y;
+      const dY = deathLunar?.y || deathSolar?.y;
+      if (!bY || !dY) return "";
+      const age = dY - bY + 1;
+      return age >= 60 ? `Hưởng Thọ ${age} tuổi` : `Hưởng Dương ${age} tuổi`;
+    };
+
     const formatBirth = (data) => {
       const parts = [];
       if (data.birthSolar) parts.push(`Dương Lịch: ${formatSolarDate(data.birthSolar)}`);
@@ -1265,6 +1274,11 @@
       if (data.deathLunar) parts.push(`Âm Lịch: ${formatLunarDate(data.deathLunar)}`);
       if (data.deathSolar) parts.push(`Dương Lịch: ${formatSolarDate(data.deathSolar)}`);
       if (data.deathNote && !isDuplicateCanChiNote(data.deathNote, data.deathLunar || data.deathSolar)) parts.push(data.deathNote);
+
+      // Bổ sung Hưởng thọ/Hưởng dương vào luồng text ngày mất ngoài danh sách
+      const thoDuong = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
+      if (thoDuong) parts.push(thoDuong);
+
       return parts.join(" · ");
     };
     const shortSolarDate = (date) => date?.d && date?.m ? `${pad2(date.d)}/${pad2(date.m)}` : "";
@@ -1310,19 +1324,29 @@
         birthSolar = { d: leadingDate.d, m: leadingDate.m, source: "recorded-no-year" };
       } else if (yearOnly) {
         birthSolar = { y: yearOnly, source: "year-only" };
+        // Tự động bổ sung Can Chi cho cấu trúc năm âm lịch nếu chỉ có năm Dương Lịch
+        birthLunar = { y: yearOnly, canChi: getCanChiYear(yearOnly), source: "year-only-lunar" };
       }
       if (!birthLunar && parentDate) {
         birthLunar = { d: parentDate.d, m: parentDate.m, y: parentDate.y || null, source: "recorded" };
       }
+
+      // Đồng bộ quét ghi chú text gốc (Ví dụ: "1891 Tân Mão") để cấu trúc lại object năm Âm lịch chuẩn xác
+      if (!birthLunar?.canChi && /\b(Tân Mão|Mậu Tý|Kỷ Dậu|Nhâm Thân|Quý Dậu|Bính Thân|Kỷ hợi|Giáp tý|Đinh Mão|Nhâm Dần|Kỷ Mão|Ất tỵ|Kỷ Dậu|Đinh Tỵ|Quý Mùi|Tân Mão|Mậu tý|Nhâm Thìn|Canh Thìn|Nhâm Ngọ|Bính Tuất|Canh Tuất|Bính Thìn|Đinh Mão|Canh Thân|Ất Dậu|Nhâm Tuất|Quý Hợi|Quý Mão|Giáp Thân|Mậu Tý|Quý Tỵ|Kỷ Sửu|Ất Tỵ|Kỷ Mùi|Tân Mão|Giáp tý|Bính Thân|Kỷ Tỵ|Nhâm Thìn|Kỷ Hợi|Canh tý|Quý Hợi|Bính Dần|Canh Ngọ|Đinh Dậu|Canh Tý|Giáp Thìn|Bính Dần|Tân Mùi|Đinh Mão|Nhâm Tuất|Canh tý|Kỷ Hợi|Bính Dần|Kỷ Mão|Nhâm Ngọ|Tân Hợi|Quý Sửu|Ất Hợi|Canh Thìn|Ất Mùi|Đinh Sửu|Giáp Thìn|Giáp Dần|Bính Thìn|Đinh Hợi|Kỷ Sửu|Tân tỵ|Đinh Hợi|Ất Dậu|Kỷ Dậu|Quý Sửu|Ất mão|Mậu Dần|Ất Mão|Quý Mùi|Quý Tỵ|Mậu Ngọ|Quý Hợi|Canh Dần|Canh Thân|Mậu THìn|Tân Mão|Bính Thân)\b/i.test(source)) {
+        const matchedCanChi = source.match(/\b(Tân Mão|Mậu Tý|Kỷ Dậu|Nhâm Thân|Quý Dậu|Bính Thân|Kỷ hợi|Giáp tý|Đinh Mão|Nhâm Dần|Kỷ Mão|Ất tỵ|Kỷ Dậu|Đinh Tỵ|Quý Mùi|Tân Mão|Mậu tý|Nhâm Thìn|Canh Thìn|Nhâm Ngọ|Bính Tuất|Canh Tuất|Bính Thìn|Đinh Mão|Canh Thân|Ất Dậu|Nhâm Tuất|Quý Hợi|Quý Mão|Giáp Thân|Mậu Tý|Quý Tỵ|Kỷ Sửu|Ất Tỵ|Kỷ Mùi|Tân Mão|Giáp tý|Bính Thân|Kỷ Tỵ|Nhâm Thìn|Kỷ Hợi|Canh tý|Quý Hợi|Bính Dần|Canh Ngọ|Đinh Dậu|Canh Tý|Giáp Thìn|Bính Dần|Tân Mùi|Đinh Mão|Nhâm Tuất|Canh tý|Kỷ Hợi|Bính Dần|Kỷ Mão|Nhâm Ngọ|Tân Hợi|Quý Sửu|Ất Hợi|Canh Thìn|Ất Mùi|Đinh Sửu|Giáp Thìn|Giáp Dần|Bính Thìn|Đinh Hợi|Kỷ Sửu|Tân tỵ|Đinh Hợi|Ất Dậu|Kỷ Dậu|Quý Sửu|Ất mão|Mậu Dần|Ất Mão|Quý Mùi|Quý Tỵ|Mậu Ngọ|Quý Hợi|Canh Dần|Canh Thân|Mậu THìn|Tân Mão|Bính Thân)\b/i);
+        if (birthLunar) birthLunar.canChi = matchedCanChi[0];
+        else birthLunar = { y: yearOnly, canChi: matchedCanChi[0], source: "text-extracted" };
+      }
+
       const parentNote = cleanDateNote(parentText);
-      const leadingNote = cleanDateNote(leadingText);
+      const leadingNote = cleanDateNote(leadingNote);
       if (parentNote && !/^(Âm|AL)$/i.test(parentNote)) noteParts.push(parentNote);
       if (leadingNote) noteParts.push(leadingNote);
       return {
         birthSolar,
         birthLunar,
         birthNote: [...new Set(noteParts)].join(" · "),
-        dateWarnings: [] // Đã tắt cảnh báo
+        dateWarnings: []
       };
     };
     const splitDeathDate = (raw = "") => {
@@ -1330,14 +1354,29 @@
       if (!source) return { deathSolar: null, deathLunar: null, deathNote: "", dateWarnings: [] };
       const parsed = parseDateToken(source);
       const note = cleanDateNote(source);
+
+      let deathLunar = null;
+      let deathSolar = null;
+
+      if (parsed) {
+        deathLunar = { d: parsed.d, m: parsed.m, y: parsed.y || null, source: "recorded-anniversary" };
+      }
+
+      // Đồng bộ quét chuỗi năm mất Âm Lịch (ví dụ: "Quý Tỵ", "Đinh Dậu") để tự động điền Can Chi
+      if (/\b(Quý Tỵ|Đinh Dậu|Kỷ Sửu|Giáp Ngọ|Mậu Dần|Bính Dần|Quý Hợi|Kỷ Mão|Ất Dậu|Đinh Tỵ|Quý Mão|Nhâm Dần|Ất Tỵ|Mậu Tý|Nhâm Tuất|Mậu Ngọ|Ất Mùi|Tân tỵ)\b/i.test(source)) {
+        const matchedCanChi = source.match(/\b(Quý Tỵ|Đinh Dậu|Kỷ Sửu|Giáp Ngọ|Mậu Dần|Bính Dần|Quý Hợi|Kỷ Mão|Ất Dậu|Đinh Tỵ|Quý Mão|Nhâm Dần|Ất Tỵ|Mậu Tý|Nhâm Tuất|Mậu Ngọ|Ất Mùi|Tân tỵ)\b/i);
+        if (deathLunar) deathLunar.canChi = matchedCanChi[0];
+        else deathLunar = { y: parsed?.y || null, canChi: matchedCanChi[0], source: "text-extracted-death" };
+      }
+
       if (!parsed) {
         return { deathSolar: null, deathLunar: null, deathNote: isUnspecifiedDateText(source) ? "Đã mất, chưa rõ ngày giỗ" : source, dateWarnings: [] };
       }
       return {
-        deathSolar: null,
-        deathLunar: { d: parsed.d, m: parsed.m, y: parsed.y || null, source: "recorded-anniversary" },
+        deathSolar,
+        deathLunar,
         deathNote: note,
-        dateWarnings: [] // Đã tắt cảnh báo
+        dateWarnings: []
       };
     };
     const GENDER_OVERRIDES = {
@@ -1386,7 +1425,7 @@
         ...deathParts,
         branch: branchLine,
         branchRoot: ownBranch,
-        dateWarnings: [], // Đã tắt cảnh báo
+        dateWarnings: [],
         gender: node.gender || deriveGender(node.name),
         role: node.role || getNormalizedRole({ ...node, isCurrentHead }),
         branchLine,
@@ -1456,7 +1495,7 @@
           formatBirth(node),
           formatDeath(node),
           node.info,
-          node.bio, // Lọc theo bio
+          node.bio,
           getGenderLabel(node.gender),
           currentBranch,
           pathNames.join(" "),
@@ -1519,7 +1558,7 @@
       <>
         <div className="meta">
           {(data.birthSolar || data.birthLunar || data.birthNote) && <span className="meta-item"><Icon name="sun" size={13} /> Sinh: <b>{formatBirth(data)}</b></span>}
-          {data.deceased && (data.deathLunar || data.deathSolar || data.deathNote) && <span className="meta-item death"><Icon name="moon" size={13} /> : <b>{formatDeath(data)}</b></span>}
+          {data.deceased && (data.deathLunar || data.deathSolar || data.deathNote) && <span className="meta-item death"><Icon name="moon" size={13} /> Mất: <b>{formatDeath(data)}</b></span>}
         </div>
         {data.info && <div className="info">{data.info}</div>}
       </>
@@ -1528,7 +1567,11 @@
       if (!person) return null;
       const { data, parentNode, grandparentNode, gen, branchName, pathNodes } = person;
       const children = data.children || [];
-      const status = data.deceased ? "Đã mất" : "Còn sống";
+
+      // BỐ TRÍ HỢP LÝ NHẤT VÀO MODAL CHI TIẾT
+      const thoDuongText = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
+      const status = data.deceased ? (thoDuongText ? `Đã mất (${thoDuongText})` : "Đã mất") : "Còn sống";
+
       const actualParent = parentNode && isSpouse(parentNode.name) ? grandparentNode : parentNode;
       const displayName = cleanName(data.name);
       const roleName = getNameRole(data.name);
@@ -1576,7 +1619,7 @@
                 )}
                 <div className="detail-field">
                   <p className="detail-label"><Icon name="badge-check" size={13} /> Trạng thái</p>
-                  <p className="detail-value">{status}</p>
+                  <p className="detail-value text-amber-900 font-extrabold">{status}</p>
                 </div>
                 <div className="detail-field">
                   <p className="detail-label"><Icon name="user-round" size={13} /> Giới tính</p>
@@ -1821,16 +1864,14 @@
         if (!terms.length) return [];
         return memberEntries.filter((item) => terms.every((term) => item.searchText.includes(term)));
       }, [memberEntries, searchQuery]);
-      // Tìm đoạn này trong file index.html trên GitHub của anh:
-useEffect(() => {
-  if (reminders.length) setShowModal(true);
-  
-  // THÊM ĐOẠN NÀY VÀO DƯỚI ĐÂY:
-  if (window.ToanAppGiaPha) {
-    // Gửi số lượng ngày giỗ sang App Flutter
-    window.ToanAppGiaPha.postMessage(reminders.length.toString());
-  }
-}, [reminders.length]);
+
+      useEffect(() => {
+        if (reminders.length) setShowModal(true);
+        if (window.ToanAppGiaPha) {
+          window.ToanAppGiaPha.postMessage(reminders.length.toString());
+        }
+      }, [reminders.length]);
+
       const beginDrag = (x, y) => {
         dragging.current = true;
         start.current = { x: x - pos.x, y: y - pos.y };
