@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -11,432 +12,529 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Noto+Serif:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Noto+Serif:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --lacquer: #733a35;
-      --lacquer-dark: #3b1b19;
-      --lacquer-soft: #9a5b50;
-      --bronze: #9c7442;
-      --bronze-soft: #d5b987;
-      --paper: #f6efe3;
-      --paper-light: #fffaf2;
-      --ink: #29241f;
-      --muted: #756b61;
-      --line: #b89a68;
+      --ink:        #1c1510;
+      --ink-soft:   #3d2e24;
+      --muted:      #7a6a5a;
+      --lacquer:    #7b2d24;
+      --lacquer-d:  #3e1410;
+      --lacquer-l:  #a84d40;
+      --gold:       #b8893c;
+      --gold-l:     #dbb96a;
+      --gold-pale:  #f0ddb0;
+      --paper:      #fdf6e9;
+      --paper-warm: #f8eedb;
+      --paper-mid:  #f0e2c8;
+      --cream:      #fffcf5;
+      --ivory:      #fff9ee;
+      --line:       #c9a45a;
+      --sep:        rgba(184,137,60,.22);
+      --shadow-sm:  0 2px 8px rgba(28,21,16,.06);
+      --shadow-md:  0 8px 28px rgba(28,21,16,.10);
+      --shadow-lg:  0 20px 56px rgba(28,21,16,.14);
+      --r-sm: 10px;
+      --r-md: 16px;
+      --r-lg: 24px;
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body, #root { width: 100%; height: 100%; margin: 0; }
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body, #root { width: 100%; height: 100%; margin: 0; padding: 0; }
+
     body {
       font-family: "Be Vietnam Pro", system-ui, sans-serif;
-      background:
-        linear-gradient(135deg, rgba(255, 251, 243, .86), rgba(246, 239, 227, .9)),
-        repeating-linear-gradient(45deg, rgba(156, 116, 66, .045) 0 1px, transparent 1px 18px),
-        linear-gradient(135deg, #fbf4e8 0%, #f4ead9 52%, #efe1ce 100%);
+      background-color: var(--paper-warm);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='0' cy='0' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='80' cy='0' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='0' cy='80' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='80' cy='80' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3C/svg%3E"),
+        linear-gradient(160deg, #fdf6e9 0%, #f8eedb 40%, #f2e4cc 100%);
       color: var(--ink);
       overflow: hidden;
     }
-    .font-serif { font-family: "Noto Serif", serif; }
+    .font-display { font-family: "Cormorant Garamond", "Noto Serif", serif; }
+    .font-serif   { font-family: "Noto Serif", "Cormorant Garamond", serif; }
+
+    /* ─── Shell ─── */
     .shell {
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background-image:
-        linear-gradient(rgba(115, 58, 53, .025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(115, 58, 53, .02) 1px, transparent 1px);
-      background-size: 34px 34px;
     }
+
+    /* ─── Top Bar ─── */
     .topbar {
       position: relative;
       z-index: 80;
-      min-height: 92px;
-      padding: 14px clamp(14px, 3vw, 34px);
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      color: #fff6e8;
-      background:
-        linear-gradient(120deg, rgba(59, 27, 25, .98), rgba(115, 58, 53, .96) 56%, rgba(82, 42, 38, .98)),
-        repeating-linear-gradient(90deg, transparent 0 28px, rgba(255, 246, 232, .026) 28px 29px);
-      box-shadow: 0 14px 34px rgba(59, 27, 25, .18);
-      border-bottom: 1px solid rgba(213, 185, 135, .34);
+      gap: 16px;
+      padding: 0 clamp(14px, 3vw, 36px);
+      min-height: 80px;
+      background: linear-gradient(110deg, var(--lacquer-d) 0%, var(--lacquer) 58%, #5c2018 100%);
+      border-bottom: 1px solid rgba(219,185,106,.28);
+      box-shadow: 0 6px 32px rgba(28,21,16,.22), inset 0 1px 0 rgba(255,255,255,.06);
     }
+    .topbar::after {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold-l) 30%, var(--gold) 50%, var(--gold-l) 70%, transparent);
+      opacity: .5;
+    }
+
+    /* Ornamental corner lines */
+    .topbar::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(219,185,106,.12);
+      pointer-events: none;
+      border-radius: 4px;
+    }
+
+    .topbar-brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+
     .crest {
-      width: 52px;
-      height: 52px;
+      flex-shrink: 0;
+      width: 52px; height: 52px;
       border-radius: 50%;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-      background: linear-gradient(145deg, #f0d9a5 0%, #a77c45 58%, #734728 100%);
-      color: #fff8ed;
-      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .2), 0 10px 22px rgba(59, 27, 25, .17);
+      background: conic-gradient(from 0deg, #d4a547, #f0c96a, #b8893c, #f0c96a, #d4a547);
+      display: grid; place-items: center;
+      box-shadow: 0 0 0 3px rgba(219,185,106,.25), 0 8px 24px rgba(28,21,16,.3), inset 0 2px 4px rgba(255,255,255,.2);
+      position: relative;
     }
+    .crest::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #e8b84a, #8c5c1e);
+    }
+    .crest-icon {
+      position: relative; z-index: 1;
+      color: #fff8e7;
+      filter: drop-shadow(0 1px 2px rgba(28,21,16,.4));
+    }
+
+    .brand-text { min-width: 0; }
+    .brand-kicker {
+      font-size: 9px; font-weight: 900; letter-spacing: .22em;
+      text-transform: uppercase; color: rgba(219,185,106,.7);
+      margin-bottom: 2px;
+    }
+    .brand-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(20px, 2.5vw, 28px); font-weight: 700;
+      line-height: 1.1; letter-spacing: .02em;
+      color: var(--gold-pale);
+      text-shadow: 0 2px 8px rgba(28,21,16,.3);
+    }
+    .brand-sub {
+      font-size: 10px; font-weight: 600;
+      color: rgba(240,221,176,.58);
+      margin-top: 3px;
+      letter-spacing: .04em;
+    }
+
+    /* Segmented control */
     .segmented {
       display: flex;
-      gap: 4px;
-      padding: 5px;
-      border-radius: 999px;
-      background: rgba(255, 246, 232, .11);
-      border: 1px solid rgba(255, 246, 232, .18);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+      gap: 2px;
+      padding: 4px;
+      border-radius: 14px;
+      background: rgba(28,21,16,.35);
+      border: 1px solid rgba(219,185,106,.2);
     }
     .segmented button {
-      height: 38px;
-      padding: 0 16px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      color: rgba(255, 246, 232, .68);
-      transition: .18s ease;
+      position: relative;
+      height: 36px;
+      padding: 0 18px;
+      border-radius: 11px;
+      font-size: 10.5px; font-weight: 800;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: rgba(240,221,176,.55);
+      transition: all .2s ease;
     }
+    .segmented button:hover { color: rgba(240,221,176,.85); }
     .segmented button.active {
-      color: #3d1716;
-      background: linear-gradient(180deg, #efdaa8, #c9a063);
-      box-shadow: 0 8px 16px rgba(45, 20, 16, .14);
+      background: linear-gradient(160deg, var(--gold-l), var(--gold));
+      color: var(--lacquer-d);
+      box-shadow: 0 4px 16px rgba(28,21,16,.25), inset 0 1px 0 rgba(255,255,255,.25);
     }
+
+    /* ─── Birthday Notice Bar ─── */
     .notice {
       position: relative;
       z-index: 50;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-height: 48px;
-      padding: 8px clamp(12px, 3vw, 28px);
-      background: linear-gradient(90deg, #e4c98f, #fbefd2 48%, #dfbd7d);
-      color: #4a3320;
-      border-bottom: 1px solid rgba(102, 70, 37, .18);
-      box-shadow: 0 8px 20px rgba(102, 70, 37, .08);
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 12px;
+      min-height: 44px;
+      padding: 6px clamp(12px, 3vw, 28px);
+      background: linear-gradient(90deg, var(--gold-pale) 0%, #fef8e7 48%, var(--gold-pale) 100%);
+      border-bottom: 1px solid rgba(184,137,60,.2);
+      overflow: hidden;
     }
-    .notice-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      height: 28px;
-      padding: 0 12px;
-      border-radius: 999px;
-      background: #733a35;
-      color: #fff6e8;
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-      white-space: nowrap;
-      box-shadow: 0 6px 12px rgba(61, 23, 22, .18);
-    }
-    main { position: relative; flex: 1; min-height: 0; overflow: hidden; }
-    .list-scroll {
+    .notice::before {
+      content: "";
       position: absolute;
       inset: 0;
-      overflow-y: auto;
-      padding: 18px 14px 96px;
-      -webkit-overflow-scrolling: touch;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 180px, rgba(184,137,60,.04) 180px, rgba(184,137,60,.04) 181px);
     }
-    .list-inner { width: min(820px, 100%); margin: 0 auto; }
-    .toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0 14px;
-      backdrop-filter: blur(10px);
-    }
-    .action-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 40px;
-      padding: 0 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(115, 58, 53, .14);
-      background: rgba(255, 251, 243, .92);
-      color: #733a35;
-      font-size: 11px;
-      font-weight: 900;
+    .notice-badge {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 26px; padding: 0 12px;
+      border-radius: 999px;
+      background: var(--lacquer);
+      color: var(--gold-pale);
+      font-size: 9px; font-weight: 900; letter-spacing: .1em;
       text-transform: uppercase;
-      box-shadow: 0 8px 18px rgba(61, 23, 22, .06);
+      box-shadow: 0 4px 12px rgba(123,45,36,.3);
     }
+    .notice marquee { font-size: 11.5px; font-weight: 700; color: var(--lacquer-d); letter-spacing: .02em; }
+
+    /* ─── Main area ─── */
+    main { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+
+    /* ─── List View ─── */
+    .list-scroll {
+      position: absolute; inset: 0;
+      overflow-y: auto; overflow-x: hidden;
+      padding: 16px 12px 100px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.3) transparent;
+    }
+    .list-scroll::-webkit-scrollbar { width: 5px; }
+    .list-scroll::-webkit-scrollbar-thumb { background: rgba(184,137,60,.3); border-radius: 4px; }
+
+    .list-inner { width: min(860px, 100%); margin: 0 auto; }
+
+    /* Sticky toolbar */
+    .toolbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px;
+      padding: 12px 0 16px;
+      background: linear-gradient(180deg, var(--paper-warm) 60%, transparent);
+    }
+    .section-kicker {
+      font-size: 9px; font-weight: 900; letter-spacing: .2em;
+      text-transform: uppercase; color: rgba(123,45,36,.55);
+    }
+    .section-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px; font-weight: 700; color: var(--lacquer-d);
+      letter-spacing: .01em;
+    }
+
+    /* Action buttons */
+    .action-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      min-height: 38px; padding: 0 16px;
+      border-radius: var(--r-sm);
+      background: var(--cream);
+      border: 1px solid rgba(123,45,36,.12);
+      color: var(--lacquer);
+      font-size: 10.5px; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-sm);
+      transition: all .18s ease;
+    }
+    .action-button:hover { border-color: rgba(184,137,60,.3); box-shadow: var(--shadow-md); }
+    .action-button:active { transform: scale(.98); }
+
+    /* ─── Search Panel ─── */
     .search-panel {
-      margin: 0 0 14px;
+      margin-bottom: 14px;
       padding: 12px;
-      border-radius: 18px;
-      background: rgba(255, 251, 243, .78);
-      border: 1px solid rgba(115, 58, 53, .1);
-      box-shadow: 0 10px 24px rgba(59, 27, 25, .045);
-      backdrop-filter: blur(10px);
+      border-radius: var(--r-md);
+      background: rgba(255,252,245,.85);
+      border: 1px solid rgba(184,137,60,.14);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(12px);
     }
-    .search-box {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .search-box i {
-      position: absolute;
-      left: 13px;
-      color: rgba(115, 58, 53, .58);
+    .search-box { position: relative; display: flex; align-items: center; }
+    .search-box .s-icon {
+      position: absolute; left: 14px;
+      color: rgba(123,45,36,.5);
       pointer-events: none;
     }
     .search-input {
-      width: 100%;
-      min-height: 44px;
+      width: 100%; min-height: 44px;
       padding: 0 44px;
-      border-radius: 14px;
-      border: 1px solid rgba(115, 58, 53, .14);
-      background: rgba(255, 253, 248, .96);
+      border-radius: 12px;
+      border: 1px solid rgba(184,137,60,.18);
+      background: var(--ivory);
       color: var(--ink);
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 13px; font-weight: 600;
       outline: none;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .74);
+      transition: border-color .18s, box-shadow .18s;
+      box-shadow: inset 0 1px 3px rgba(28,21,16,.04);
     }
-    .search-input:focus {
-      border-color: rgba(156, 116, 66, .45);
-      box-shadow: 0 0 0 3px rgba(213, 185, 135, .18);
-    }
+    .search-input:focus { border-color: rgba(184,137,60,.4); box-shadow: 0 0 0 3px rgba(184,137,60,.1); }
+    .search-input::placeholder { color: rgba(122,106,90,.5); }
     .clear-search {
-      position: absolute;
-      right: 6px;
-      width: 32px;
-      height: 32px;
-      display: grid;
-      place-items: center;
-      border-radius: 10px;
-      color: #733a35;
+      position: absolute; right: 6px;
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      border-radius: 8px;
+      color: var(--lacquer);
+      transition: background .15s;
     }
+    .clear-search:hover { background: rgba(123,45,36,.08); }
     .search-summary {
-      margin: 10px 2px 0;
-      color: rgba(41, 36, 31, .58);
-      font-size: 11px;
-      font-weight: 800;
+      margin: 8px 2px 0;
+      font-size: 10.5px; font-weight: 700;
+      color: rgba(28,21,16,.45);
+      letter-spacing: .03em;
     }
-    .search-results {
-      margin-top: 10px;
-      display: grid;
-      gap: 8px;
-    }
+    .search-results { margin-top: 10px; display: grid; gap: 6px; }
     .search-result {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: center;
-      padding: 12px;
-      border-radius: 14px;
-      background: #fffdf8;
-      border: 1px solid rgba(115, 58, 53, .08);
+      display: grid; grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px; align-items: center;
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: var(--ivory);
+      border: 1px solid rgba(184,137,60,.1);
       text-align: left;
-      box-shadow: 0 6px 14px rgba(59, 27, 25, .035);
+      cursor: pointer;
+      transition: all .16s ease;
+      box-shadow: var(--shadow-sm);
     }
-    .search-result-name {
-      color: #4a2522;
-      font-size: 13px;
-      font-weight: 900;
-      line-height: 1.35;
-    }
-    .search-result-path {
-      display: block;
-      margin-top: 4px;
-      color: rgba(41, 36, 31, .55);
-      font-size: 10px;
-      font-weight: 700;
-      line-height: 1.4;
-    }
+    .search-result:hover { border-color: rgba(184,137,60,.28); background: var(--cream); transform: translateX(2px); }
+    .search-result-name { color: var(--lacquer-d); font-size: 12.5px; font-weight: 800; line-height: 1.35; }
+    .search-result-path { display: block; margin-top: 3px; color: rgba(28,21,16,.45); font-size: 10px; font-weight: 600; }
     .search-empty {
-      margin-top: 10px;
-      padding: 14px;
-      border-radius: 14px;
-      color: rgba(41, 36, 31, .62);
-      background: rgba(115, 58, 53, .035);
-      font-size: 12px;
-      font-weight: 700;
+      margin-top: 10px; padding: 14px;
+      border-radius: 12px;
+      background: rgba(123,45,36,.04);
+      color: rgba(28,21,16,.5);
+      font-size: 12px; font-weight: 600;
       text-align: center;
     }
+
+    /* ─── Family Card ─── */
     .family-card {
       position: relative;
-      min-height: 118px;
-      margin-bottom: 10px;
-      border-radius: 16px;
+      margin-bottom: 8px;
+      border-radius: var(--r-md);
       overflow: hidden;
       cursor: pointer;
-      background:
-        linear-gradient(180deg, rgba(255,251,243,.98), rgba(250,244,234,.97));
-      border: 1px solid rgba(115, 58, 53, .095);
-      box-shadow: 0 10px 24px rgba(59, 27, 25, .05);
-      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      background: linear-gradient(170deg, var(--cream) 0%, var(--ivory) 100%);
+      border: 1px solid rgba(184,137,60,.12);
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
     }
-    .family-card:active { transform: scale(.99); }
     .family-card::before {
       content: "";
       position: absolute;
-      inset: 0 0 auto;
-      height: 3px;
-      background: linear-gradient(90deg, rgba(115,58,53,.18), rgba(156,116,66,.32), rgba(115,58,53,.08));
-      opacity: .78;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold-l), var(--gold), rgba(184,137,60,.3));
+      border-radius: 4px 0 0 4px;
     }
-    .family-card:hover { border-color: rgba(156, 116, 66, .25); box-shadow: 0 16px 32px rgba(59, 27, 25, .07); }
+    .family-card:hover {
+      transform: translateX(3px);
+      border-color: rgba(184,137,60,.26);
+      box-shadow: var(--shadow-md);
+    }
+    .family-card:active { transform: scale(.99) translateX(1px); }
+
+    /* Dark card (root) */
     .family-card.dark {
-      color: #fff6e8;
-      background:
-        linear-gradient(135deg, rgba(59, 27, 25, .98), rgba(115, 58, 53, .94));
-      border-color: rgba(213, 185, 135, .28);
+      background: linear-gradient(135deg, var(--lacquer-d) 0%, var(--lacquer) 100%);
+      border-color: rgba(219,185,106,.25);
+      color: var(--gold-pale);
     }
+    .family-card.dark::before { background: linear-gradient(180deg, var(--gold-l), var(--gold-pale)); width: 4px; }
+    .family-card.dark:hover { transform: none; box-shadow: 0 12px 40px rgba(28,21,16,.22); }
+
+    /* Branch card */
     .family-card.branch {
-      background:
-        linear-gradient(180deg, rgba(255, 250, 242, .99), rgba(247, 238, 224, .98));
-      border-color: rgba(156, 116, 66, .24);
+      background: linear-gradient(170deg, #fffbf2 0%, var(--paper-mid) 100%);
+      border-color: rgba(184,137,60,.2);
     }
     .family-card.branch::before {
-      height: 4px;
-      background: linear-gradient(90deg, #733a35, #c5a06a 48%, rgba(115, 58, 53, .18));
+      background: linear-gradient(180deg, var(--lacquer), var(--lacquer-l), rgba(184,137,60,.4));
+      width: 4px;
     }
+
+    /* Birthday highlight */
     .family-card.birthday {
-      border-color: #b58b4d;
-      box-shadow: 0 0 0 1px rgba(181, 139, 77, .18), 0 16px 34px rgba(156, 116, 66, .11);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px rgba(184,137,60,.15), var(--shadow-md);
     }
+
     .card-body {
-      position: relative;
-      z-index: 2;
+      position: relative; z-index: 2;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 14px;
-      padding: 18px 18px 16px 22px;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 12px;
+      padding: 16px 16px 14px 20px;
     }
+    .card-body.has-deceased { padding-left: 52px; }
+
+    /* Deceased ribbon */
     .deceased-mark {
-      position: absolute;
-      inset: 0 auto auto 0;
-      width: 58px;
-      height: 58px;
-      overflow: hidden;
-      z-index: 3;
-      pointer-events: none;
+      position: absolute; inset: 0 auto auto 0;
+      width: 46px; height: 46px;
+      overflow: hidden; z-index: 3; pointer-events: none;
     }
     .deceased-mark::before {
       content: "";
-      position: absolute;
-      top: 11px;
-      left: -24px;
-      width: 78px;
-      height: 18px;
+      position: absolute; top: 8px; left: -22px;
+      width: 68px; height: 16px;
       transform: rotate(-45deg);
-      background: #24201d;
-      box-shadow: 0 2px 5px rgba(0,0,0,.26);
+      background: linear-gradient(90deg, #1c1510, #2e241c);
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
     }
+
+    /* Birthday ribbon */
     .birthday-ribbon {
-      position: absolute;
-      top: 0;
-      right: 0;
-      z-index: 4;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      height: 22px;
-      padding: 0 11px;
-      border-bottom-left-radius: 13px;
-      background: linear-gradient(135deg, #8d4a40, #b58b4d);
-      color: #fffaf1;
-      font-size: 8px;
-      font-weight: 900;
-      text-transform: uppercase;
+      position: absolute; top: 0; right: 0; z-index: 4;
+      display: inline-flex; align-items: center; gap: 4px;
+      height: 22px; padding: 0 10px;
+      border-bottom-left-radius: 12px;
+      background: linear-gradient(135deg, var(--lacquer), var(--gold));
+      color: #fff8e7;
+      font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em;
       pointer-events: none;
     }
+
+    /* Title pill */
     .title-pill {
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      height: 22px;
-      padding: 0 9px;
+      display: inline-flex; align-items: center;
+      height: 20px; padding: 0 10px;
       border-radius: 999px;
-      background: linear-gradient(180deg, #ead6a5, #ac824a);
-      color: #3d2515;
-      font-size: 9px;
-      font-weight: 900;
-      text-transform: uppercase;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+      background: linear-gradient(135deg, rgba(184,137,60,.15), rgba(184,137,60,.08));
+      border: 1px solid rgba(184,137,60,.2);
+      color: var(--gold);
+      font-size: 8.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em;
     }
+    .dark .title-pill {
+      background: rgba(240,221,176,.12);
+      border-color: rgba(240,221,176,.2);
+      color: var(--gold-pale);
+    }
+
+    /* Name */
     .name {
-      margin-top: 7px;
-      font-size: clamp(17px, 2vw, 23px);
-      line-height: 1.22;
-      font-weight: 900;
-      color: #733a35;
+      margin-top: 6px;
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(17px, 1.9vw, 22px);
+      font-weight: 700; line-height: 1.18;
+      color: var(--lacquer-d);
+      letter-spacing: .01em;
     }
-    .dark .name { color: #efdcae; }
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-      font-size: 11px;
-      color: #776d63;
-    }
-    .dark .meta { color: rgba(255,246,232,.74); }
+    .dark .name { color: var(--gold-pale); }
+    .branch .name { color: var(--lacquer); }
+
+    /* Meta chips */
+    .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .meta-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-height: 28px;
-      padding: 5px 9px;
-      border-radius: 10px;
-      background: rgba(115, 58, 53, .038);
-      border: 1px solid rgba(115, 58, 53, .06);
+      display: inline-flex; align-items: center; gap: 5px;
+      min-height: 26px; padding: 4px 9px;
+      border-radius: 8px;
+      background: rgba(184,137,60,.06);
+      border: 1px solid rgba(184,137,60,.1);
+      color: var(--muted);
+      font-size: 10.5px; font-weight: 600;
+      line-height: 1.3;
     }
+    .meta-item b { color: var(--ink-soft); }
     .dark .meta-item {
-      background: rgba(255,255,255,.1);
-      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.1);
+      color: rgba(240,221,176,.7);
     }
-    .death { color: #8d4a40; font-weight: 800; }
-    .dark .death { color: #efdcae; }
+    .dark .meta-item b { color: var(--gold-pale); }
+    .meta-item.death { color: var(--lacquer-l); }
+    .meta-item.death b { color: var(--lacquer); }
+    .dark .meta-item.death { color: var(--gold-l); }
+    .dark .meta-item.death b { color: var(--gold-pale); }
+
     .info {
-      margin-top: 10px;
-      width: fit-content;
-      max-width: 100%;
-      padding: 8px 10px;
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: rgba(184,137,60,.05);
+      border-left: 2px solid rgba(184,137,60,.25);
+      color: var(--muted);
+      font-size: 10.5px; font-style: italic; line-height: 1.5;
+    }
+    .dark .info { background: rgba(255,255,255,.06); border-left-color: rgba(240,221,176,.25); color: rgba(240,221,176,.65); }
+
+    /* Toggle button */
+    .toggle-btn {
+      flex-shrink: 0; align-self: flex-start;
+      margin-top: 4px;
+      width: 40px; height: 40px;
+      display: grid; place-items: center;
       border-radius: 12px;
-      background: rgba(59, 27, 25, .04);
-      color: #655a50;
-      font-size: 11px;
-      line-height: 1.45;
-      font-style: italic;
+      background: rgba(184,137,60,.08);
+      border: 1px solid rgba(184,137,60,.15);
+      color: var(--gold);
+      transition: all .18s;
     }
-    .dark .info { background: rgba(255,255,255,.09); color: rgba(255,246,232,.86); }
+    .toggle-btn:hover { background: rgba(184,137,60,.14); }
+    .dark .toggle-btn {
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.15);
+      color: var(--gold-pale);
+    }
+
+    /* Branch tree */
     .branch-list {
-      margin: 0 0 8px 16px;
+      margin: 0 0 6px 18px;
       padding-left: 14px;
-      border-left: 1.5px solid rgba(156, 116, 66, .28);
+      border-left: 2px solid rgba(184,137,60,.2);
+      position: relative;
     }
-    .branch-list .branch-list .branch-list .branch-list {
-      margin-left: 6px;
-      padding-left: 10px;
+    .branch-list::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -1px;
+      width: 1px; height: 12px;
+      background: linear-gradient(180deg, rgba(184,137,60,.4), transparent);
+    }
+    .branch-list .branch-list .branch-list {
+      margin-left: 10px; padding-left: 10px;
       border-left-style: dashed;
     }
+
+    /* ─── Tree View ─── */
     .tree-stage {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       overflow: hidden;
-      cursor: grab;
-      touch-action: none;
+      cursor: grab; touch-action: none;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(184,137,60,.06) 0%, transparent 60%),
+        linear-gradient(180deg, var(--paper-warm), var(--paper-mid));
+      background-size: cover;
+    }
+    .tree-stage::before {
+      content: "";
+      position: absolute; inset: 0; pointer-events: none;
       background-image:
-        linear-gradient(rgba(115, 58, 53, .035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(115, 58, 53, .027) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(255,251,243,.62), rgba(246,239,227,.22));
-      background-size: 34px 34px, 34px 34px, 100% 100%;
+        linear-gradient(rgba(184,137,60,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184,137,60,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
     }
     .tree-stage:active { cursor: grabbing; }
     .tree-canvas {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      justify-content: center;
-      padding-top: 38px;
+      position: absolute; inset: 0;
+      display: flex; justify-content: center;
+      padding-top: 36px;
       transform-origin: top center;
       transition: transform .06s linear;
     }
+
+    /* Tree nodes */
     .tree-branch {
       position: relative;
       display: flex;
@@ -444,389 +542,344 @@
     }
     .tree-item {
       position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 44px 18px 0;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 44px 16px 0;
     }
     .tree-item::before {
       content: "";
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: 2px;
-      height: 44px;
+      position: absolute; top: 0; left: 50%;
+      width: 2px; height: 44px;
       transform: translateX(-50%);
       background: var(--line);
     }
     .tree-item::after {
       content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
+      position: absolute; top: 0; left: 0; width: 100%; height: 2px;
       background: var(--line);
     }
     .tree-item:first-child::after, .tree-item:last-child::after, .tree-item:only-child::after { display: none; }
     .tree-item:first-child::before {
-      left: 50%;
-      width: 50%;
-      transform: none;
-      border-top: 2px solid var(--line);
-      border-left: 2px solid var(--line);
-      border-top-left-radius: 16px;
-      background: transparent;
+      left: 50%; width: 50%; transform: none;
+      border-top: 2px solid var(--line); border-left: 2px solid var(--line);
+      border-top-left-radius: 16px; background: transparent;
     }
     .tree-item:last-child::before {
-      left: 0;
-      width: 50%;
-      transform: none;
-      border-top: 2px solid var(--line);
-      border-right: 2px solid var(--line);
-      border-top-right-radius: 16px;
-      background: transparent;
+      left: 0; width: 50%; transform: none;
+      border-top: 2px solid var(--line); border-right: 2px solid var(--line);
+      border-top-right-radius: 16px; background: transparent;
     }
     .tree-item:only-child::before {
-      left: 50%;
-      width: 2px;
-      transform: translateX(-50%);
-      border: 0;
-      border-radius: 0;
-      background: var(--line);
+      left: 50%; width: 2px; transform: translateX(-50%);
+      border: 0; background: var(--line);
     }
     .root-node { padding-top: 0; }
     .root-node::before, .root-node::after { display: none; }
+
+    /* Tree card */
     .tree-card {
       position: relative;
-      width: 304px;
-      min-height: 212px;
-      border-radius: 16px;
+      width: 290px; min-height: 200px;
+      border-radius: var(--r-md);
       overflow: visible;
-      border: 1px solid rgba(115, 58, 53, .12);
-      background: rgba(255, 251, 243, .96);
-      box-shadow: 0 16px 32px rgba(59, 27, 25, .07);
+      border: 1px solid rgba(184,137,60,.14);
+      background: var(--cream);
+      box-shadow: var(--shadow-md);
       cursor: pointer;
+      transition: box-shadow .2s, border-color .2s;
     }
     .tree-card::before {
       content: "";
-      position: absolute;
-      inset: 0 0 auto;
+      position: absolute; inset: 0 0 auto;
       height: 3px;
-      border-radius: 16px 16px 0 0;
-      background: linear-gradient(90deg, rgba(115,58,53,.18), rgba(156,116,66,.32), rgba(115,58,53,.08));
-      z-index: 3;
-      pointer-events: none;
+      border-radius: var(--r-md) var(--r-md) 0 0;
+      background: linear-gradient(90deg, rgba(184,137,60,.15), var(--gold-l) 40%, rgba(184,137,60,.1));
+      z-index: 3; pointer-events: none;
     }
+    .tree-card:hover { border-color: rgba(184,137,60,.3); box-shadow: var(--shadow-lg); }
     .tree-card.dark {
-      color: #fff6e8;
-      background: linear-gradient(135deg, #3b1b19, #733a35);
-      border-color: rgba(213, 185, 135, .3);
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-color: rgba(219,185,106,.28);
+    }
+    .tree-card.dark::before {
+      background: linear-gradient(90deg, rgba(219,185,106,.4), var(--gold-pale) 40%, rgba(219,185,106,.2));
     }
     .tree-card.branch {
-      background: linear-gradient(180deg, rgba(255, 250, 242, .99), rgba(247, 238, 224, .98));
-      border-color: rgba(156, 116, 66, .24);
+      background: linear-gradient(170deg, #fffbf2, var(--paper-mid));
+      border-color: rgba(184,137,60,.22);
     }
     .tree-card.branch::before {
       height: 4px;
-      background: linear-gradient(90deg, #733a35, #c5a06a 48%, rgba(115, 58, 53, .18));
+      background: linear-gradient(90deg, var(--lacquer), var(--gold-l) 48%, rgba(184,137,60,.1));
     }
     .tree-card.spouse {
-      background: linear-gradient(135deg, #fffaf2, #f8eddd);
-      border-color: rgba(156, 116, 66, .2);
+      background: linear-gradient(135deg, #fffaf2, var(--paper));
+      border-color: rgba(184,137,60,.16);
     }
     .tree-card-content {
-      position: relative;
-      z-index: 2;
-      height: 100%;
-      padding: 20px;
-      overflow: hidden;
-      border-radius: 16px;
+      position: relative; z-index: 2;
+      height: 100%; padding: 18px;
+      overflow: hidden; border-radius: var(--r-md);
     }
-    .tree-card .name { text-align: center; font-size: 19px; }
-    .tree-card.dark .name { color: #efdcae; }
+    .tree-card .name { text-align: center; font-size: 17px; }
+    .tree-card.dark .name { color: var(--gold-pale); }
     .parent-line {
-      position: absolute;
-      left: 50%;
-      bottom: -44px;
-      width: 2px;
-      height: 44px;
+      position: absolute; left: 50%; bottom: -44px;
+      width: 2px; height: 44px;
       transform: translateX(-50%);
-      background: var(--line);
-      z-index: 1;
+      background: var(--line); z-index: 1;
     }
     .parent-line::after {
       content: "";
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 9px;
-      height: 9px;
+      position: absolute; bottom: 0; left: 50%;
+      width: 8px; height: 8px;
       border-radius: 50%;
       transform: translate(-50%, 50%);
-      background: #9d7745;
-      box-shadow: 0 0 0 4px rgba(156, 116, 66, .14);
+      background: var(--gold);
+      box-shadow: 0 0 0 3px rgba(184,137,60,.15);
     }
+
+    /* Tree controls */
     .tree-controls {
-      position: absolute;
-      right: 18px;
-      bottom: 18px;
+      position: absolute; right: 18px; bottom: 18px;
       z-index: 30;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      display: flex; flex-direction: column; gap: 8px;
     }
     .icon-button {
-      width: 46px;
-      height: 46px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      background: rgba(255, 251, 243, .92);
-      color: #733a35;
-      border: 1px solid rgba(115, 58, 53, .11);
-      box-shadow: 0 10px 22px rgba(59, 27, 25, .09);
+      width: 44px; height: 44px;
+      display: grid; place-items: center;
+      border-radius: 13px;
+      background: rgba(255,252,245,.95);
+      color: var(--lacquer);
+      border: 1px solid rgba(184,137,60,.15);
+      box-shadow: var(--shadow-md);
       backdrop-filter: blur(8px);
+      transition: all .18s;
     }
+    .icon-button:hover { box-shadow: var(--shadow-lg); background: var(--cream); }
     .icon-button.primary {
-      background: linear-gradient(180deg, #8b4b42, #733a35);
-      color: #fff6e8;
-      border-color: rgba(213, 185, 135, .26);
+      background: linear-gradient(160deg, var(--lacquer-l), var(--lacquer));
+      color: var(--gold-pale);
+      border-color: rgba(219,185,106,.22);
     }
+    .icon-button.primary:hover { background: linear-gradient(160deg, var(--lacquer), var(--lacquer-d)); }
+
+    /* ─── Modal ─── */
     .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(37, 25, 20, .58);
-      backdrop-filter: blur(10px);
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      background: rgba(16,11,8,.6);
+      backdrop-filter: blur(12px);
+      animation: fade-in .2s ease both;
     }
+    @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
     .modal {
       width: min(440px, 100%);
-      max-height: min(680px, 88vh);
-      display: flex;
-      flex-direction: column;
+      max-height: min(680px, 90vh);
+      display: flex; flex-direction: column;
       overflow: hidden;
-      border-radius: 24px;
-      background: #fffaf2;
-      border: 1px solid rgba(213, 185, 135, .38);
-      box-shadow: 0 26px 64px rgba(37, 25, 20, .32);
-      animation: pop .24s ease-out both;
+      border-radius: var(--r-lg);
+      background: var(--ivory);
+      border: 1px solid rgba(184,137,60,.28);
+      box-shadow: 0 32px 80px rgba(16,11,8,.4), 0 0 0 1px rgba(255,255,255,.05);
+      animation: pop .25s cubic-bezier(.22,.68,0,1.2) both;
     }
-    @keyframes pop { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+    @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(.97) } to { opacity: 1; transform: none } }
+
     .modal-head {
-      padding: 26px;
+      padding: 26px 26px 22px;
       text-align: center;
-      color: #fff6e8;
-      background: linear-gradient(135deg, #3b1b19, #733a35);
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-bottom: 1px solid rgba(219,185,106,.2);
+      position: relative;
     }
+    .modal-head::after {
+      content: "";
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(219,185,106,.4), transparent);
+    }
+    .modal-icon { color: var(--gold-l); }
     .modal-list {
-      padding: 16px;
+      padding: 14px;
       overflow-y: auto;
-      display: grid;
-      gap: 10px;
+      display: grid; gap: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.25) transparent;
     }
     .reminder-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: center;
-      padding: 14px;
-      border-radius: 16px;
-      background: #fffdf8;
-      border: 1px solid rgba(115, 58, 53, .09);
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px; align-items: center;
+      padding: 13px 14px;
+      border-radius: var(--r-sm);
+      background: var(--cream);
+      border: 1px solid rgba(184,137,60,.1);
+      transition: border-color .16s;
     }
+    .reminder-row:hover { border-color: rgba(184,137,60,.22); }
+    .reminder-name { font-size: 12.5px; font-weight: 800; color: var(--ink-soft); line-height: 1.3; }
+    .modal-date { margin-top: 3px; font-size: 10px; font-weight: 700; color: var(--lacquer-l); }
     .days-pill {
-      padding: 7px 9px;
+      padding: 5px 10px;
       border-radius: 999px;
-      background: #f0dfbb;
-      color: #5a3a20;
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-      white-space: nowrap;
+      background: rgba(184,137,60,.12);
+      color: var(--gold);
+      font-size: 9.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em;
+      white-space: nowrap; border: 1px solid rgba(184,137,60,.18);
     }
-    .days-pill.today { background: #733a35; color: #fff6e8; }
-    .modal-icon { color: #e4ca91; }
-    .modal-date { color: #8d4a40; }
+    .days-pill.today { background: var(--lacquer); color: var(--gold-pale); border-color: rgba(219,185,106,.25); }
     .modal-close {
-      background: linear-gradient(180deg, #8b4b42, #733a35) !important;
-      color: #fff6e8 !important;
-      border-color: rgba(213, 185, 135, .26) !important;
+      background: linear-gradient(160deg, var(--lacquer-l), var(--lacquer)) !important;
+      color: var(--gold-pale) !important;
+      border-color: rgba(219,185,106,.22) !important;
     }
-    .detail-modal {
-      width: min(560px, 100%);
-    }
+    .modal-close:hover { opacity: .9; }
+
+    /* ─── Detail Modal ─── */
+    .detail-modal { width: min(580px, 100%); }
     .detail-head {
-      padding: 24px;
-      color: #fff6e8;
-      background:
-        linear-gradient(135deg, rgba(59, 27, 25, .98), rgba(115, 58, 53, .94)),
-        repeating-linear-gradient(90deg, transparent 0 24px, rgba(255, 246, 232, .025) 24px 25px);
+      padding: 22px 52px 20px 22px;
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-bottom: 1px solid rgba(219,185,106,.2);
+      position: relative;
+    }
+    .detail-head-name {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 26px; font-weight: 700; line-height: 1.15;
+      color: var(--gold-pale); letter-spacing: .01em;
+    }
+    .detail-subtitle { margin-top: 6px; font-size: 12px; font-weight: 600; color: rgba(240,221,176,.65); }
+    .detail-tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .detail-tag {
+      display: inline-flex; align-items: center;
+      min-height: 22px; padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(240,221,176,.15);
+      color: rgba(240,221,176,.85);
+      font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
     }
     .detail-close {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 36px;
-      height: 36px;
-      display: grid;
-      place-items: center;
-      border-radius: 12px;
-      color: rgba(255, 246, 232, .86);
-      background: rgba(255, 255, 255, .1);
-      border: 1px solid rgba(255, 255, 255, .12);
+      position: absolute; top: 14px; right: 14px;
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      border-radius: 10px;
+      color: rgba(240,221,176,.8);
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.1);
+      transition: all .16s;
     }
+    .detail-close:hover { background: rgba(255,255,255,.18); color: var(--gold-pale); }
+
     .detail-body {
-      padding: 16px;
+      padding: 14px;
       overflow-y: auto;
-      display: grid;
-      gap: 12px;
+      display: grid; gap: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.25) transparent;
     }
     .detail-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
     }
     .detail-field {
-      min-height: 70px;
-      padding: 13px;
-      border-radius: 14px;
-      background: #fffdf8;
-      border: 1px solid rgba(115, 58, 53, .08);
+      padding: 12px 13px;
+      border-radius: 12px;
+      background: var(--cream);
+      border: 1px solid rgba(184,137,60,.1);
+      transition: border-color .16s;
     }
+    .detail-field:hover { border-color: rgba(184,137,60,.2); }
     .detail-label {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: rgba(115, 58, 53, .68);
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .04em;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em;
+      color: rgba(123,45,36,.55);
     }
     .detail-value {
-      margin-top: 7px;
-      color: #29241f;
-      font-size: 13px;
-      font-weight: 800;
-      line-height: 1.45;
+      margin-top: 6px;
+      font-size: 13px; font-weight: 700; line-height: 1.45;
+      color: var(--ink-soft);
     }
-    .detail-subtitle {
-      margin-top: 8px;
-      color: rgba(255, 246, 232, .74);
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.45;
-    }
-    .detail-tags {
-      margin-top: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
-    .detail-tag {
-      display: inline-flex;
-      align-items: center;
-      min-height: 24px;
-      padding: 0 10px;
-      border-radius: 999px;
-      background: rgba(255, 246, 232, .12);
-      color: rgba(255, 246, 232, .9);
-      border: 1px solid rgba(255, 246, 232, .14);
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
+
+    /* Lineage box */
     .lineage-box {
-      padding: 14px;
-      border-radius: 16px;
-      background: linear-gradient(180deg, rgba(255, 253, 248, .98), rgba(247, 238, 224, .9));
-      border: 1px solid rgba(156, 116, 66, .18);
+      padding: 13px 14px;
+      border-radius: 13px;
+      background: linear-gradient(170deg, var(--cream), var(--ivory));
+      border: 1px solid rgba(184,137,60,.14);
     }
     .lineage-path {
       margin-top: 8px;
-      color: #4b4038;
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1.55;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 4px;
+      font-size: 12.5px; font-weight: 700; line-height: 1.6;
+      color: var(--ink-soft);
+      display: flex; flex-wrap: wrap; align-items: center; gap: 3px;
     }
-    .lineage-step {
-      display: inline-flex;
-      align-items: center;
-      margin: 3px 0;
-    }
-    .lineage-separator {
-      color: rgba(115, 58, 53, .38);
-      font-weight: 900;
-      margin: 0 4px;
-      font-size: 11px;
-    }
-    .lineage-heart {
-      color: #e11d48;
-      font-size: 11px;
-      margin: 0 4px;
-      display: inline-flex;
-      align-items: center;
-    }
-    .bio-content {
-      margin-top: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.7;
-      color: #29241f;
-      white-space: pre-wrap;
-      max-height: 180px;
-      overflow-y: auto;
-      padding-right: 8px;
-    }
-    .bio-content::-webkit-scrollbar { width: 4px; }
-    .bio-content::-webkit-scrollbar-track { background: rgba(115, 58, 53, .05); border-radius: 4px; }
-    .bio-content::-webkit-scrollbar-thumb { background: rgba(115, 58, 53, .25); border-radius: 4px; }
-    .bio-content::-webkit-scrollbar-thumb:hover { background: rgba(115, 58, 53, .45); }
+    .lineage-step { display: inline-flex; align-items: center; }
+    .lineage-separator { color: rgba(123,45,36,.3); font-weight: 700; margin: 0 3px; }
+    .lineage-heart { color: #e11d48; margin: 0 3px; display: inline-flex; align-items: center; }
 
-    .child-list {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
+    /* Bio */
+    .bio-content {
+      margin-top: 9px;
+      font-size: 12.5px; font-weight: 500; line-height: 1.75;
+      color: var(--ink-soft); font-style: italic;
+      white-space: pre-wrap; max-height: 180px;
+      overflow-y: auto; padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.2) transparent;
     }
+
+    .child-list { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 6px; }
     .child-chip {
-      padding: 7px 9px;
+      padding: 5px 10px;
       border-radius: 999px;
-      background: rgba(115, 58, 53, .055);
-      color: #4a2522;
-      border: 1px solid rgba(115, 58, 53, .08);
-      font-size: 11px;
-      font-weight: 800;
+      background: rgba(184,137,60,.07);
+      border: 1px solid rgba(184,137,60,.12);
+      color: var(--lacquer-d);
+      font-size: 11px; font-weight: 700;
+      transition: background .15s;
     }
-    .brand-kicker { color: rgba(228, 202, 145, .78); }
-    .brand-title { color: #f5e1b2; }
-    .brand-sub { color: rgba(255, 246, 232, .62); }
-    .section-kicker { color: rgba(115, 58, 53, .64); }
-    .section-title { color: #4a2522; }
+    .child-chip:hover { background: rgba(184,137,60,.13); }
+
+    /* ─── Responsive ─── */
     @media (max-width: 700px) {
       .topbar {
-        min-height: 116px;
+        min-height: 112px;
         align-items: flex-start;
         flex-direction: column;
+        padding-top: 12px; padding-bottom: 12px;
       }
       .segmented { width: 100%; }
-      .segmented button { flex: 1; padding: 0 10px; }
-      .notice { align-items: flex-start; flex-direction: column; gap: 8px; }
-      .card-body { grid-template-columns: 1fr; padding: 16px 15px 15px 18px; }
+      .segmented button { flex: 1; padding: 0 8px; }
+      .notice { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .card-body { grid-template-columns: 1fr; padding: 14px 14px 13px 18px; }
       .branch-list { margin-left: 8px; padding-left: 9px; }
-      .tree-controls { right: 12px; bottom: 12px; }
+      .tree-controls { right: 10px; bottom: 10px; }
       .detail-grid { grid-template-columns: 1fr; }
-      .detail-head { padding: 22px 52px 22px 20px; }
+      .detail-head { padding: 22px 52px 20px 18px; }
+      .modal { border-radius: 18px; }
     }
+
+    /* ─── Animations ─── */
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .family-card { animation: slide-in .22s ease both; }
+
+    /* Divider ornament */
+    .ornament-divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 4px 0 10px; color: rgba(184,137,60,.4);
+      font-size: 10px;
+    }
+    .ornament-divider::before, .ornament-divider::after {
+      content: ""; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(184,137,60,.25));
+    }
+    .ornament-divider::after { background: linear-gradient(270deg, transparent, rgba(184,137,60,.25)); }
   </style>
 </head>
 <body>
@@ -1547,25 +1600,35 @@
     };
     const Icon = ({ name, size = 16, className = "" }) => {
       useEffect(() => { window.lucide?.createIcons(); }, [name]);
-      return <i data-lucide={name} className={className} style={{ width: size, height: size }} />;
+      return <i data-lucide={name} className={className} style={{ width: size, height: size, display: "inline-block" }} />;
     };
+
     const Meta = ({ data, dark = false }) => (
       <>
         <div className="meta">
-          {(data.birthSolar || data.birthLunar || data.birthNote) && <span className="meta-item"><Icon name="sun" size={13} /> Sinh: <b>{formatBirth(data)}</b></span>}
-          {data.deceased && (data.deathLunar || data.deathSolar || data.deathNote) && <span className="meta-item death"><Icon name="moon" size={13} /> Mất: <b>{formatDeath(data)}</b></span>}
+          {(data.birthSolar || data.birthLunar || data.birthNote) && (
+            <span className="meta-item">
+              <Icon name="sun" size={12} />
+              Sinh: <b>{formatBirth(data)}</b>
+            </span>
+          )}
+          {data.deceased && (data.deathLunar || data.deathSolar || data.deathNote) && (
+            <span className="meta-item death">
+              <Icon name="moon" size={12} />
+              Mất: <b>{formatDeath(data)}</b>
+            </span>
+          )}
         </div>
         {data.info && <div className="info">{data.info}</div>}
       </>
     );
+
     const PersonDetailModal = ({ person, onClose }) => {
       if (!person) return null;
       const { data, parentNode, grandparentNode, gen, branchName, pathNodes } = person;
       const children = data.children || [];
-
       const thoDuongText = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
       const status = data.deceased ? (thoDuongText ? `Đã mất (${thoDuongText})` : "Đã mất") : "Còn sống";
-
       const actualParent = parentNode && isSpouse(parentNode.name) ? grandparentNode : parentNode;
       const displayName = cleanName(data.name);
       const roleName = getNameRole(data.name);
@@ -1574,16 +1637,14 @@
       const relation = parentNode
         ? (isSpouse(data.name) ? `${roleName || "Vợ"} của ${cleanName(parentNode.name)}` : `Con của ${actualParent ? cleanName(actualParent.name) : cleanName(parentNode.name)}`)
         : "Thủy tổ của gia phả";
-
       const titleLabel = [...new Set([genTitle, roleName, data.role])].filter(Boolean).join(" - ");
       const branchLabel = data.branchLine || branchName || "Gốc gia phả";
-
       return (
         <div className="modal-backdrop" onClick={onClose}>
           <section className="modal detail-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="detail-head relative">
-              <button className="detail-close" onClick={onClose} aria-label="Đóng chi tiết"><Icon name="x" size={18} /></button>
-              <h2 className="font-serif text-[25px] font-black leading-tight">{displayName}</h2>
+            <div className="detail-head">
+              <button className="detail-close" onClick={onClose} aria-label="Đóng"><Icon name="x" size={17} /></button>
+              <h2 className="font-display detail-head-name">{displayName}</h2>
               <p className="detail-subtitle">{relation}</p>
               {roleTags.length > 0 && (
                 <div className="detail-tags">
@@ -1594,101 +1655,100 @@
             <div className="detail-body">
               <div className="detail-grid">
                 <div className="detail-field">
-                  <p className="detail-label"><Icon name="signature" size={13} /> Họ tên</p>
-                  <p className="detail-value">{displayName}</p>
+                  <p className="detail-label"><Icon name="signature" size={12} /> Họ tên</p>
+                  <p className="detail-value font-serif">{displayName}</p>
                 </div>
                 <div className="detail-field">
-                  <p className="detail-label"><Icon name="layers" size={13} /> Đời / vai vế</p>
-                  <p className="detail-value">Đời thứ {gen}{titleLabel ? ` - ${titleLabel}` : ""}</p>
+                  <p className="detail-label"><Icon name="layers" size={12} /> Đời / vai vế</p>
+                  <p className="detail-value">Đời thứ {gen}{titleLabel ? ` · ${titleLabel}` : ""}</p>
                 </div>
                 <div className="detail-field">
-                  <p className="detail-label"><Icon name="sun" size={13} /> Ngày sinh</p>
+                  <p className="detail-label"><Icon name="sun" size={12} /> Ngày sinh</p>
                   <p className="detail-value">{formatBirth(data) || "Chưa có dữ liệu"}</p>
                 </div>
                 {data.deceased && (
                   <div className="detail-field">
-                    <p className="detail-label"><Icon name="moon" size={13} /> Ngày Mất</p>
+                    <p className="detail-label"><Icon name="moon" size={12} /> Ngày Mất</p>
                     <p className="detail-value">{formatDeath(data) || "Chưa có dữ liệu"}</p>
                   </div>
                 )}
                 <div className="detail-field">
-                  <p className="detail-label"><Icon name="badge-check" size={13} /> Trạng thái</p>
-                  <p className="detail-value text-amber-900 font-extrabold">{status}</p>
+                  <p className="detail-label"><Icon name="badge-check" size={12} /> Trạng thái</p>
+                  <p className="detail-value" style={{ color: data.deceased ? "var(--lacquer)" : "#16a34a", fontWeight: 800 }}>{status}</p>
                 </div>
                 <div className="detail-field">
-                  <p className="detail-label"><Icon name="user-round" size={13} /> Giới tính</p>
+                  <p className="detail-label"><Icon name="user-round" size={12} /> Giới tính</p>
                   <p className="detail-value">{getGenderLabel(data.gender)}</p>
                 </div>
                 <div className="detail-field">
-                  <p className="detail-label"><Icon name="git-branch" size={13} /> Chi nhánh</p>
+                  <p className="detail-label"><Icon name="git-branch" size={12} /> Chi nhánh</p>
                   <p className="detail-value">{branchLabel}</p>
                 </div>
               </div>
+
               <div className="lineage-box">
-                <p className="detail-label"><Icon name="route" size={13} /> ÔNG BÀ/ BỐ MẸ</p>
+                <p className="detail-label"><Icon name="route" size={12} /> Ông bà / Bố mẹ</p>
                 <p className="lineage-path">
                   {pathNodes.map((node, idx) => {
                     const nodeName = cleanName(node.name);
-                    if (idx === 0) {
-                      return <span className="lineage-step" key={`${nodeName}-${idx}`}>{nodeName}</span>;
-                    }
-                    if (node.isSpouse) {
-                      return (
-                        <React.Fragment key={`${nodeName}-${idx}`}>
-                          <span className="lineage-heart">❤️</span>
-                          <span className="lineage-step">{nodeName}</span>
-                        </React.Fragment>
-                      );
-                    } else {
-                      return (
-                        <React.Fragment key={`${nodeName}-${idx}`}>
-                          <span className="lineage-separator">/</span>
-                          <span className="lineage-step">{nodeName}</span>
-                        </React.Fragment>
-                      );
-                    }
+                    if (idx === 0) return <span className="lineage-step" key={`${nodeName}-${idx}`}>{nodeName}</span>;
+                    if (node.isSpouse) return (
+                      <React.Fragment key={`${nodeName}-${idx}`}>
+                        <span className="lineage-heart">❤</span>
+                        <span className="lineage-step">{nodeName}</span>
+                      </React.Fragment>
+                    );
+                    return (
+                      <React.Fragment key={`${nodeName}-${idx}`}>
+                        <span className="lineage-separator">›</span>
+                        <span className="lineage-step">{nodeName}</span>
+                      </React.Fragment>
+                    );
                   })}
                 </p>
               </div>
 
               {data.bio && (
                 <div className="lineage-box">
-                  <p className="detail-label"><Icon name="book-open" size={13} /> Lý lịch / Tiểu sử</p>
-                  <div className="bio-content">
-                    {data.bio}
-                  </div>
+                  <p className="detail-label"><Icon name="book-open" size={12} /> Lý lịch / Tiểu sử</p>
+                  <div className="bio-content">{data.bio}</div>
                 </div>
               )}
 
               {data.info && (
                 <div className="lineage-box">
-                  <p className="detail-label"><Icon name="notebook-text" size={13} /> Ghi chú</p>
+                  <p className="detail-label"><Icon name="notebook-text" size={12} /> Ghi chú</p>
                   <p className="lineage-path">{data.info}</p>
                 </div>
               )}
 
               <div className="lineage-box">
-                <p className="detail-label"><Icon name="users" size={13} /> VỢ CHỒNG/ CON CÁI</p>
+                <p className="detail-label"><Icon name="users" size={12} /> Vợ chồng / Con cái</p>
                 {children.length ? (
                   <div className="child-list">
-                    {children.map((child, idx) => <span className="child-chip" key={`${child.name}-${idx}`}>{formatPersonName(child)}</span>)}
+                    {children.map((child, idx) => (
+                      <span className="child-chip" key={`${child.name}-${idx}`}>{formatPersonName(child)}</span>
+                    ))}
                   </div>
                 ) : (
-                  <p className="lineage-path">Chưa có dữ liệu vợ chồng & con cái.</p>
+                  <p className="lineage-path" style={{ color: "var(--muted)", fontStyle: "italic" }}>Chưa có dữ liệu vợ chồng &amp; con cái.</p>
                 )}
               </div>
             </div>
-            <div className="p-4">
-              <button className="action-button w-full modal-close" onClick={onClose}>Đóng</button>
+            <div style={{ padding: "12px 14px 14px" }}>
+              <button className="action-button modal-close" style={{ width: "100%", justifyContent: "center" }} onClick={onClose}>
+                <Icon name="x" size={14} /> Đóng
+              </button>
             </div>
           </section>
         </div>
       );
     };
+
     const SearchPanel = ({ query, onQueryChange, results, total, onSelect }) => (
       <section className="search-panel">
         <div className="search-box">
-          <Icon name="search" size={17} />
+          <span className="s-icon"><Icon name="search" size={16} /></span>
           <input
             className="search-input"
             value={query}
@@ -1696,8 +1756,8 @@
             placeholder="Tìm tên, ngày sinh, ngày giỗ, chi nhánh..."
           />
           {query && (
-            <button className="clear-search" onClick={() => onQueryChange("")} aria-label="Xóa tìm kiếm">
-              <Icon name="x" size={16} />
+            <button className="clear-search" onClick={() => onQueryChange("")} aria-label="Xóa">
+              <Icon name="x" size={15} />
             </button>
           )}
         </div>
@@ -1708,11 +1768,11 @@
               <div className="search-results">
                 {results.slice(0, 12).map((item) => (
                   <button className="search-result" key={item.id} onClick={() => onSelect(item)}>
-                    <span className="min-w-0">
-                      <span className="search-result-name">{item.data.name}</span>
-                      <span className="search-result-path">{item.pathNames.join(" / ")}</span>
+                    <span style={{ minWidth: 0 }}>
+                      <span className="search-result-name font-serif">{item.data.name}</span>
+                      <span className="search-result-path">{item.pathNames.join(" › ")}</span>
                     </span>
-                    <Icon name="panel-right-open" size={17} />
+                    <Icon name="panel-right-open" size={16} />
                   </button>
                 ))}
               </div>
@@ -1723,6 +1783,7 @@
         )}
       </section>
     );
+
     const MemberItem = ({ data, level = 0, forceOpen, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
       const [open, setOpen] = useState(level < 1);
       const hasChildren = data.children?.length > 0;
@@ -1734,29 +1795,35 @@
       const currentBranch = data.branchLine || data.branch || branchName || "";
       const currentPath = [...pathNodes, data];
       const person = {
-        data,
-        parentNode,
-        grandparentNode,
-        gen: currentGen,
-        branchName: currentBranch,
+        data, parentNode, grandparentNode,
+        gen: currentGen, branchName: currentBranch,
         pathNodes: currentPath,
         fullName: describeNode(data, parentNode, grandparentNode, currentGen)
       };
       useEffect(() => { if (forceOpen !== null) setOpen(forceOpen); }, [forceOpen]);
       return (
         <div>
-          <article className={`family-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isBirthday ? "birthday" : ""}`} onClick={() => onSelect(person)}>
+          <article
+            className={`family-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isBirthday ? "birthday" : ""}`}
+            onClick={() => onSelect(person)}
+          >
             {data.deceased && <div className="deceased-mark" />}
             {isBirthday && <div className="birthday-ribbon"><Icon name="cake" size={10} /> Sinh nhật</div>}
-            <div className="card-body" style={{ paddingLeft: data.deceased ? 54 : undefined }}>
+            <div className={`card-body ${data.deceased ? "has-deceased" : ""}`}>
               <div>
-                {(data.role || data.branchRoot) && <span className="title-pill">{data.role || data.branchRoot}</span>}
-                <h3 className="font-serif name">{data.name}</h3>
+                {(data.role || data.branchRoot) && (
+                  <span className="title-pill">{data.role || data.branchRoot}</span>
+                )}
+                <h3 className="name font-display">{data.name}</h3>
                 <Meta data={data} dark={dark} />
               </div>
               {hasChildren && (
-                <button className="icon-button" aria-label={open ? "Thu gọn" : "Mở rộng"} onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
-                  <Icon name={open ? "chevron-up" : "chevron-down"} size={18} />
+                <button
+                  className="toggle-btn"
+                  aria-label={open ? "Thu gọn" : "Mở rộng"}
+                  onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+                >
+                  <Icon name={open ? "chevron-up" : "chevron-down"} size={17} />
                 </button>
               )}
             </div>
@@ -1766,15 +1833,10 @@
               {data.children.map((child, i) => (
                 <MemberItem
                   key={`${child.name}-${i}`}
-                  data={child}
-                  level={level + 1}
-                  forceOpen={forceOpen}
-                  onSelect={onSelect}
-                  parentNode={data}
-                  grandparentNode={parentNode}
-                  gen={currentGen}
-                  branchName={currentBranch}
-                  pathNodes={currentPath}
+                  data={child} level={level + 1}
+                  forceOpen={forceOpen} onSelect={onSelect}
+                  parentNode={data} grandparentNode={parentNode}
+                  gen={currentGen} branchName={currentBranch} pathNodes={currentPath}
                 />
               ))}
             </div>
@@ -1782,6 +1844,7 @@
         </div>
       );
     };
+
     const TreeNode = ({ data, level = 0, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
       const [open, setOpen] = useState(level < 1);
       const hasChildren = data.children?.length > 0;
@@ -1793,25 +1856,32 @@
       const currentBranch = data.branchLine || data.branch || branchName || "";
       const currentPath = [...pathNodes, data];
       const person = {
-        data,
-        parentNode,
-        grandparentNode,
-        gen: currentGen,
-        branchName: currentBranch,
-        pathNodes: currentPath,
+        data, parentNode, grandparentNode,
+        gen: currentGen, branchName: currentBranch, pathNodes: currentPath,
         fullName: describeNode(data, parentNode, grandparentNode, currentGen)
       };
       return (
         <div className={`tree-item ${level === 0 ? "root-node" : ""}`}>
-          <article className={`tree-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isSpouse(data.name) ? "spouse" : ""} ${isBirthday ? "birthday" : ""}`} onClick={() => onSelect(person)}>
+          <article
+            className={`tree-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isSpouse(data.name) ? "spouse" : ""} ${isBirthday ? "birthday" : ""}`}
+            onClick={() => onSelect(person)}
+          >
             {data.deceased && <div className="deceased-mark" />}
             {isBirthday && <div className="birthday-ribbon"><Icon name="cake" size={10} /> Sinh nhật</div>}
             <div className="tree-card-content">
-              {(data.role || data.branchRoot) && <div className="flex justify-center"><span className="title-pill">{data.role || data.branchRoot}</span></div>}
-              <h3 className="font-serif name">{data.name}</h3>
+              {(data.role || data.branchRoot) && (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <span className="title-pill">{data.role || data.branchRoot}</span>
+                </div>
+              )}
+              <h3 className="name font-display">{data.name}</h3>
               <Meta data={data} dark={dark} />
               {hasChildren && (
-                <button className="mx-auto mt-3 flex h-8 w-8 items-center justify-center rounded-xl opacity-70" onClick={(e) => { e.stopPropagation(); setOpen(!open); }} aria-label={open ? "Thu gọn" : "Mở rộng"}>
+                <button
+                  style={{ display: "flex", margin: "10px auto 0", width: 32, height: 32, alignItems: "center", justifyContent: "center", borderRadius: 10, opacity: .65 }}
+                  onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+                  aria-label={open ? "Thu gọn" : "Mở rộng"}
+                >
                   <Icon name={open ? "chevron-up" : "chevron-down"} size={16} />
                 </button>
               )}
@@ -1823,14 +1893,9 @@
               {data.children.map((child, i) => (
                 <TreeNode
                   key={`${child.name}-${i}`}
-                  data={child}
-                  level={level + 1}
-                  onSelect={onSelect}
-                  parentNode={data}
-                  grandparentNode={parentNode}
-                  gen={currentGen}
-                  branchName={currentBranch}
-                  pathNodes={currentPath}
+                  data={child} level={level + 1} onSelect={onSelect}
+                  parentNode={data} grandparentNode={parentNode}
+                  gen={currentGen} branchName={currentBranch} pathNodes={currentPath}
                 />
               ))}
             </div>
@@ -1838,6 +1903,7 @@
         </div>
       );
     };
+
     const App = () => {
       const [viewMode, setViewMode] = useState("list");
       const [scale, setScale] = useState(.48);
@@ -1861,9 +1927,7 @@
 
       useEffect(() => {
         if (reminders.length) setShowModal(true);
-        if (window.ToanAppGiaPha) {
-          window.ToanAppGiaPha.postMessage(reminders.length.toString());
-        }
+        if (window.ToanAppGiaPha) window.ToanAppGiaPha.postMessage(reminders.length.toString());
       }, [reminders.length]);
 
       const beginDrag = (x, y) => {
@@ -1874,66 +1938,91 @@
         if (!dragging.current) return;
         setPos({ x: x - start.current.x, y: y - start.current.y });
       };
+
       return (
         <div className="shell">
           <PersonDetailModal person={selectedPerson} onClose={() => setSelectedPerson(null)} />
+
+          {/* Reminder Modal */}
           {showModal && (
             <div className="modal-backdrop">
               <section className="modal">
                 <div className="modal-head">
-                  <Icon name="bell-ring" size={34} className="mx-auto mb-3 modal-icon" />
-                  <h2 className="font-serif text-2xl font-black">Ngày giỗ sắp tới</h2>
-                  <p className="mt-2 text-xs font-semibold opacity-70">Theo ngày âm lịch đang hiển thị: {todayLunar.label}</p>
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                    <Icon name="bell-ring" size={34} className="modal-icon" />
+                  </div>
+                  <h2 className="font-display" style={{ fontSize: 24, fontWeight: 700, color: "var(--gold-pale)", textAlign: "center" }}>Ngày giỗ sắp tới</h2>
+                  <p style={{ marginTop: 6, fontSize: 11, fontWeight: 600, color: "rgba(240,221,176,.6)", textAlign: "center" }}>
+                    {todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch
+                  </p>
                 </div>
                 <div className="modal-list">
                   {reminders.map((item, idx) => (
                     <div className="reminder-row" key={idx}>
                       <div>
-                        <p className="text-sm font-extrabold leading-snug text-slate-800">{item.fullName}</p>
-                        <p className="mt-1 text-[11px] font-bold modal-date">Ngày: {item.date}</p>
+                        <p className="reminder-name font-serif">{item.fullName}</p>
+                        <p className="modal-date">Ngày: {item.date}</p>
                       </div>
-                      <span className={`days-pill ${item.days === 0 ? "today" : ""}`}>{item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}</span>
+                      <span className={`days-pill ${item.days === 0 ? "today" : ""}`}>
+                        {item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}
+                      </span>
                     </div>
                   ))}
                 </div>
-                <div className="p-4">
-                  <button className="action-button w-full modal-close" onClick={() => setShowModal(false)}>Đóng</button>
+                <div style={{ padding: "10px 14px 14px" }}>
+                  <button className="action-button modal-close" style={{ width: "100%", justifyContent: "center" }} onClick={() => setShowModal(false)}>
+                    <Icon name="x" size={14} /> Đóng
+                  </button>
                 </div>
               </section>
             </div>
           )}
+
+          {/* Top Bar */}
           <header className="topbar">
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="crest"><Icon name="scroll-text" size={27} /></div>
-              <div className="min-w-0">
-                <h1 className="font-serif text-[22px] sm:text-[28px] font-black leading-tight brand-title">GIA PHẢ PHẠM TỘC</h1>
-                <p className="mt-1 text-xs font-bold brand-sub">{todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch</p>
+            <div className="topbar-brand">
+              <div className="crest">
+                <span className="crest-icon"><Icon name="scroll-text" size={24} /></span>
+              </div>
+              <div className="brand-text">
+                <p className="brand-kicker">Lưu trữ thế hệ</p>
+                <h1 className="brand-title">Gia Phả Phạm Tộc</h1>
+                <p className="brand-sub">{todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch</p>
               </div>
             </div>
             <nav className="segmented" aria-label="Chế độ xem">
-              <button className={viewMode === "list" ? "active" : ""} onClick={() => setViewMode("list")}>Danh sách</button>
-              <button className={viewMode === "tree" ? "active" : ""} onClick={() => setViewMode("tree")}>Sơ đồ cây</button>
+              <button className={viewMode === "list" ? "active" : ""} onClick={() => setViewMode("list")}>
+                Danh sách
+              </button>
+              <button className={viewMode === "tree" ? "active" : ""} onClick={() => setViewMode("tree")}>
+                Sơ đồ cây
+              </button>
             </nav>
           </header>
+
+          {/* Birthday Bar */}
           {birthdays.length > 0 && (
             <section className="notice">
-              <span className="notice-label"><Icon name="cake" size={13} /> Sinh nhật tháng {CURRENT_SOLAR_MONTH}</span>
-              <marquee className="text-xs font-extrabold" scrollamount="4">
-                {birthdays.map((m) => `Chúc mừng sinh nhật: ${m.fullName} (${shortSolarDate(m.birthSolar)})`).join("  •  ")}
+              <span className="notice-badge">
+                <Icon name="cake" size={12} /> Sinh nhật tháng {CURRENT_SOLAR_MONTH}
+              </span>
+              <marquee scrollamount="4">
+                {birthdays.map((m) => `Chúc mừng sinh nhật: ${m.fullName} (${shortSolarDate(m.birthSolar)})`).join("   •   ")}
               </marquee>
             </section>
           )}
+
           <main>
             {viewMode === "list" ? (
               <div className="list-scroll">
                 <div className="list-inner">
                   <div className="toolbar">
                     <div>
-                      <p className="text-[11px] font-black uppercase tracking-[.18em] section-kicker">Dòng họ Phạm</p>
-                      <h2 className="font-serif text-xl font-black section-title">Danh sách thành viên</h2>
+                      <p className="section-kicker">Dòng họ Phạm</p>
+                      <h2 className="section-title font-display">Danh sách thành viên</h2>
                     </div>
                     <button className="action-button" onClick={() => setAllOpen(!allOpen)}>
-                      <Icon name={allOpen ? "folder-minus" : "folder-plus"} size={15} />
+                      <Icon name={allOpen ? "folder-minus" : "folder-plus"} size={14} />
                       {allOpen ? "Thu gọn" : "Mở hết"}
                     </button>
                   </div>
@@ -1965,7 +2054,7 @@
                 <div className="tree-controls">
                   <button className="icon-button" onClick={() => setScale((s) => Math.min(1.8, s + .06))} aria-label="Phóng to"><Icon name="plus" /></button>
                   <button className="icon-button" onClick={() => setScale((s) => Math.max(.16, s - .06))} aria-label="Thu nhỏ"><Icon name="minus" /></button>
-                  <button className="icon-button primary" onClick={() => { setPos({ x: 0, y: 72 }); setScale(.48); }} aria-label="Đặt lại"><Icon name="rotate-ccw" size={18} /></button>
+                  <button className="icon-button primary" onClick={() => { setPos({ x: 0, y: 72 }); setScale(.48); }} aria-label="Đặt lại"><Icon name="rotate-ccw" size={17} /></button>
                 </div>
               </div>
             )}
