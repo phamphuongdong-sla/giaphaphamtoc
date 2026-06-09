@@ -1486,7 +1486,7 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
                   {pathNodes.map((n, i) => {
                     const nm = cleanName(n.name);
                     if (i === 0) return <span key={i}>{nm}</span>;
-                    if (n.isSpouse) return <React.Fragment key={i}><span className="lin-heart">♥</span><span>{nm}</span></React.Fragment>;
+                    if (n.isSpouse) return <React.Fragment key={i}><span className="lin-heart">-</span><span>{nm}</span></React.Fragment>;
                     return <React.Fragment key={i}><span className="lin-arrow">›</span><span>{nm}</span></React.Fragment>;
                   })}
                 </p>
