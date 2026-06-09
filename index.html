@@ -2032,14 +2032,14 @@
               </div>
 
               <div className="lineage-box">
-                <p className="detail-label"><Icon name="route" size={12} /> Ông bà / Bố mẹ</p>
+                <p className="detail-label"><Icon name="route" size={12} />Nhánh trên</p>
                 <p className="lineage-path">
                   {pathNodes.map((node, idx) => {
                     const nodeName = cleanName(node.name);
                     if (idx === 0) return <span className="lineage-step" key={`${nodeName}-${idx}`}>{nodeName}</span>;
                     if (node.isSpouse) return (
                       <React.Fragment key={`${nodeName}-${idx}`}>
-                        <span className="lineage-heart">❤</span>
+                        <span className="lineage-heart">-</span>
                         <span className="lineage-step">{nodeName}</span>
                       </React.Fragment>
                     );
@@ -2068,7 +2068,7 @@
               )}
 
               <div className="lineage-box">
-                <p className="detail-label"><Icon name="users" size={12} /> Vợ chồng / Con cái</p>
+                <p className="detail-label"><Icon name="users" size={12} />Nhánh dưới</p>
                 {children.length ? (
                   <div className="child-list">
                     {children.map((child, idx) => (
