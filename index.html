@@ -1831,9 +1831,7 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
                 <div className="tree-canvas" style={{ transform: `translate(${pos.x}px,${pos.y}px) scale(${scale})` }}>
                   <TreeNode data={family} onSelect={setSelected} />
                 </div>
-                  <button className="tfab" onClick={() => setScale(s => Math.min(1.8, s + .07))}><Icon name="plus" size={20} /></button>
-                  <button className="tfab" onClick={() => setScale(s => Math.max(.16, s - .07))}><Icon name="minus" size={20} /></button>
-                  <button className="tfab gold" onClick={() => { setPos({ x: 0, y: 72 }); setScale(.5); }}><Icon name="home" size={18} /></button>
+                  
                 </div>
             )}
           </main>
