@@ -1481,7 +1481,7 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
               </div>
 
               <div className="info-block">
-                <p className="info-label"><Icon name="route" size={12} /> Thế thứ</p>
+                <p className="info-label"><Icon name="route" size={12} />Nhánh trên</p>
                 <p className="lin-path">
                   {pathNodes.map((n, i) => {
                     const nm = cleanName(n.name);
@@ -1507,7 +1507,7 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
               )}
 
               <div className="info-block">
-                <p className="info-label"><Icon name="users" size={12} /> Vợ chồng · Con cái</p>
+                <p className="info-label"><Icon name="users" size={12} /> Nhánh dưới </p>
                 {(data.children || []).length > 0 ? (
                   <div className="child-list">
                     {(data.children || []).map((c, i) => <span className="child-item" key={i}>{formatPersonName(c)}</span>)}
