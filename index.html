@@ -1,680 +1,890 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<title>Phạm Tộc · Gia Phả</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<style>
-/* ─── TOKENS (Light Bright Theme) ──────────────────────────────────── */
-:root{
-  --bg0:#f5f4ef; /* Soft warm paper-like background */
-  --bg1:#ffffff;
-  --bg2:#f0eee5;
-  --bg3:#e8e4d8;
-  --bg4:#dedad0;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gia Phả Phạm Tộc</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Noto+Serif:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:        #1c1510;
+      --ink-soft:   #3d2e24;
+      --muted:      #7a6a5a;
+      --lacquer:    #7b2d24;
+      --lacquer-d:  #3e1410;
+      --lacquer-l:  #a84d40;
+      --gold:       #b8893c;
+      --gold-l:     #dbb96a;
+      --gold-pale:  #f0ddb0;
+      --paper:      #fdf6e9;
+      --paper-warm: #f8eedb;
+      --paper-mid:  #f0e2c8;
+      --cream:      #fffcf5;
+      --ivory:      #fff9ee;
+      --line:       #c9a45a;
+      --sep:        rgba(184,137,60,.22);
+      --shadow-sm:  0 2px 8px rgba(28,21,16,.06);
+      --shadow-md:  0 8px 28px rgba(28,21,16,.10);
+      --shadow-lg:  0 20px 56px rgba(28,21,16,.14);
+      --r-sm: 10px;
+      --r-md: 16px;
+      --r-lg: 24px;
+    }
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body, #root { width: 100%; height: 100%; margin: 0; padding: 0; }
 
-  --line:rgba(0,0,0,.06);
-  --line2:rgba(0,0,0,.12);
-  --line3:rgba(0,0,0,.2);
+    body {
+      font-family: "Be Vietnam Pro", system-ui, sans-serif;
+      background-color: var(--paper-warm);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='0' cy='0' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='80' cy='0' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='0' cy='80' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='80' cy='80' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3C/svg%3E"),
+        linear-gradient(160deg, #fdf6e9 0%, #f8eedb 40%, #f2e4cc 100%);
+      color: var(--ink);
+      overflow: hidden;
+    }
+    .font-display { font-family: "Cormorant Garamond", "Noto Serif", serif; }
+    .font-serif   { font-family: "Noto Serif", "Cormorant Garamond", serif; }
 
-  --gold:#b8860b;      /* Darker, legible gold */
-  --gold2:#c59b27;
-  --gold3:#8b6508;     /* Very deep gold/brown for contrast */
-  --gold-glow:rgba(184,134,11,.15);
+    /* ─── Shell ─── */
+    .shell {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-  --red:#9e1b1b;       /* Deep traditional red */
-  --red2:#d63031;
-  --green:#27ae60;
+    /* ─── Top Bar ─── */
+    .topbar {
+      position: relative;
+      z-index: 80;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 clamp(14px, 3vw, 36px);
+      min-height: 80px;
+      background: linear-gradient(110deg, var(--lacquer-d) 0%, var(--lacquer) 58%, #5c2018 100%);
+      border-bottom: 1px solid rgba(219,185,106,.28);
+      box-shadow: 0 6px 32px rgba(28,21,16,.22), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .topbar::after {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold-l) 30%, var(--gold) 50%, var(--gold-l) 70%, transparent);
+      opacity: .5;
+    }
 
-  --t0:#2d2824;        /* Primary high-contrast text */
-  --t1:#5c544d;        /* Secondary text */
-  --t2:#857c74;        /* Tertiary / labels */
-  --t3:#aaa29b;
+    /* Ornamental corner lines */
+    .topbar::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(219,185,106,.12);
+      pointer-events: none;
+      border-radius: 4px;
+    }
 
-  --r4:4px;--r8:8px;--r10:10px;--r12:12px;--r16:16px;--r20:20px;--r24:24px;
+    .topbar-brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
 
-  --ease-out:cubic-bezier(.2,.8,.2,1);
-  --ease-spring:cubic-bezier(.34,1.4,.64,1);
-}
+    .crest {
+      flex-shrink: 0;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #d4a547, #f0c96a, #b8893c, #f0c96a, #d4a547);
+      display: grid; place-items: center;
+      box-shadow: 0 0 0 3px rgba(219,185,106,.25), 0 8px 24px rgba(28,21,16,.3), inset 0 2px 4px rgba(255,255,255,.2);
+      position: relative;
+    }
+    .crest::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #e8b84a, #8c5c1e);
+    }
+    .crest-icon {
+      position: relative; z-index: 1;
+      color: #fff8e7;
+      filter: drop-shadow(0 1px 2px rgba(28,21,16,.4));
+    }
 
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body,#root{width:100%;height:100%}
+    .brand-text { min-width: 0; }
+    .brand-kicker {
+      font-size: 9px; font-weight: 900; letter-spacing: .22em;
+      text-transform: uppercase; color: rgba(219,185,106,.7);
+      margin-bottom: 2px;
+    }
+    .brand-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(20px, 2.5vw, 28px); font-weight: 700;
+      line-height: 1.1; letter-spacing: .02em;
+      color: var(--gold-pale);
+      text-shadow: 0 2px 8px rgba(28,21,16,.3);
+    }
+    .brand-sub {
+      font-size: 10px; font-weight: 600;
+      color: rgba(240,221,176,.58);
+      margin-top: 3px;
+      letter-spacing: .04em;
+    }
 
-body{
-  font-family:'Inter',system-ui,sans-serif;
-  background:var(--bg0);
-  color:var(--t0);
-  overflow:hidden;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
-}
+    /* Segmented control */
+    .segmented {
+      display: flex;
+      gap: 2px;
+      padding: 4px;
+      border-radius: 14px;
+      background: rgba(28,21,16,.35);
+      border: 1px solid rgba(219,185,106,.2);
+    }
+    .segmented button {
+      position: relative;
+      height: 36px;
+      padding: 0 18px;
+      border-radius: 11px;
+      font-size: 10.5px; font-weight: 800;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: rgba(240,221,176,.55);
+      transition: all .2s ease;
+    }
+    .segmented button:hover { color: rgba(240,221,176,.85); }
+    .segmented button.active {
+      background: linear-gradient(160deg, var(--gold-l), var(--gold));
+      color: var(--lacquer-d);
+      box-shadow: 0 4px 16px rgba(28,21,16,.25), inset 0 1px 0 rgba(255,255,255,.25);
+    }
 
-/* Hình nền sáng sủa, thanh lịch */
-body::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(circle at 15% 10%, rgba(184,134,11,.05) 0%, transparent 50%),
-    radial-gradient(circle at 85% 85%, rgba(158,27,27,.04) 0%, transparent 60%);
-}
+    /* ─── Birthday Notice Bar ─── */
+    .notice {
+      position: relative;
+      z-index: 50;
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 12px;
+      min-height: 44px;
+      padding: 6px clamp(12px, 3vw, 28px);
+      background: linear-gradient(90deg, var(--gold-pale) 0%, #fef8e7 48%, var(--gold-pale) 100%);
+      border-bottom: 1px solid rgba(184,137,60,.2);
+      overflow: hidden;
+    }
+    .notice::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 180px, rgba(184,137,60,.04) 180px, rgba(184,137,60,.04) 181px);
+    }
+    .notice-badge {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 26px; padding: 0 12px;
+      border-radius: 999px;
+      background: var(--lacquer);
+      color: var(--gold-pale);
+      font-size: 9px; font-weight: 900; letter-spacing: .1em;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(123,45,36,.3);
+    }
+    .notice marquee { font-size: 11.5px; font-weight: 700; color: var(--lacquer-d); letter-spacing: .02em; }
 
-/* ─── SHELL ──────────────────────────────────── */
-.shell{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+    /* ─── Main area ─── */
+    main { flex: 1; min-height: 0; position: relative; overflow: hidden; }
 
-/* ─── TOPBAR ─────────────────────────────────── */
-.topbar{
-  flex-shrink:0;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:0 clamp(16px,4vw,40px);
-  height:70px;
-  background:rgba(255,255,255,0.92);
-  backdrop-filter:blur(24px) saturate(1.8);
-  -webkit-backdrop-filter:blur(24px) saturate(1.8);
-  position:relative;z-index:100;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-  border-bottom:1px solid var(--line);
-}
-.topbar::after{
-  content:"";position:absolute;bottom:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--red)40%,var(--gold2)50%,var(--red)60%,transparent);
-  opacity:.7;
-}
+    /* ─── List View ─── */
+    .list-scroll {
+      position: absolute; inset: 0;
+      overflow-y: auto; overflow-x: hidden;
+      padding: 16px 12px 100px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.3) transparent;
+    }
+    .list-scroll::-webkit-scrollbar { width: 5px; }
+    .list-scroll::-webkit-scrollbar-thumb { background: rgba(184,137,60,.3); border-radius: 4px; }
 
-.tb-brand{display:flex;align-items:center;gap:16px;min-width:0}
+    .list-inner { width: min(860px, 100%); margin: 0 auto; }
 
-/* Sigil */
-.sigil{
-  flex-shrink:0;width:44px;height:44px;border-radius:50%;
-  background:var(--bg1);
-  border:2px solid var(--gold);
-  display:grid;place-items:center;
-  box-shadow:0 0 15px var(--gold-glow);
-  position:relative;
-}
-.sigil-icon{color:var(--red)}
+    /* Sticky toolbar */
+    .toolbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px;
+      padding: 12px 0 16px;
+      background: linear-gradient(180deg, var(--paper-warm) 60%, transparent);
+    }
+    .section-kicker {
+      font-size: 9px; font-weight: 900; letter-spacing: .2em;
+      text-transform: uppercase; color: rgba(123,45,36,.55);
+    }
+    .section-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px; font-weight: 700; color: var(--lacquer-d);
+      letter-spacing: .01em;
+    }
 
-.tb-title{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(18px,2vw,24px);font-weight:800;
-  color:var(--red);letter-spacing:.02em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.tb-sub{font-size:11px;font-weight:600;color:var(--gold3);margin-bottom:2px;letter-spacing:.06em; text-transform:uppercase;}
+    /* Action buttons */
+    .action-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      min-height: 38px; padding: 0 16px;
+      border-radius: var(--r-sm);
+      background: var(--cream);
+      border: 1px solid rgba(123,45,36,.12);
+      color: var(--lacquer);
+      font-size: 10.5px; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-sm);
+      transition: all .18s ease;
+    }
+    .action-button:hover { border-color: rgba(184,137,60,.3); box-shadow: var(--shadow-md); }
+    .action-button:active { transform: scale(.98); }
 
-/* Pill tabs */
-.tab-group{
-  display:flex;gap:4px;padding:4px;
-  background:var(--bg2);
-  border:1px solid var(--line);
-  border-radius:var(--r12);
-}
-.tab-btn{
-  display:flex;align-items:center;gap:6px;
-  height:36px;padding:0 16px;border-radius:var(--r10);
-  font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-  color:var(--t1);transition:all .2s var(--ease-out);
-}
-.tab-btn:hover{color:var(--t0); background:var(--bg1);}
-.tab-btn.on{
-  background:var(--red);
-  color:white;
-  box-shadow:0 4px 10px rgba(158,27,27,.25);
-}
+    /* ─── Search Panel ─── */
+    .search-panel {
+      margin-bottom: 14px;
+      padding: 12px;
+      border-radius: var(--r-md);
+      background: rgba(255,252,245,.85);
+      border: 1px solid rgba(184,137,60,.14);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(12px);
+    }
+    .search-box { position: relative; display: flex; align-items: center; }
+    .search-box .s-icon {
+      position: absolute; left: 14px;
+      color: rgba(123,45,36,.5);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%; min-height: 44px;
+      padding: 0 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(184,137,60,.18);
+      background: var(--ivory);
+      color: var(--ink);
+      font-size: 13px; font-weight: 600;
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+      box-shadow: inset 0 1px 3px rgba(28,21,16,.04);
+    }
+    .search-input:focus { border-color: rgba(184,137,60,.4); box-shadow: 0 0 0 3px rgba(184,137,60,.1); }
+    .search-input::placeholder { color: rgba(122,106,90,.5); }
+    .clear-search {
+      position: absolute; right: 6px;
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      border-radius: 8px;
+      color: var(--lacquer);
+      transition: background .15s;
+    }
+    .clear-search:hover { background: rgba(123,45,36,.08); }
+    .search-summary {
+      margin: 8px 2px 0;
+      font-size: 10.5px; font-weight: 700;
+      color: rgba(28,21,16,.45);
+      letter-spacing: .03em;
+    }
+    .search-results { margin-top: 10px; display: grid; gap: 6px; }
+    .search-result {
+      display: grid; grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px; align-items: center;
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: var(--ivory);
+      border: 1px solid rgba(184,137,60,.1);
+      text-align: left;
+      cursor: pointer;
+      transition: all .16s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-result:hover { border-color: rgba(184,137,60,.28); background: var(--cream); transform: translateX(2px); }
+    .search-result-name { color: var(--lacquer-d); font-size: 12.5px; font-weight: 800; line-height: 1.35; }
+    .search-result-path { display: block; margin-top: 3px; color: rgba(28,21,16,.45); font-size: 10px; font-weight: 600; }
+    .search-empty {
+      margin-top: 10px; padding: 14px;
+      border-radius: 12px;
+      background: rgba(123,45,36,.04);
+      color: rgba(28,21,16,.5);
+      font-size: 12px; font-weight: 600;
+      text-align: center;
+    }
 
-/* ─── TICKER ─────────────────────────────────── */
-.ticker{
-  flex-shrink:0;display:flex;align-items:center;
-  height:40px;
-  background:rgba(184,134,11,.05);
-  border-bottom:1px solid var(--line);
-  overflow:hidden;position:relative;
-}
-.ticker::before,.ticker::after{
-  content:"";position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;
-}
-.ticker::before{left:0;background:linear-gradient(90deg,var(--bg0),transparent)}
-.ticker::after{right:0;background:linear-gradient(270deg,var(--bg0),transparent)}
-.ticker-label{
-  flex-shrink:0;z-index:3;
-  display:flex;align-items:center;gap:8px;
-  padding:0 16px;height:100%;
-  background:linear-gradient(90deg, var(--bg0) 60%, transparent);
-  border-right:1px solid var(--line);
-  font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--red);
-  white-space:nowrap;
-}
-.live-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--red);
-  box-shadow:0 0 8px var(--red);
-  animation:blink 2s ease-in-out infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-.ticker marquee{font-size:12px;font-weight:600;color:var(--t0);letter-spacing:.02em}
+    /* ─── Family Card ─── */
+    .family-card {
+      position: relative;
+      margin-bottom: 8px;
+      border-radius: var(--r-md);
+      overflow: hidden;
+      cursor: pointer;
+      background: linear-gradient(170deg, var(--cream) 0%, var(--ivory) 100%);
+      border: 1px solid rgba(184,137,60,.12);
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .family-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold-l), var(--gold), rgba(184,137,60,.3));
+      border-radius: 4px 0 0 4px;
+    }
+    .family-card:hover {
+      transform: translateX(3px);
+      border-color: rgba(184,137,60,.26);
+      box-shadow: var(--shadow-md);
+    }
+    .family-card:active { transform: scale(.99) translateX(1px); }
 
-/* ─── MAIN ───────────────────────────────────── */
-main{flex:1;min-height:0;position:relative;overflow:hidden}
+    /* Dark card (root) */
+    .family-card.dark {
+      background: linear-gradient(135deg, var(--lacquer-d) 0%, var(--lacquer) 100%);
+      border-color: rgba(219,185,106,.25);
+      color: var(--gold-pale);
+    }
+    .family-card.dark::before { background: linear-gradient(180deg, var(--gold-l), var(--gold-pale)); width: 4px; }
+    .family-card.dark:hover { transform: none; box-shadow: 0 12px 40px rgba(28,21,16,.22); }
 
-/* ─── LIST SCROLL ────────────────────────────── */
-.list-scroll{
-  position:absolute;inset:0;
-  overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;scrollbar-color:var(--gold) transparent;
-}
-.list-scroll::-webkit-scrollbar{width:6px}
-.list-scroll::-webkit-scrollbar-thumb{background:var(--gold);border-radius:6px}
+    /* Branch card */
+    .family-card.branch {
+      background: linear-gradient(170deg, #fffbf2 0%, var(--paper-mid) 100%);
+      border-color: rgba(184,137,60,.2);
+    }
+    .family-card.branch::before {
+      background: linear-gradient(180deg, var(--lacquer), var(--lacquer-l), rgba(184,137,60,.4));
+      width: 4px;
+    }
 
-.list-wrap{width:min(860px,100%);margin:0 auto;padding:0 clamp(16px,3vw,32px) 100px}
+    /* Birthday highlight */
+    .family-card.birthday {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px rgba(184,137,60,.15), var(--shadow-md);
+    }
 
-/* Sticky list header */
-.list-hd{
-  position:sticky;top:0;z-index:40;
-  padding:24px 0 16px;
-  background:linear-gradient(180deg,var(--bg0) 70%,transparent);
-}
-.list-hd-row{display:flex;justify-content:space-between;align-items:center;gap:16px}
-.list-eyebrow{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--gold3);opacity:.9;margin-bottom:6px}
-.list-heading{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(22px,2.5vw,30px);font-weight:800;color:var(--red);letter-spacing:.02em;
-}
+    .card-body {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 12px;
+      padding: 16px 16px 14px 20px;
+    }
+    .card-body.has-deceased { padding-left: 52px; }
 
-/* Expand btn */
-.btn-exp{
-  display:flex;align-items:center;gap:8px;
-  height:38px;padding:0 16px;
-  border-radius:var(--r10);
-  background:var(--bg1);
-  border:1px solid var(--line2);
-  color:var(--t1);
-  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  transition:all .2s;white-space:nowrap;
-}
-.btn-exp:hover{background:var(--bg1);border-color:var(--gold);color:var(--gold3); box-shadow: 0 2px 10px rgba(0,0,0,0.05)}
+    /* Deceased ribbon */
+    .deceased-mark {
+      position: absolute; inset: 0 auto auto 0;
+      width: 46px; height: 46px;
+      overflow: hidden; z-index: 3; pointer-events: none;
+    }
+    .deceased-mark::before {
+      content: "";
+      position: absolute; top: 8px; left: -22px;
+      width: 68px; height: 16px;
+      transform: rotate(-45deg);
+      background: linear-gradient(90deg, #1c1510, #2e241c);
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    }
 
-/* Divider */
-.hdiv{height:1px;background:var(--line2);margin:16px 0 20px}
+    /* Birthday ribbon */
+    .birthday-ribbon {
+      position: absolute; top: 0; right: 0; z-index: 4;
+      display: inline-flex; align-items: center; gap: 4px;
+      height: 22px; padding: 0 10px;
+      border-bottom-left-radius: 12px;
+      background: linear-gradient(135deg, var(--lacquer), var(--gold));
+      color: #fff8e7;
+      font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em;
+      pointer-events: none;
+    }
 
-/* ─── SEARCH ─────────────────────────────────── */
-.s-wrap{
-  position:relative;
-  margin-bottom:20px;
-  border-radius:var(--r12);
-  background:var(--bg1);
-  border:1px solid var(--line2);
-  transition:border-color .2s,box-shadow .2s;
-  overflow:hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-}
-.s-wrap:focus-within{
-  border-color:var(--gold);
-  box-shadow:0 0 0 4px var(--gold-glow);
-  background:var(--bg1);
-}
-.s-row{display:flex;align-items:center;gap:12px;padding:0 16px}
-.s-ico{color:var(--t2);flex-shrink:0}
-.s-input{
-  flex:1;height:52px;background:transparent;border:none;outline:none;
-  font-size:14.5px;font-weight:500;color:var(--t0);font-family:inherit;
-}
-.s-input::placeholder{color:var(--t3)}
-.s-clear{
-  width:32px;height:32px;display:grid;place-items:center;
-  border-radius:var(--r8);color:var(--t2);
-  transition:all .14s;
-}
-.s-clear:hover{background:var(--bg2); color:var(--t0)}
-.s-meta{
-  padding:10px 16px 12px;
-  font-size:11px;font-weight:700;color:var(--gold3);letter-spacing:.05em;
-  border-top:1px solid var(--line);
-}
-.s-item{
-  display:flex;justify-content:space-between;align-items:center;
-  gap:12px;padding:14px 16px;
-  border-top:1px solid var(--line);
-  cursor:pointer;text-align:left;transition:background .2s;
-}
-.s-item:hover{background:var(--bg0)}
-.s-item-name{font-size:14px;font-weight:700;color:var(--t0);line-height:1.3}
-.s-item-path{display:block;margin-top:4px;font-size:10.5px;font-weight:500;color:var(--t2)}
-.s-empty{padding:20px 16px;font-size:13px;color:var(--t3);text-align:center;font-style:italic;border-top:1px solid var(--line)}
+    /* Title pill */
+    .title-pill {
+      display: inline-flex; align-items: center;
+      height: 20px; padding: 0 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(184,137,60,.15), rgba(184,137,60,.08));
+      border: 1px solid rgba(184,137,60,.2);
+      color: var(--gold);
+      font-size: 8.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em;
+    }
+    .dark .title-pill {
+      background: rgba(240,221,176,.12);
+      border-color: rgba(240,221,176,.2);
+      color: var(--gold-pale);
+    }
 
-/* ─── MEMBER CARD ────────────────────────────── */
-.mc{
-  position:relative;
-  margin-bottom:8px;
-  border-radius:var(--r12);
-  background:var(--bg1);
-  border:1px solid var(--line2);
-  overflow:hidden;
-  cursor:pointer;
-  transition:all .2s var(--ease-out);
-  animation:fadeup .25s var(--ease-out) both;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-}
-@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.mc::before{
-  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:linear-gradient(180deg, var(--red), var(--gold));opacity:0;
-  transition:opacity .2s;
-}
-.mc:hover{background:#fff;border-color:var(--gold);transform:translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.06);}
-.mc:hover::before{opacity:1}
-.mc:active{transform:scale(.99) translateX(2px)}
+    /* Name */
+    .name {
+      margin-top: 6px;
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(17px, 1.9vw, 22px);
+      font-weight: 700; line-height: 1.18;
+      color: var(--lacquer-d);
+      letter-spacing: .01em;
+    }
+    .dark .name { color: var(--gold-pale); }
+    .branch .name { color: var(--lacquer); }
 
-/* Root */
-.mc.root{
-  background:linear-gradient(145deg, #fffafa, #fff4f4);
-  border-color:rgba(158,27,27,.25);
-  box-shadow:0 4px 15px rgba(158,27,27,.06);
-}
-.mc.root::before{opacity:1; width: 4px; background:linear-gradient(180deg,var(--red),var(--gold2))}
-.mc.root:hover{background:linear-gradient(145deg, #fffafa, #ffeeee);transform:translateY(-2px)}
+    /* Meta chips */
+    .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .meta-item {
+      display: inline-flex; align-items: center; gap: 5px;
+      min-height: 26px; padding: 4px 9px;
+      border-radius: 8px;
+      background: rgba(184,137,60,.06);
+      border: 1px solid rgba(184,137,60,.1);
+      color: var(--muted);
+      font-size: 10.5px; font-weight: 600;
+      line-height: 1.3;
+    }
+    .meta-item b { color: var(--ink-soft); }
+    .dark .meta-item {
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.1);
+      color: rgba(240,221,176,.7);
+    }
+    .dark .meta-item b { color: var(--gold-pale); }
+    .meta-item.death { color: var(--lacquer-l); }
+    .meta-item.death b { color: var(--lacquer); }
+    .dark .meta-item.death { color: var(--gold-l); }
+    .dark .meta-item.death b { color: var(--gold-pale); }
 
-/* Branch */
-.mc.branch{
-  background:#fafaf9;
-}
-.mc.branch::before{background:var(--gold);opacity:.8}
+    .info {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: rgba(184,137,60,.05);
+      border-left: 2px solid rgba(184,137,60,.25);
+      color: var(--muted);
+      font-size: 10.5px; font-style: italic; line-height: 1.5;
+    }
+    .dark .info { background: rgba(255,255,255,.06); border-left-color: rgba(240,221,176,.25); color: rgba(240,221,176,.65); }
 
-/* Birthday */
-.mc.bday{border-color:var(--red);box-shadow:0 0 15px rgba(214,48,49,.1)}
+    /* Toggle button */
+    .toggle-btn {
+      flex-shrink: 0; align-self: flex-start;
+      margin-top: 4px;
+      width: 40px; height: 40px;
+      display: grid; place-items: center;
+      border-radius: 12px;
+      background: rgba(184,137,60,.08);
+      border: 1px solid rgba(184,137,60,.15);
+      color: var(--gold);
+      transition: all .18s;
+    }
+    .toggle-btn:hover { background: rgba(184,137,60,.14); }
+    .dark .toggle-btn {
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.15);
+      color: var(--gold-pale);
+    }
 
-/* Deceased overlay */
-.mc-dead-mark{
-  position:absolute;top:0;left:0;width:40px;height:40px;overflow:hidden;pointer-events:none;z-index:3;
-}
-.mc-dead-mark::after{
-  content:"";position:absolute;top:7px;left:-18px;
-  width:54px;height:12px;
-  background:rgba(0,0,0,.6);
-  transform:rotate(-45deg);
-}
+    /* Branch tree */
+    .branch-list {
+      margin: 0 0 6px 18px;
+      padding-left: 14px;
+      border-left: 2px solid rgba(184,137,60,.2);
+      position: relative;
+    }
+    .branch-list::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -1px;
+      width: 1px; height: 12px;
+      background: linear-gradient(180deg, rgba(184,137,60,.4), transparent);
+    }
+    .branch-list .branch-list .branch-list {
+      margin-left: 10px; padding-left: 10px;
+      border-left-style: dashed;
+    }
 
-/* Birthday badge */
-.bday-tag{
-  position:absolute;top:0;right:0;z-index:4;
-  display:flex;align-items:center;gap:6px;
-  height:22px;padding:0 12px;
-  border-bottom-left-radius:12px;
-  background:linear-gradient(120deg,var(--red),var(--red2));
-  color:white;
-  font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;
-  pointer-events:none;
-}
+    /* ─── Tree View ─── */
+    .tree-stage {
+      position: absolute; inset: 0;
+      overflow: hidden;
+      cursor: grab; touch-action: none; user-select: none;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(184,137,60,.06) 0%, transparent 60%),
+        linear-gradient(180deg, var(--paper-warm), var(--paper-mid));
+      background-size: cover;
+    }
+    .tree-stage::before {
+      content: "";
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(184,137,60,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184,137,60,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .tree-stage:active { cursor: grabbing; }
+    .tree-canvas {
+      position: absolute; inset: 0;
+      display: flex; justify-content: center;
+      padding-top: 36px;
+      transform-origin: top center;
+      transition: transform .06s linear;
+    }
 
-/* Card body */
-.mc-body{
-  display:grid;grid-template-columns:minmax(0,1fr) auto;
-  gap:12px;align-items:start;
-  padding:16px 16px 16px 20px;
-}
+    /* Tree nodes */
+    .tree-branch {
+      position: relative;
+      display: flex;
+      padding-top: 44px;
+    }
+    .tree-item {
+      position: relative;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 44px 16px 0;
+    }
+    .tree-item::before {
+      content: "";
+      position: absolute; top: 0; left: 50%;
+      width: 2px; height: 44px;
+      transform: translateX(-50%);
+      background: var(--line);
+    }
+    .tree-item::after {
+      content: "";
+      position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+      background: var(--line);
+    }
+    .tree-item:first-child::after, .tree-item:last-child::after, .tree-item:only-child::after { display: none; }
+    .tree-item:first-child::before {
+      left: 50%; width: 50%; transform: none;
+      border-top: 2px solid var(--line); border-left: 2px solid var(--line);
+      border-top-left-radius: 16px; background: transparent;
+    }
+    .tree-item:last-child::before {
+      left: 0; width: 50%; transform: none;
+      border-top: 2px solid var(--line); border-right: 2px solid var(--line);
+      border-top-right-radius: 16px; background: transparent;
+    }
+    .tree-item:only-child::before {
+      left: 50%; width: 2px; transform: translateX(-50%);
+      border: 0; background: var(--line);
+    }
+    .root-node { padding-top: 0; }
+    .root-node::before, .root-node::after { display: none; }
 
-/* Role pill */
-.role-pill{
-  display:inline-flex;align-items:center;
-  height:20px;padding:0 10px;margin-bottom:8px;
-  border-radius:999px;
-  background:var(--bg2);
-  border:1px solid var(--line2);
-  color:var(--gold3);
-  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
-}
-.root .role-pill{background:rgba(158,27,27,.06); border-color:rgba(158,27,27,.2); color:var(--red)}
+    /* Tree card */
+    .tree-card {
+      position: relative;
+      width: 290px; min-height: 200px;
+      border-radius: var(--r-md);
+      overflow: visible;
+      border: 1px solid rgba(184,137,60,.14);
+      background: var(--cream);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .tree-card::before {
+      content: "";
+      position: absolute; inset: 0 0 auto;
+      height: 3px;
+      border-radius: var(--r-md) var(--r-md) 0 0;
+      background: linear-gradient(90deg, rgba(184,137,60,.15), var(--gold-l) 40%, rgba(184,137,60,.1));
+      z-index: 3; pointer-events: none;
+    }
+    .tree-card:hover { border-color: rgba(184,137,60,.3); box-shadow: var(--shadow-lg); }
+    .tree-card.dark {
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-color: rgba(219,185,106,.28);
+    }
+    .tree-card.dark::before {
+      background: linear-gradient(90deg, rgba(219,185,106,.4), var(--gold-pale) 40%, rgba(219,185,106,.2));
+    }
+    .tree-card.branch {
+      background: linear-gradient(170deg, #fffbf2, var(--paper-mid));
+      border-color: rgba(184,137,60,.22);
+    }
+    .tree-card.branch::before {
+      height: 4px;
+      background: linear-gradient(90deg, var(--lacquer), var(--gold-l) 48%, rgba(184,137,60,.1));
+    }
+    .tree-card.spouse {
+      background: linear-gradient(135deg, #fffaf2, var(--paper));
+      border-color: rgba(184,137,60,.16);
+    }
+    .tree-card-content {
+      position: relative; z-index: 2;
+      height: 100%; padding: 18px;
+      overflow: hidden; border-radius: var(--r-md);
+    }
+    .tree-card .name { text-align: center; font-size: 17px; }
+    .tree-card.dark .name { color: var(--gold-pale); }
+    .parent-line {
+      position: absolute; left: 50%; bottom: -44px;
+      width: 2px; height: 44px;
+      transform: translateX(-50%);
+      background: var(--line); z-index: 1;
+    }
+    .parent-line::after {
+      content: "";
+      position: absolute; bottom: 0; left: 50%;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      transform: translate(-50%, 50%);
+      background: var(--gold);
+      box-shadow: 0 0 0 3px rgba(184,137,60,.15);
+    }
 
-/* Name */
-.mc-name{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(17px,2vw,22px);font-weight:700;
-  color:var(--t0);letter-spacing:.02em;line-height:1.2;
-}
-.root .mc-name{color:var(--red); font-size:clamp(20px,2.2vw,24px);}
-.branch .mc-name{color:var(--gold3)}
+    /* Tree controls */
+    .tree-controls {
+      position: absolute; right: 18px; bottom: 18px;
+      z-index: 30;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .icon-button {
+      width: 44px; height: 44px;
+      display: grid; place-items: center;
+      border-radius: 13px;
+      background: rgba(255,252,245,.95);
+      color: var(--lacquer);
+      border: 1px solid rgba(184,137,60,.15);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(8px);
+      transition: all .18s;
+    }
+    .icon-button:hover { box-shadow: var(--shadow-lg); background: var(--cream); }
+    .icon-button.primary {
+      background: linear-gradient(160deg, var(--lacquer-l), var(--lacquer));
+      color: var(--gold-pale);
+      border-color: rgba(219,185,106,.22);
+    }
+    .icon-button.primary:hover { background: linear-gradient(160deg, var(--lacquer), var(--lacquer-d)); }
 
-/* Meta chips */
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:4px 10px;border-radius:var(--r8);
-  background:var(--bg0);
-  border:1px solid var(--line);
-  color:var(--t1);font-size:11px;font-weight:500;line-height:1.4;
-}
-.chip b{color:var(--t0);font-weight:700}
-.chip.dead{background:rgba(214,48,49,.06); color:var(--t1); border-color:rgba(214,48,49,.2)}
-.chip.dead b{color:var(--red2)}
-.root .chip{background:var(--bg1);border-color:var(--line2)}
+    /* ─── Modal ─── */
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      background: rgba(16,11,8,.6);
+      backdrop-filter: blur(12px);
+      animation: fade-in .2s ease both;
+    }
+    @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+    .modal {
+      width: min(440px, 100%);
+      max-height: min(680px, 90vh);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      border-radius: var(--r-lg);
+      background: var(--ivory);
+      border: 1px solid rgba(184,137,60,.28);
+      box-shadow: 0 32px 80px rgba(16,11,8,.4), 0 0 0 1px rgba(255,255,255,.05);
+      animation: pop .25s cubic-bezier(.22,.68,0,1.2) both;
+    }
+    @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(.97) } to { opacity: 1; transform: none } }
 
-/* Note */
-.mc-note{
-  margin-top:10px;padding:8px 12px;
-  border-radius:var(--r8);
-  border-left:3px solid var(--gold);
-  background:var(--bg2);
-  font-size:11.5px;font-style:italic;color:var(--t1);line-height:1.6;
-}
+    .modal-head {
+      padding: 26px 26px 22px;
+      text-align: center;
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-bottom: 1px solid rgba(219,185,106,.2);
+      position: relative;
+    }
+    .modal-head::after {
+      content: "";
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(219,185,106,.4), transparent);
+    }
+    .modal-icon { color: var(--gold-l); }
+    .modal-list {
+      padding: 14px;
+      overflow-y: auto;
+      display: grid; gap: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.25) transparent;
+    }
+    .reminder-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px; align-items: center;
+      padding: 13px 14px;
+      border-radius: var(--r-sm);
+      background: var(--cream);
+      border: 1px solid rgba(184,137,60,.1);
+      transition: border-color .16s;
+    }
+    .reminder-row:hover { border-color: rgba(184,137,60,.22); }
+    .reminder-name { font-size: 12.5px; font-weight: 800; color: var(--ink-soft); line-height: 1.3; }
+    .modal-date { margin-top: 3px; font-size: 10px; font-weight: 700; color: var(--lacquer-l); }
+    .days-pill {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(184,137,60,.12);
+      color: var(--gold);
+      font-size: 9.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em;
+      white-space: nowrap; border: 1px solid rgba(184,137,60,.18);
+    }
+    .days-pill.today { background: var(--lacquer); color: var(--gold-pale); border-color: rgba(219,185,106,.25); }
+    .modal-close {
+      background: linear-gradient(160deg, var(--lacquer-l), var(--lacquer)) !important;
+      color: var(--gold-pale) !important;
+      border-color: rgba(219,185,106,.22) !important;
+    }
+    .modal-close:hover { opacity: .9; }
 
-/* Toggle */
-.mc-toggle{
-  flex-shrink:0;width:38px;height:38px;
-  display:grid;place-items:center;
-  border-radius:var(--r10);
-  background:var(--bg2);
-  border:1px solid var(--line);
-  color:var(--t1);
-  transition:all .2s;
-}
-.mc-toggle:hover{background:var(--bg3);border-color:var(--line2);color:var(--t0)}
-.root .mc-toggle{background:var(--bg1);border-color:var(--line2);color:var(--red)}
+    /* ─── Detail Modal ─── */
+    .detail-modal { width: min(580px, 100%); }
+    .detail-head {
+      padding: 22px 52px 20px 22px;
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-bottom: 1px solid rgba(219,185,106,.2);
+      position: relative;
+    }
+    .detail-head-name {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 26px; font-weight: 700; line-height: 1.15;
+      color: var(--gold-pale); letter-spacing: .01em;
+    }
+    .detail-subtitle { margin-top: 6px; font-size: 12px; font-weight: 600; color: rgba(240,221,176,.65); }
+    .detail-tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .detail-tag {
+      display: inline-flex; align-items: center;
+      min-height: 22px; padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(240,221,176,.15);
+      color: rgba(240,221,176,.85);
+      font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .detail-close {
+      position: absolute; top: 14px; right: 14px;
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      border-radius: 10px;
+      color: rgba(240,221,176,.8);
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.1);
+      transition: all .16s;
+    }
+    .detail-close:hover { background: rgba(255,255,255,.18); color: var(--gold-pale); }
 
-/* Indent */
-.indent{
-  margin:0 0 8px 18px;
-  padding-left:18px;
-  border-left:1px solid var(--line2);
-}
-.indent .indent .indent{margin-left:10px;padding-left:10px;border-left-style:dashed}
+    .detail-body {
+      padding: 14px;
+      overflow-y: auto;
+      display: grid; gap: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.25) transparent;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+    }
+    .detail-field {
+      padding: 12px 13px;
+      border-radius: 12px;
+      background: var(--cream);
+      border: 1px solid rgba(184,137,60,.1);
+      transition: border-color .16s;
+    }
+    .detail-field:hover { border-color: rgba(184,137,60,.2); }
+    .detail-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em;
+      color: rgba(123,45,36,.55);
+    }
+    .detail-value {
+      margin-top: 6px;
+      font-size: 13px; font-weight: 700; line-height: 1.45;
+      color: var(--ink-soft);
+    }
 
-/* ─── TREE STAGE ─────────────────────────────── */
-.tree-stage{
-  position:absolute;inset:0;
-  cursor:grab;touch-action:none;overflow:hidden;
-  background:var(--bg0);
-}
-.tree-stage::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:
-    radial-gradient(var(--line2) 1px,transparent 1px);
-  background-size:30px 30px;
-}
-.tree-stage:active{cursor:grabbing}
-.tree-canvas{
-  position:absolute;inset:0;
-  display:flex;justify-content:center;
-  padding-top:40px;
-  transform-origin:top center;
-  transition:transform .08s linear;
-}
+    /* Lineage box */
+    .lineage-box {
+      padding: 13px 14px;
+      border-radius: 13px;
+      background: linear-gradient(170deg, var(--cream), var(--ivory));
+      border: 1px solid rgba(184,137,60,.14);
+    }
+    .lineage-path {
+      margin-top: 8px;
+      font-size: 12.5px; font-weight: 700; line-height: 1.6;
+      color: var(--ink-soft);
+      display: flex; flex-wrap: wrap; align-items: center; gap: 3px;
+    }
+    .lineage-step { display: inline-flex; align-items: center; }
+    .lineage-separator { color: rgba(123,45,36,.3); font-weight: 700; margin: 0 3px; }
+    .lineage-heart { color: #e11d48; margin: 0 3px; display: inline-flex; align-items: center; }
 
-/* Tree structure */
-.t-branch{position:relative;display:flex;padding-top:48px}
-.t-item{
-  position:relative;
-  display:flex;flex-direction:column;align-items:center;
-  padding:48px 16px 0;
-}
-/* vertical connector */
-.t-item::before{
-  content:"";position:absolute;top:0;left:50%;
-  width:2px;height:48px;transform:translateX(-50%);
-  background:var(--gold);
-}
-/* horizontal connector */
-.t-item::after{
-  content:"";position:absolute;top:0;left:0;width:100%;height:2px;
-  background:var(--gold);
-}
-.t-item:only-child::after{display:none}
-.t-item:first-child::after,.t-item:last-child::after{display:none}
-.t-item:first-child::before{
-  left:50%;width:calc(50% + 1px);transform:none;
-  background:transparent;
-  border-top:2px solid var(--gold);
-  border-left:2px solid var(--gold);
-  border-top-left-radius:16px;height:48px;
-}
-.t-item:last-child::before{
-  left:0;width:calc(50% + 1px);transform:none;
-  background:transparent;
-  border-top:2px solid var(--gold);
-  border-right:2px solid var(--gold);
-  border-top-right-radius:16px;height:48px;
-}
-.t-item:only-child::before{
-  left:50%;width:2px;transform:translateX(-50%);
-  border:none;
-  background:var(--gold);
-}
-.t-root{padding-top:0}
-.t-root::before,.t-root::after{display:none!important}
+    /* Bio */
+    .bio-content {
+      margin-top: 9px;
+      font-size: 12.5px; font-weight: 500; line-height: 1.75;
+      color: var(--ink-soft); font-style: italic;
+      white-space: pre-wrap; max-height: 180px;
+      overflow-y: auto; padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.2) transparent;
+    }
 
-/* Tree card */
-.tc{
-  position:relative;
-  width:280px;min-height:180px;
-  border-radius:var(--r16);
-  background:var(--bg1);
-  border:1px solid var(--line2);
-  box-shadow:0 6px 20px rgba(0,0,0,.06);
-  cursor:pointer;overflow:visible;
-  transition:all .2s var(--ease-out);
-  backdrop-filter: blur(10px);
-}
-.tc::before{
-  content:"";position:absolute;inset:0 0 auto;height:3px;
-  border-radius:var(--r16) var(--r16) 0 0;
-  background:linear-gradient(90deg,transparent,var(--gold)50%,transparent);
-  z-index:2;pointer-events:none;
-}
-.tc:hover{border-color:var(--gold);box-shadow:0 10px 30px rgba(0,0,0,.1);transform:translateY(-4px)}
-.tc.root{
-  background:linear-gradient(145deg, #fffafa, #fff4f4);
-  border-color:var(--red);
-  box-shadow:0 8px 25px rgba(158,27,27,.1);
-}
-.tc.root::before{background:linear-gradient(90deg,transparent,var(--red)50%,transparent)}
-.tc.branch{
-  background:#fdfcf9;
-}
-.tc.spouse{
-  background:var(--bg2);
-  border: 1px dashed var(--line3);
-}
-.tc-body{
-  position:relative;z-index:1;
-  height:100%;padding:18px 16px 16px;
-  border-radius:var(--r16);overflow:hidden;
-}
-.tc .mc-name{text-align:center;font-size:16px}
-/* down connector */
-.t-down{
-  position:absolute;left:50%;bottom:-48px;
-  width:2px;height:48px;transform:translateX(-50%);
-  background:var(--gold);
-  z-index:0;
-}
-.t-down::after{
-  content:"";position:absolute;bottom:0;left:50%;
-  width:8px;height:8px;border-radius:50%;transform:translate(-50%,50%);
-  background:var(--red);box-shadow:0 0 8px rgba(158,27,27,.4);
-}
+    .child-list { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .child-chip {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(184,137,60,.07);
+      border: 1px solid rgba(184,137,60,.12);
+      color: var(--lacquer-d);
+      font-size: 11px; font-weight: 700;
+      transition: background .15s;
+    }
+    .child-chip:hover { background: rgba(184,137,60,.13); }
 
-/* Tree controls */
-.tree-ctrls{
-  position:absolute;right:20px;bottom:20px;z-index:30;
-  display:flex;flex-direction:column;gap:8px;
-}
-.tfab{
-  width:46px;height:46px;
-  display:grid;place-items:center;
-  border-radius:var(--r12);
-  background:var(--bg1);
-  border:1px solid var(--line2);
-  color:var(--t1);
-  box-shadow:0 4px 15px rgba(0,0,0,.08);
-  transition:all .2s;
-}
-.tfab:hover{background:var(--bg0);color:var(--t0); border-color:var(--gold)}
-.tfab.gold{background:var(--red);border-color:var(--red);color:white;box-shadow:0 6px 15px rgba(158,27,27,.25)}
-.tfab.gold:hover{box-shadow:0 8px 20px rgba(158,27,27,.35); transform:scale(1.05)}
+    /* ─── Responsive ─── */
+    @media (max-width: 700px) {
+      .topbar {
+        min-height: 112px;
+        align-items: flex-start;
+        flex-direction: column;
+        padding-top: 12px; padding-bottom: 12px;
+      }
+      .segmented { width: 100%; }
+      .segmented button { flex: 1; padding: 0 8px; }
+      .notice { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .card-body { grid-template-columns: 1fr; padding: 14px 14px 13px 18px; }
+      .branch-list { margin-left: 8px; padding-left: 9px; }
+      .tree-controls { right: 10px; bottom: 10px; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .detail-head { padding: 22px 52px 20px 18px; }
+      .modal { border-radius: 18px; }
+    }
 
-/* ─── OVERLAY ─────────────────────────────────── */
-.overlay{
-  position:fixed;inset:0;z-index:9000;
-  display:flex;align-items:center;justify-content:center;
-  padding:20px;
-  background:rgba(255,255,255,.8);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  animation:ov-in .25s ease both;
-}
-@keyframes ov-in{from{opacity:0}to{opacity:1}}
+    /* ─── Animations ─── */
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .family-card { animation: slide-in .22s ease both; }
 
-.panel{
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  border-radius:var(--r24);
-  background:var(--bg1);
-  border:1px solid var(--line2);
-  box-shadow:0 20px 60px rgba(0,0,0,.15);
-  animation:pan-in .3s var(--ease-spring) both;
-  max-height:min(750px,92vh);
-}
-@keyframes pan-in{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:none}}
-.panel.sm{width:min(440px,100%)}
-.panel.lg{width:min(640px,100%)}
-
-/* Panel header */
-.pan-hd{
-  flex-shrink:0;position:relative;
-  background:var(--bg0);
-  border-bottom:1px solid var(--line);
-  overflow:hidden;
-}
-.pan-hd::before{
-  content:"";position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,transparent,var(--gold)30%,var(--red)50%,var(--gold)70%,transparent);
-}
-
-.pan-hd-inner{position:relative;z-index:1}
-
-/* ─── REMINDER MODAL ─────────────────────────── */
-.rem-hd{padding:32px 28px 24px;text-align:center}
-.rem-ico{
-  width:56px;height:56px;margin:0 auto 16px;
-  border-radius:50%;
-  background:rgba(158,27,27,.06);
-  border:2px solid rgba(158,27,27,.2);
-  display:grid;place-items:center;color:var(--red);
-}
-.rem-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:var(--t0);letter-spacing:.02em}
-.rem-sub{margin-top:6px;font-size:12px;font-weight:600;color:var(--t2);letter-spacing:.08em; text-transform:uppercase;}
-
-.pan-list{flex:1;overflow-y:auto;padding:16px;display:grid;gap:10px;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
-.rem-row{
-  display:grid;grid-template-columns:minmax(0,1fr) auto;
-  gap:12px;align-items:center;
-  padding:16px 18px;
-  border-radius:var(--r12);
-  background:var(--bg1);
-  border:1px solid var(--line);
-  transition:all .2s;
-}
-.rem-row:hover{border-color:var(--gold); background:var(--bg0);}
-.rem-name{font-size:14px;font-weight:700;color:var(--t0);line-height:1.3}
-.rem-date{margin-top:4px;font-size:11px;font-weight:600;color:var(--t1)}
-.days-badge{
-  padding:6px 12px;border-radius:999px;
-  background:var(--bg2);border:1px solid var(--line2);
-  color:var(--t1);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;
-}
-.days-badge.now{background:var(--red);border-color:var(--red);color:white; box-shadow:0 2px 8px rgba(158,27,27,.3)}
-
-.pan-ft{flex-shrink:0;padding:14px 16px 18px}
-.btn-dismiss{
-  width:100%;height:46px;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  border-radius:var(--r10);
-  background:var(--bg2);
-  border:1px solid var(--line);
-  color:var(--t0);
-  font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-  transition:all .2s;
-}
-.btn-dismiss:hover{background:var(--bg3); border-color:var(--line2);}
-
-/* ─── DETAIL MODAL ───────────────────────────── */
-.det-hd{padding:28px 64px 24px 28px}
-.det-name{font-family:'Playfair Display',serif;font-size:clamp(22px,2.8vw,32px);font-weight:800;color:var(--red);letter-spacing:.02em;line-height:1.15;}
-.det-rel{margin-top:8px;font-size:12.5px;font-weight:600;color:var(--t1);letter-spacing:.04em}
-.det-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.det-tag{
-  height:24px;padding:0 12px;border-radius:999px;
-  background:var(--bg2);border:1px solid var(--line2);
-  color:var(--t1);font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
-}
-.det-close{
-  position:absolute;top:20px;right:20px;
-  width:36px;height:36px;display:grid;place-items:center;
-  border-radius:var(--r10);
-  color:var(--t2);background:var(--bg1);border:1px solid var(--line);
-  transition:all .2s;
-}
-.det-close:hover{background:var(--bg2);color:var(--t0); border-color:var(--line2)}
-
-.det-body{flex:1;overflow-y:auto;padding:16px;display:grid;gap:12px;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
-
-.det-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.det-field{
-  padding:14px 16px;
-  border-radius:var(--r12);
-  background:var(--bg0);
-  border:1px solid var(--line);
-  transition:all .2s;
-}
-.det-field:hover{border-color:var(--gold); background:var(--bg2)}
-.det-label{
-  font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
-  color:var(--t2);margin-bottom:6px;
-  display:flex;align-items:center;gap:6px;opacity:.9;
-}
-.det-val{font-size:13.5px;font-weight:700;color:var(--t0);line-height:1.5}
-
-.info-block{
-  padding:18px 20px;border-radius:var(--r16);
-  background:var(--bg0);border:1px solid var(--line);
-}
-.info-label{
-  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
-  color:var(--t2);margin-bottom:10px;
-  display:flex;align-items:center;gap:6px;
-}
-.lin-path{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:13.5px;font-weight:700;color:var(--t0);line-height:1.7}
-.lin-arrow{color:var(--gold);margin:0 4px;font-size:13px}
-.lin-heart{color:var(--red2);margin:0 4px;}
-.bio{font-size:14.5px;line-height:1.8;color:var(--t1);white-space:pre-wrap;max-height:200px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
-.child-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.child-item{
-  padding:6px 14px;border-radius:999px;
-  background:var(--bg1);border:1px solid var(--line2);
-  color:var(--t0);font-size:12px;font-weight:600;
-  transition:all .2s;
-}
-.child-item:hover{background:var(--bg2); border-color:var(--gold)}
-
-/* ─── RESPONSIVE ─────────────────────────────── */
-@media(max-width:640px){
-  .topbar{height:auto;flex-direction:column;align-items:flex-start;padding:16px;gap:14px}
-  .tab-group{width:100%}.tab-btn{flex:1;justify-content:center}
-  .det-grid{grid-template-columns:1fr}
-  .det-hd{padding:24px 60px 20px 24px}
-  .mc-body{grid-template-columns:1fr;gap:10px;padding:14px 14px 14px 18px}
-  .indent{margin-left:10px;padding-left:12px}
-  .tree-ctrls{right:12px;bottom:12px}
-}
-</style>
+    /* Divider ornament */
+    .ornament-divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 4px 0 10px; color: rgba(184,137,60,.4);
+      font-size: 10px;
+    }
+    .ornament-divider::before, .ornament-divider::after {
+      content: ""; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(184,137,60,.25));
+    }
+    .ornament-divider::after { background: linear-gradient(270deg, transparent, rgba(184,137,60,.25)); }
+  </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
+  <div id="root"></div>
+  <script type="text/babel">
     const { useEffect, useMemo, useRef, useState } = React;
     const now = new Date();
     const CURRENT_SOLAR_MONTH = now.getMonth() + 1;
@@ -1104,6 +1314,7 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
       return age >= 60 ? `Hưởng Thọ ${age} tuổi` : `Hưởng Dương ${age} tuổi`;
     };
 
+    // ĐÃ LOẠI BỎ HOÀN TOÀN HIỂN THỊ NGÀY ÂM LỊCH TẠI MỤC NGÀY SINH CỦA THÀNH VIÊN
     const formatBirth = (data) => {
       const parts = [];
       if (data.birthSolar) parts.push(`${formatSolarDate(data.birthSolar)}`);
@@ -1387,220 +1598,253 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
       });
       return list.sort((a, b) => a.days - b.days);
     };
-
-    /* ── Icon ───────────────────────────────── */
-    const Icon = ({ name, size = 16 }) => {
+    const Icon = ({ name, size = 16, className = "" }) => {
       useEffect(() => { window.lucide?.createIcons(); }, [name]);
-      return <i data-lucide={name} style={{ width: size, height: size, display: "inline-block", verticalAlign: "middle", flexShrink: 0 }} />;
+      return <i data-lucide={name} className={className} style={{ width: size, height: size, display: "inline-block" }} />;
     };
 
-    /* ── Meta chips ─────────────────────────── */
-    const Chips = ({ data, isRoot }) => (
+    const Meta = ({ data, dark = false }) => (
       <>
-        <div className="chips">
+        <div className="meta">
           {(data.birthSolar || data.birthLunar || data.birthNote) && (
-            <span className="chip">
-              <Icon name="sun" size={11} />
-              Sinh&nbsp;<b>{formatBirth(data)}</b>
+            <span className="meta-item">
+              <Icon name="sun" size={12} />
+              Sinh: <b>{formatBirth(data)}</b>
             </span>
           )}
           {data.deceased && (data.deathLunar || data.deathSolar || data.deathNote) && (
-            <span className="chip dead">
-              <Icon name="moon" size={11} />
-              Mất&nbsp;<b>{formatDeath(data)}</b>
+            <span className="meta-item death">
+              <Icon name="moon" size={12} />
+              Mất: <b>{formatDeath(data)}</b>
             </span>
           )}
         </div>
-        {data.info && <p className="mc-note">{data.info}</p>}
+        {data.info && <div className="info">{data.info}</div>}
       </>
     );
 
-    /* ── Detail Modal ───────────────────────── */
-    const DetailModal = ({ person, onClose }) => {
+    const PersonDetailModal = ({ person, onClose }) => {
       if (!person) return null;
       const { data, parentNode, grandparentNode, gen, branchName, pathNodes } = person;
-      const displayName = cleanName(data.name);
-      const roleName    = getNameRole(data.name);
-      const genTitle    = getGenTitle(data, gen);
-      const thoDuong    = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
-      const status      = data.deceased ? (thoDuong ? `Đã mất · ${thoDuong}` : "Đã mất") : "Còn sống";
+      const children = data.children || [];
+      const thoDuongText = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
+      const status = data.deceased ? (thoDuongText ? `Đã mất (${thoDuongText})` : "Đã mất") : "Còn sống";
       const actualParent = parentNode && isSpouse(parentNode.name) ? grandparentNode : parentNode;
-      const relation    = parentNode
-        ? (isSpouse(data.name) ? `${roleName || "Vợ"} của ${cleanName(parentNode.name)}`
-                                : `Con của ${actualParent ? cleanName(actualParent.name) : cleanName(parentNode.name)}`)
+      const displayName = cleanName(data.name);
+      const roleName = getNameRole(data.name);
+      const genTitle = getGenTitle(data, gen);
+      const roleTags = [...new Set([data.role, roleName, genTitle, data.branchRoot].filter(Boolean))];
+      const relation = parentNode
+        ? (isSpouse(data.name) ? `${roleName || "Vợ"} của ${cleanName(parentNode.name)}` : `Con của ${actualParent ? cleanName(actualParent.name) : cleanName(parentNode.name)}`)
         : "Thủy tổ của gia phả";
-      const tags = [...new Set([data.role, roleName, genTitle, data.branchRoot].filter(Boolean))];
+      const titleLabel = [...new Set([genTitle, roleName, data.role])].filter(Boolean).join(" - ");
       const branchLabel = data.branchLine || branchName || "Gốc gia phả";
-
       return (
-        <div className="overlay" onClick={onClose}>
-          <section className="panel lg" onClick={e => e.stopPropagation()}>
-            <div className="pan-hd">
-              <div className="pan-hd-inner det-hd">
-                <button className="det-close" onClick={onClose}><Icon name="x" size={18} /></button>
-                <h2 className="det-name">{displayName}</h2>
-                <p className="det-rel">{relation}</p>
-                {tags.length > 0 && (
-                  <div className="det-tags">{tags.map(t => <span className="det-tag" key={t}>{t}</span>)}</div>
-                )}
-              </div>
+        <div className="modal-backdrop" onClick={onClose}>
+          <section className="modal detail-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="detail-head">
+              <button className="detail-close" onClick={onClose} aria-label="Đóng"><Icon name="x" size={17} /></button>
+              <h2 className="font-display detail-head-name">{displayName}</h2>
+              <p className="detail-subtitle">{relation}</p>
+              {roleTags.length > 0 && (
+                <div className="detail-tags">
+                  {roleTags.map((tag) => <span className="detail-tag" key={tag}>{tag}</span>)}
+                </div>
+              )}
             </div>
-
-            <div className="det-body">
-              <div className="det-grid">
-                <div className="det-field">
-                  <p className="det-label"><Icon name="user" size={12} /> Họ tên</p>
-                  <p className="det-val">{displayName}</p>
+            <div className="detail-body">
+              <div className="detail-grid">
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="signature" size={12} /> Họ tên</p>
+                  <p className="detail-value font-serif">{displayName}</p>
                 </div>
-                <div className="det-field">
-                  <p className="det-label"><Icon name="layers" size={12} /> Đời thứ</p>
-                  <p className="det-val">{gen}{[genTitle, roleName, data.role].filter(Boolean).length ? " · " + [...new Set([genTitle, roleName, data.role].filter(Boolean))].join(" · ") : ""}</p>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="layers" size={12} /> Đời / vai vế</p>
+                  <p className="detail-value">Đời thứ {gen}{titleLabel ? ` · ${titleLabel}` : ""}</p>
                 </div>
-                <div className="det-field">
-                  <p className="det-label"><Icon name="sun" size={12} /> Ngày sinh</p>
-                  <p className="det-val">{formatBirth(data) || "—"}</p>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="sun" size={12} /> Ngày sinh</p>
+                  <p className="detail-value">{formatBirth(data) || "Chưa có dữ liệu"}</p>
                 </div>
                 {data.deceased && (
-                  <div className="det-field">
-                    <p className="det-label"><Icon name="moon" size={12} /> Ngày mất</p>
-                    <p className="det-val">{formatDeath(data) || "—"}</p>
+                  <div className="detail-field">
+                    <p className="detail-label"><Icon name="moon" size={12} /> Ngày Mất</p>
+                    <p className="detail-value">{formatDeath(data) || "Chưa có dữ liệu"}</p>
                   </div>
                 )}
-                <div className="det-field">
-                  <p className="det-label"><Icon name="activity" size={12} /> Trạng thái</p>
-                  <p className="det-val" style={{ color: data.deceased ? "var(--red2)" : "var(--green)", fontWeight: 800 }}>{status}</p>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="badge-check" size={12} /> Trạng thái</p>
+                  <p className="detail-value" style={{ color: data.deceased ? "var(--lacquer)" : "#16a34a", fontWeight: 800 }}>{status}</p>
                 </div>
-                <div className="det-field">
-                  <p className="det-label"><Icon name="user-round" size={12} /> Giới tính</p>
-                  <p className="det-val">{getGenderLabel(data.gender)}</p>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="user-round" size={12} /> Giới tính</p>
+                  <p className="detail-value">{getGenderLabel(data.gender)}</p>
                 </div>
-                <div className="det-field" style={{ gridColumn: "span 2" }}>
-                  <p className="det-label"><Icon name="git-branch" size={12} /> Chi nhánh</p>
-                  <p className="det-val">{branchLabel}</p>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="git-branch" size={12} /> Chi nhánh</p>
+                  <p className="detail-value">{branchLabel}</p>
                 </div>
               </div>
 
-              <div className="info-block">
-                <p className="info-label"><Icon name="route" size={12} />Nhánh trên</p>
-                <p className="lin-path">
-                  {pathNodes.map((n, i) => {
-                    const nm = cleanName(n.name);
-                    if (i === 0) return <span key={i}>{nm}</span>;
-                    if (n.isSpouse) return <React.Fragment key={i}><span className="lin-heart">-</span><span>{nm}</span></React.Fragment>;
-                    return <React.Fragment key={i}><span className="lin-arrow">›</span><span>{nm}</span></React.Fragment>;
+              <div className="lineage-box">
+                <p className="detail-label"><Icon name="route" size={12} /> Ông bà / Bố mẹ</p>
+                <p className="lineage-path">
+                  {pathNodes.map((node, idx) => {
+                    const nodeName = cleanName(node.name);
+                    if (idx === 0) return <span className="lineage-step" key={`${nodeName}-${idx}`}>{nodeName}</span>;
+                    if (node.isSpouse) return (
+                      <React.Fragment key={`${nodeName}-${idx}`}>
+                        <span className="lineage-heart">❤</span>
+                        <span className="lineage-step">{nodeName}</span>
+                      </React.Fragment>
+                    );
+                    return (
+                      <React.Fragment key={`${nodeName}-${idx}`}>
+                        <span className="lineage-separator">›</span>
+                        <span className="lineage-step">{nodeName}</span>
+                      </React.Fragment>
+                    );
                   })}
                 </p>
               </div>
 
               {data.bio && (
-                <div className="info-block">
-                  <p className="info-label"><Icon name="book-open" size={12} /> Tiểu sử</p>
-                  <div className="bio">{data.bio}</div>
+                <div className="lineage-box">
+                  <p className="detail-label"><Icon name="book-open" size={12} /> Lý lịch / Tiểu sử</p>
+                  <div className="bio-content">{data.bio}</div>
                 </div>
               )}
 
-              {data.info && !data.bio && (
-                <div className="info-block">
-                  <p className="info-label"><Icon name="file-text" size={12} /> Ghi chú</p>
-                  <p className="lin-path">{data.info}</p>
+              {data.info && (
+                <div className="lineage-box">
+                  <p className="detail-label"><Icon name="notebook-text" size={12} /> Ghi chú</p>
+                  <p className="lineage-path">{data.info}</p>
                 </div>
               )}
 
-              <div className="info-block">
-                <p className="info-label"><Icon name="users" size={12} /> Nhánh dưới </p>
-                {(data.children || []).length > 0 ? (
+              <div className="lineage-box">
+                <p className="detail-label"><Icon name="users" size={12} /> Vợ chồng / Con cái</p>
+                {children.length ? (
                   <div className="child-list">
-                    {(data.children || []).map((c, i) => <span className="child-item" key={i}>{formatPersonName(c)}</span>)}
+                    {children.map((child, idx) => (
+                      <span className="child-chip" key={`${child.name}-${idx}`}>{formatPersonName(child)}</span>
+                    ))}
                   </div>
                 ) : (
-                  <p style={{ fontSize: 12, color: "var(--t3)", fontStyle: "italic", marginTop: 4 }}>Chưa có dữ liệu.</p>
+                  <p className="lineage-path" style={{ color: "var(--muted)", fontStyle: "italic" }}>Chưa có dữ liệu vợ chồng &amp; con cái.</p>
                 )}
               </div>
             </div>
-
-            <div className="pan-ft">
-              <button className="btn-dismiss" onClick={onClose}><Icon name="x" size={14} /> Đóng</button>
+            <div style={{ padding: "12px 14px 14px" }}>
+              <button className="action-button modal-close" style={{ width: "100%", justifyContent: "center" }} onClick={onClose}>
+                <Icon name="x" size={14} /> Đóng
+              </button>
             </div>
           </section>
         </div>
       );
     };
 
-    /* ── Search ─────────────────────────────── */
-    const Search = ({ query, onChange, results, total, onSelect }) => (
-      <div className="s-wrap">
-        <div className="s-row">
-          <span className="s-ico"><Icon name="search" size={18} /></span>
+    const SearchPanel = ({ query, onQueryChange, results, total, onSelect }) => (
+      <section className="search-panel">
+        <div className="search-box">
+          <span className="s-icon"><Icon name="search" size={16} /></span>
           <input
-            className="s-input"
+            className="search-input"
             value={query}
-            onChange={e => onChange(e.target.value)}
-            placeholder="Tìm tên, ngày sinh, ngày giỗ, chi nhánh…"
+            onChange={(e) => onQueryChange(e.target.value)}
+            placeholder="Tìm tên, ngày sinh, ngày giỗ, chi nhánh..."
           />
-          {query && <button className="s-clear" onClick={() => onChange("")}><Icon name="x" size={16} /></button>}
+          {query && (
+            <button className="clear-search" onClick={() => onQueryChange("")} aria-label="Xóa">
+              <Icon name="x" size={15} />
+            </button>
+          )}
         </div>
         {query.trim() && (
           <>
-            <p className="s-meta">Tìm thấy {results.length} / {total}</p>
-            {results.length > 0
-              ? <div className="s-results">
-                  {results.slice(0, 12).map(item => (
-                    <button className="s-item" key={item.id} onClick={() => onSelect(item)}>
-                      <span>
-                        <span className="s-item-name">{cleanName(item.data.name)}</span>
-                        <span className="s-item-path">{item.pathNames.join(" › ")}</span>
-                      </span>
-                      <Icon name="chevron-right" size={16} />
-                    </button>
-                  ))}
-                </div>
-              : <p className="s-empty">Không tìm thấy kết quả phù hợp.</p>
-            }
+            <p className="search-summary">Tìm thấy {results.length} / {total} thành viên</p>
+            {results.length ? (
+              <div className="search-results">
+                {results.slice(0, 12).map((item) => (
+                  <button className="search-result" key={item.id} onClick={() => onSelect(item)}>
+                    <span style={{ minWidth: 0 }}>
+                      <span className="search-result-name font-serif">{item.data.name}</span>
+                      <span className="search-result-path">{item.pathNames.join(" › ")}</span>
+                    </span>
+                    <Icon name="panel-right-open" size={16} />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="search-empty">Không tìm thấy thành viên phù hợp.</div>
+            )}
           </>
         )}
-      </div>
+      </section>
     );
 
-    /* ── Member List Item ───────────────────── */
-    const Item = ({ data, level = 0, forceOpen, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
+    const MemberItem = ({ data, level = 0, forceOpen, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
       const [open, setOpen] = useState(level < 1);
-      const has       = data.children?.length > 0;
-      const bd        = data.birthSolar;
-      const isBday    = !data.deceased && bd?.d && bd?.m && bd.m === CURRENT_SOLAR_MONTH && bd.d >= CURRENT_SOLAR_DAY;
-      const isRoot    = level === 0;
-      const isBranch  = !!data.branchRoot && level > 0;
-      const curGen    = parentNode === null ? 1 : (isSpouse(data.name) ? gen : gen + 1);
-      const curBranch = data.branchLine || data.branch || branchName || "";
-      const curPath   = [...pathNodes, data];
-      const person    = { data, parentNode, grandparentNode, gen: curGen, branchName: curBranch, pathNodes: curPath, fullName: describeNode(data, parentNode, grandparentNode, curGen) };
-
+      const hasChildren = data.children?.length > 0;
+      const bDate = data.birthSolar;
+      const isBirthday = !data.deceased && bDate?.d && bDate?.m && bDate.m === CURRENT_SOLAR_MONTH && bDate.d >= CURRENT_SOLAR_DAY;
+      const dark = level === 0;
+      const branch = !!data.branchRoot;
+      const currentGen = parentNode === null ? 1 : (isSpouse(data.name) ? gen : gen + 1);
+      const currentBranch = data.branchLine || data.branch || branchName || "";
+      const currentPath = [...pathNodes, data];
+      const person = {
+        data, parentNode, grandparentNode,
+        gen: currentGen, branchName: currentBranch,
+        pathNodes: currentPath,
+        fullName: describeNode(data, parentNode, grandparentNode, currentGen)
+      };
       useEffect(() => { if (forceOpen !== null) setOpen(forceOpen); }, [forceOpen]);
-
-      const cls = ["mc", isRoot ? "root" : "", isBranch ? "branch" : "", isBday ? "bday" : ""].filter(Boolean).join(" ");
-
       return (
         <div>
-          <article className={cls} onClick={() => onSelect(person)}>
-            {data.deceased && <div className="mc-dead-mark" />}
-            {isBday && <div className="bday-tag"><Icon name="cake" size={10} /> Sinh nhật</div>}
-            <div className="mc-body">
-              <div style={{ paddingLeft: data.deceased ? 30 : 0 }}>
-                {(data.role || data.branchRoot) && <div className="role-pill">{data.role || data.branchRoot}</div>}
-                <h3 className="mc-name">{cleanName(data.name)}</h3>
-                <Chips data={data} isRoot={isRoot} />
+          <article
+            className={`family-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isBirthday ? "birthday" : ""}`}
+            onClick={() => onSelect(person)}
+          >
+            {data.deceased && <div className="deceased-mark" />}
+            {isBirthday && <div className="birthday-ribbon"><Icon name="cake" size={10} /> Sinh nhật</div>}
+            <div className={`card-body ${data.deceased ? "has-deceased" : ""}`}>
+              <div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 2 }}>
+                  {getNameRole(data.name) && (
+                    <span className="title-pill" style={{ background: "rgba(184,137,60,.09)", borderColor: "rgba(184,137,60,.18)" }}>
+                      {getNameRole(data.name)}
+                    </span>
+                  )}
+                  {(data.role || data.branchRoot) && (
+                    <span className="title-pill">{data.role || data.branchRoot}</span>
+                  )}
+                </div>
+                <h3 className="name font-display">{cleanName(data.name)}</h3>
+                <Meta data={data} dark={dark} />
               </div>
-              {has && (
-                <button className="mc-toggle" onClick={e => { e.stopPropagation(); setOpen(o => !o); }} aria-label="toggle">
-                  <Icon name={open ? "chevron-up" : "chevron-down"} size={18} />
+              {hasChildren && (
+                <button
+                  className="toggle-btn"
+                  aria-label={open ? "Thu gọn" : "Mở rộng"}
+                  onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+                >
+                  <Icon name={open ? "chevron-up" : "chevron-down"} size={17} />
                 </button>
               )}
             </div>
           </article>
-          {has && open && (
-            <div className="indent">
-              {data.children.map((c, i) => (
-                <Item key={`${c.name}-${i}`} data={c} level={level + 1} forceOpen={forceOpen} onSelect={onSelect}
-                  parentNode={data} grandparentNode={parentNode} gen={curGen} branchName={curBranch} pathNodes={curPath} />
+          {hasChildren && open && (
+            <div className="branch-list">
+              {data.children.map((child, i) => (
+                <MemberItem
+                  key={`${child.name}-${i}`}
+                  data={child} level={level + 1}
+                  forceOpen={forceOpen} onSelect={onSelect}
+                  parentNode={data} grandparentNode={parentNode}
+                  gen={currentGen} branchName={currentBranch} pathNodes={currentPath}
+                />
               ))}
             </div>
           )}
@@ -1608,50 +1852,63 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
       );
     };
 
-    /* ── Tree Node ──────────────────────────── */
     const TreeNode = ({ data, level = 0, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
       const [open, setOpen] = useState(level < 1);
-      const has       = data.children?.length > 0;
-      const bd        = data.birthSolar;
-      const isBday    = !data.deceased && bd?.d && bd?.m && bd.m === CURRENT_SOLAR_MONTH && bd.d >= CURRENT_SOLAR_DAY;
-      const isRoot    = level === 0;
-      const isBranch  = !!data.branchRoot && level > 0;
-      const curGen    = parentNode === null ? 1 : (isSpouse(data.name) ? gen : gen + 1);
-      const curBranch = data.branchLine || data.branch || branchName || "";
-      const curPath   = [...pathNodes, data];
-      const person    = { data, parentNode, grandparentNode, gen: curGen, branchName: curBranch, pathNodes: curPath, fullName: describeNode(data, parentNode, grandparentNode, curGen) };
-
-      const cardCls = ["tc", isRoot ? "root" : "", isBranch ? "branch" : "", isSpouse(data.name) ? "spouse" : "", isBday ? "bday" : ""].filter(Boolean).join(" ");
-
+      const hasChildren = data.children?.length > 0;
+      const bDate = data.birthSolar;
+      const isBirthday = !data.deceased && bDate?.d && bDate?.m && bDate.m === CURRENT_SOLAR_MONTH && bDate.d >= CURRENT_SOLAR_DAY;
+      const dark = level === 0;
+      const branch = !!data.branchRoot;
+      const currentGen = parentNode === null ? 1 : (isSpouse(data.name) ? gen : gen + 1);
+      const currentBranch = data.branchLine || data.branch || branchName || "";
+      const currentPath = [...pathNodes, data];
+      const person = {
+        data, parentNode, grandparentNode,
+        gen: currentGen, branchName: currentBranch, pathNodes: currentPath,
+        fullName: describeNode(data, parentNode, grandparentNode, currentGen)
+      };
       return (
-        <div className={`t-item ${level === 0 ? "t-root" : ""}`}>
-          <article className={cardCls} onClick={() => onSelect(person)}>
-            {data.deceased && <div className="mc-dead-mark" />}
-            {isBday && <div className="bday-tag"><Icon name="cake" size={10} /> Sinh nhật</div>}
-            <div className="tc-body">
-              {(data.role || data.branchRoot) && (
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
-                  <span className="role-pill">{data.role || data.branchRoot}</span>
-                </div>
-              )}
-              <h3 className="mc-name">{cleanName(data.name)}</h3>
-              <Chips data={data} isRoot={isRoot} />
-              {has && (
+        <div className={`tree-item ${level === 0 ? "root-node" : ""}`}>
+          <article
+            className={`tree-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isSpouse(data.name) ? "spouse" : ""} ${isBirthday ? "birthday" : ""}`}
+            onClick={() => onSelect(person)}
+          >
+            {data.deceased && <div className="deceased-mark" />}
+            {isBirthday && <div className="birthday-ribbon"><Icon name="cake" size={10} /> Sinh nhật</div>}
+            <div className="tree-card-content">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, justifyContent: "center" }}>
+                {getNameRole(data.name) && (
+                  <span className="title-pill" style={{ background: "rgba(184,137,60,.09)", borderColor: "rgba(184,137,60,.18)" }}>
+                    {getNameRole(data.name)}
+                  </span>
+                )}
+                {(data.role || data.branchRoot) && (
+                  <span className="title-pill">{data.role || data.branchRoot}</span>
+                )}
+              </div>
+              <h3 className="name font-display">{cleanName(data.name)}</h3>
+              <Meta data={data} dark={dark} />
+              {hasChildren && (
                 <button
-                  style={{ display: "flex", margin: "12px auto 0", width: 32, height: 32, alignItems: "center", justifyContent: "center", borderRadius: 8, color: "var(--t1)", background: "var(--bg0)", border: "1px solid var(--line)" }}
-                  onClick={e => { e.stopPropagation(); setOpen(o => !o); }}
+                  style={{ display: "flex", margin: "10px auto 0", width: 32, height: 32, alignItems: "center", justifyContent: "center", borderRadius: 10, opacity: .65 }}
+                  onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+                  aria-label={open ? "Thu gọn" : "Mở rộng"}
                 >
                   <Icon name={open ? "chevron-up" : "chevron-down"} size={16} />
                 </button>
               )}
             </div>
-            {has && open && <div className="t-down" />}
+            {hasChildren && open && <div className="parent-line" />}
           </article>
-          {has && open && (
-            <div className="t-branch">
-              {data.children.map((c, i) => (
-                <TreeNode key={`${c.name}-${i}`} data={c} level={level + 1} onSelect={onSelect}
-                  parentNode={data} grandparentNode={parentNode} gen={curGen} branchName={curBranch} pathNodes={curPath} />
+          {hasChildren && open && (
+            <div className="tree-branch">
+              {data.children.map((child, i) => (
+                <TreeNode
+                  key={`${child.name}-${i}`}
+                  data={child} level={level + 1} onSelect={onSelect}
+                  parentNode={data} grandparentNode={parentNode}
+                  gen={currentGen} branchName={currentBranch} pathNodes={currentPath}
+                />
               ))}
             </div>
           )}
@@ -1659,186 +1916,187 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
       );
     };
 
-    /* Helper distance for Pinch to zoom */
-    const getTouchDistance = (touches) => {
-      const dx = touches[0].clientX - touches[1].clientX;
-      const dy = touches[0].clientY - touches[1].clientY;
-      return Math.hypot(dx, dy);
-    };
-
-    /* ── App ────────────────────────────────── */
     const App = () => {
-      const [view, setView]         = useState("list");
-      const [scale, setScale]       = useState(.5);
-      const [pos, setPos]           = useState({ x: 0, y: 72 });
-      const [allOpen, setAllOpen]   = useState(null);
-      const [showRem, setShowRem]   = useState(false);
-      const [query, setQuery]       = useState("");
-      const [selected, setSelected] = useState(null);
-
-      const drag = useRef(false);
-      const ds   = useRef({ x: 0, y: 0 });
-      const pinchData = useRef({ dist: 0, scale: 1 });
-
-      const family  = useMemo(() => normalizeGenealogy(GIA_PHA_DATA), []);
-      const lunar   = useMemo(() => VietnameseLunarCalendar.getLunarToday(), []);
-      const bdays   = useMemo(() => getBirthdays(family), [family]);
-      const rems    = useMemo(() => getReminders(family, lunar), [family, lunar]);
-      const entries = useMemo(() => buildMemberEntries(family), [family]);
-
-      const results = useMemo(() => {
-        const terms = normalizeText(query).split(/\s+/).filter(Boolean);
+      const [viewMode, setViewMode] = useState("list");
+      const [scale, setScale] = useState(.48);
+      const [pos, setPos] = useState({ x: 0, y: 72 });
+      const [allOpen, setAllOpen] = useState(null);
+      const [showModal, setShowModal] = useState(false);
+      const [searchQuery, setSearchQuery] = useState("");
+      const [selectedPerson, setSelectedPerson] = useState(null);
+      const dragging = useRef(false);
+      const start = useRef({ x: 0, y: 0 });
+      const pinchDist = useRef(null);
+      const familyData = useMemo(() => normalizeGenealogy(GIA_PHA_DATA), []);
+      const todayLunar = useMemo(() => VietnameseLunarCalendar.getLunarToday(), []);
+      const birthdays = useMemo(() => getBirthdays(familyData), [familyData]);
+      const reminders = useMemo(() => getReminders(familyData, todayLunar), [familyData, todayLunar]);
+      const memberEntries = useMemo(() => buildMemberEntries(familyData), [familyData]);
+      const searchResults = useMemo(() => {
+        const terms = normalizeText(searchQuery).split(/\s+/).filter(Boolean);
         if (!terms.length) return [];
-        return entries.filter(e => terms.every(t => e.searchText.includes(t)));
-      }, [entries, query]);
+        return memberEntries.filter((item) => terms.every((term) => item.searchText.includes(term)));
+      }, [memberEntries, searchQuery]);
 
       useEffect(() => {
-        if (rems.length) setShowRem(true);
-        if (window.ToanAppGiaPha) window.ToanAppGiaPha.postMessage(rems.length.toString());
-      }, [rems.length]);
+        if (reminders.length) setShowModal(true);
+        if (window.ToanAppGiaPha) window.ToanAppGiaPha.postMessage(reminders.length.toString());
+      }, [reminders.length]);
 
-      const onDown  = (x, y) => { drag.current = true; ds.current = { x: x - pos.x, y: y - pos.y }; };
-      const onMove  = (x, y) => { if (drag.current) setPos({ x: x - ds.current.x, y: y - ds.current.y }); };
-      const onUp    = () => { drag.current = false; };
-
+      const beginDrag = (x, y) => {
+        dragging.current = true;
+        start.current = { x: x - pos.x, y: y - pos.y };
+      };
+      const moveDrag = (x, y) => {
+        if (!dragging.current) return;
+        setPos({ x: x - start.current.x, y: y - start.current.y });
+      };
+      const getDist = (t) => {
+        const dx = t[0].clientX - t[1].clientX;
+        const dy = t[0].clientY - t[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+      };
       const handleTouchStart = (e) => {
         if (e.touches.length === 2) {
-          pinchData.current.dist = getTouchDistance(e.touches);
-          pinchData.current.scale = scale;
-        } else if (e.touches.length === 1) {
-          onDown(e.touches[0].clientX, e.touches[0].clientY);
+          pinchDist.current = getDist(e.touches);
+        } else {
+          beginDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
       };
-
       const handleTouchMove = (e) => {
-        if (e.touches.length === 2) {
-          const dist = getTouchDistance(e.touches);
-          const scaleDiff = dist / pinchData.current.dist;
-          const newScale = Math.min(1.8, Math.max(.16, pinchData.current.scale * scaleDiff));
-          setScale(newScale);
+        if (e.touches.length === 2 && pinchDist.current !== null) {
+          e.preventDefault();
+          const newDist = getDist(e.touches);
+          const ratio = newDist / pinchDist.current;
+          pinchDist.current = newDist;
+          setScale((s) => Math.min(1.8, Math.max(.16, s * ratio)));
         } else if (e.touches.length === 1) {
-          onMove(e.touches[0].clientX, e.touches[0].clientY);
+          moveDrag(e.touches[0].clientX, e.touches[0].clientY);
         }
+      };
+      const handleTouchEnd = () => {
+        dragging.current = false;
+        pinchDist.current = null;
       };
 
       return (
         <div className="shell">
-          <DetailModal person={selected} onClose={() => setSelected(null)} />
+          <PersonDetailModal person={selectedPerson} onClose={() => setSelectedPerson(null)} />
 
-          {/* Reminder */}
-          {showRem && (
-            <div className="overlay">
-              <section className="panel sm">
-                <div className="pan-hd">
-                  <div className="pan-hd-inner rem-hd">
-                    <div className="rem-ico"><Icon name="bell-ring" size={26} /></div>
-                    <h2 className="rem-title">Ngày giỗ sắp tới</h2>
-                    <p className="rem-sub">{lunar.label} · Tháng {CURRENT_SOLAR_MONTH}</p>
+          {/* Reminder Modal */}
+          {showModal && (
+            <div className="modal-backdrop">
+              <section className="modal">
+                <div className="modal-head">
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                    <Icon name="bell-ring" size={34} className="modal-icon" />
                   </div>
+                  <h2 className="font-display" style={{ fontSize: 24, fontWeight: 700, color: "var(--gold-pale)", textAlign: "center" }}>Ngày giỗ sắp tới</h2>
+                  <p style={{ marginTop: 6, fontSize: 11, fontWeight: 600, color: "rgba(240,221,176,.6)", textAlign: "center" }}>
+                    {todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch
+                  </p>
                 </div>
-                <div className="pan-list">
-                  {rems.map((r, i) => (
-                    <div className="rem-row" key={i}>
+                <div className="modal-list">
+                  {reminders.map((item, idx) => (
+                    <div className="reminder-row" key={idx}>
                       <div>
-                        <p className="rem-name">{r.fullName}</p>
-                        <p className="rem-date">{r.date}</p>
+                        <p className="reminder-name font-serif">{item.fullName}</p>
+                        <p className="modal-date">Ngày: {item.date}</p>
                       </div>
-                      <span className={`days-badge ${r.days === 0 ? "now" : ""}`}>
-                        {r.days === 0 ? "Hôm nay" : `${r.days} ngày`}
+                      <span className={`days-pill ${item.days === 0 ? "today" : ""}`}>
+                        {item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="pan-ft">
-                  <button className="btn-dismiss" onClick={() => setShowRem(false)}>
-                    <Icon name="check" size={16} /> Đã rõ
+                <div style={{ padding: "10px 14px 14px" }}>
+                  <button className="action-button modal-close" style={{ width: "100%", justifyContent: "center" }} onClick={() => setShowModal(false)}>
+                    <Icon name="x" size={14} /> Đóng
                   </button>
                 </div>
               </section>
             </div>
           )}
 
-          {/* Topbar */}
+          {/* Top Bar */}
           <header className="topbar">
-            <div className="tb-brand">
-              <div className="sigil">
-                <span className="sigil-icon"><Icon name="scroll-text" size={22} /></span>
+            <div className="topbar-brand">
+              <div className="crest">
+                <span className="crest-icon"><Icon name="scroll-text" size={24} /></span>
               </div>
-              <div>
-                <p className="tb-sub">Lưu trữ thế hệ · Họ Phạm</p>
-                <h1 className="tb-title">Gia Phả Phạm Tộc</h1>
+              <div className="brand-text">
+                <p className="brand-kicker">Lưu trữ thế hệ</p>
+                <h1 className="brand-title">Gia Phả Phạm Tộc</h1>
+                <p className="brand-sub">{todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch</p>
               </div>
             </div>
-            <nav className="tab-group">
-              <button className={`tab-btn ${view === "list" ? "on" : ""}`} onClick={() => setView("list")}>
-                <Icon name="list" size={14} /> Danh sách
+            <nav className="segmented" aria-label="Chế độ xem">
+              <button className={viewMode === "list" ? "active" : ""} onClick={() => setViewMode("list")}>
+                Danh sách
               </button>
-              <button className={`tab-btn ${view === "tree" ? "on" : ""}`} onClick={() => setView("tree")}>
-                <Icon name="network" size={14} /> Sơ đồ cây
+              <button className={viewMode === "tree" ? "active" : ""} onClick={() => setViewMode("tree")}>
+                Sơ đồ cây
               </button>
             </nav>
           </header>
 
-          {/* Ticker */}
-          {bdays.length > 0 && (
-            <div className="ticker">
-              <div className="ticker-label">
-                <div className="live-dot" />
-                <Icon name="cake" size={13} />
-                Sinh nhật
-              </div>
+          {/* Birthday Bar */}
+          {birthdays.length > 0 && (
+            <section className="notice">
+              <span className="notice-badge">
+                <Icon name="cake" size={12} /> Sinh nhật tháng {CURRENT_SOLAR_MONTH}
+              </span>
               <marquee scrollamount="4">
-                {bdays.map(m => `✦ ${m.fullName}  (${shortSolarDate(m.birthSolar)})`).join("     ")}
+                {birthdays.map((m) => `Chúc mừng sinh nhật: ${m.fullName} (${shortSolarDate(m.birthSolar)})`).join("   •   ")}
               </marquee>
-            </div>
+            </section>
           )}
 
-          {/* Main */}
           <main>
-            {view === "list" ? (
+            {viewMode === "list" ? (
               <div className="list-scroll">
-                <div className="list-wrap">
-                  <div className="list-hd">
-                    <div className="list-hd-row">
-                      <div>
-                        <p className="list-eyebrow">✦ Dòng họ Phạm</p>
-                        <h2 className="list-heading">Thành viên gia tộc</h2>
-                      </div>
-                      <button className="btn-exp" onClick={() => setAllOpen(v => !v)}>
-                        <Icon name={allOpen ? "minimize-2" : "maximize-2"} size={14} />
-                        {allOpen ? "Thu gọn" : "Mở hết"}
-                      </button>
+                <div className="list-inner">
+                  <div className="toolbar">
+                    <div>
+                      <p className="section-kicker">Dòng họ Phạm</p>
+                      <h2 className="section-title font-display">Danh sách thành viên</h2>
                     </div>
-                    <div className="hdiv" />
+                    <button className="action-button" onClick={() => setAllOpen(!allOpen)}>
+                      <Icon name={allOpen ? "folder-minus" : "folder-plus"} size={14} />
+                      {allOpen ? "Thu gọn" : "Mở hết"}
+                    </button>
                   </div>
-
-                  <Search query={query} onChange={setQuery} results={results} total={entries.length} onSelect={setSelected} />
-
-                  <Item data={family} forceOpen={allOpen} onSelect={setSelected} />
+                  <SearchPanel
+                    query={searchQuery}
+                    onQueryChange={setSearchQuery}
+                    results={searchResults}
+                    total={memberEntries.length}
+                    onSelect={setSelectedPerson}
+                  />
+                  <MemberItem data={familyData} forceOpen={allOpen} onSelect={setSelectedPerson} />
                 </div>
               </div>
             ) : (
               <div
                 className="tree-stage"
-                onWheel={e => setScale(s => Math.min(1.8, Math.max(.16, s + (e.deltaY > 0 ? -.04 : .04))))}
-                onMouseDown={e => onDown(e.clientX, e.clientY)}
-                onMouseMove={e => onMove(e.clientX, e.clientY)}
-                onMouseUp={onUp} onMouseLeave={onUp}
+                onWheel={(e) => { e.preventDefault(); setScale((s) => Math.min(1.8, Math.max(.16, s + (e.deltaY > 0 ? -.04 : .04)))); }}
+                onMouseDown={(e) => beginDrag(e.clientX, e.clientY)}
+                onMouseMove={(e) => moveDrag(e.clientX, e.clientY)}
+                onMouseUp={() => dragging.current = false}
+                onMouseLeave={() => dragging.current = false}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
-                onTouchEnd={onUp}
+                onTouchEnd={handleTouchEnd}
               >
-                <div className="tree-canvas" style={{ transform: `translate(${pos.x}px,${pos.y}px) scale(${scale})` }}>
-                  <TreeNode data={family} onSelect={setSelected} />
+                <div className="tree-canvas" style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})` }}>
+                  <TreeNode data={familyData} onSelect={setSelectedPerson} />
                 </div>
-                  
-                </div>
+              </div>
             )}
           </main>
         </div>
       );
     };
-
     ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 </body>
