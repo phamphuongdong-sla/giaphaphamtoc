@@ -1,0 +1,2459 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gia Phả Phạm Tộc</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Noto+Serif:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:        #1c1510;
+      --ink-soft:   #3d2e24;
+      --muted:      #7a6a5a;
+      --lacquer:    #7b2d24;
+      --lacquer-d:  #3e1410;
+      --lacquer-l:  #a84d40;
+      --gold:       #b8893c;
+      --gold-l:     #dbb96a;
+      --gold-pale:  #f0ddb0;
+      --paper:      #fdf6e9;
+      --paper-warm: #f8eedb;
+      --paper-mid:  #f0e2c8;
+      --cream:      #fffcf5;
+      --ivory:      #fff9ee;
+      --line:       #c9a45a;
+      --sep:        rgba(184,137,60,.22);
+      --shadow-sm:  0 2px 8px rgba(28,21,16,.06);
+      --shadow-md:  0 8px 28px rgba(28,21,16,.10);
+      --shadow-lg:  0 20px 56px rgba(28,21,16,.14);
+      --r-sm: 10px;
+      --r-md: 16px;
+      --r-lg: 24px;
+    }
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body, #root { width: 100%; height: 100%; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Be Vietnam Pro", system-ui, sans-serif;
+      background-color: var(--paper-warm);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='0' cy='0' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='80' cy='0' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='0' cy='80' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3Ccircle cx='80' cy='80' r='1' fill='%23b8893c' fill-opacity='.08'/%3E%3C/svg%3E"),
+        linear-gradient(160deg, #fdf6e9 0%, #f8eedb 40%, #f2e4cc 100%);
+      color: var(--ink);
+      overflow: hidden;
+    }
+    .font-display { font-family: "Cormorant Garamond", "Noto Serif", serif; }
+    .font-serif   { font-family: "Noto Serif", "Cormorant Garamond", serif; }
+
+    /* ─── Shell ─── */
+    .shell {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ─── Top Bar ─── */
+    .topbar {
+      position: relative;
+      z-index: 80;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 clamp(14px, 3vw, 36px);
+      min-height: 80px;
+      background: linear-gradient(110deg, var(--lacquer-d) 0%, var(--lacquer) 58%, #5c2018 100%);
+      border-bottom: 1px solid rgba(219,185,106,.28);
+      box-shadow: 0 6px 32px rgba(28,21,16,.22), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .topbar::after {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold-l) 30%, var(--gold) 50%, var(--gold-l) 70%, transparent);
+      opacity: .5;
+    }
+
+    /* Ornamental corner lines */
+    .topbar::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(219,185,106,.12);
+      pointer-events: none;
+      border-radius: 4px;
+    }
+
+    .topbar-brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+
+    .crest {
+      flex-shrink: 0;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #d4a547, #f0c96a, #b8893c, #f0c96a, #d4a547);
+      display: grid; place-items: center;
+      box-shadow: 0 0 0 3px rgba(219,185,106,.25), 0 8px 24px rgba(28,21,16,.3), inset 0 2px 4px rgba(255,255,255,.2);
+      position: relative;
+    }
+    .crest::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #e8b84a, #8c5c1e);
+    }
+    .crest-icon {
+      position: relative; z-index: 1;
+      color: #fff8e7;
+      filter: drop-shadow(0 1px 2px rgba(28,21,16,.4));
+    }
+
+    .brand-text { min-width: 0; }
+    .brand-kicker {
+      font-size: 9px; font-weight: 900; letter-spacing: .22em;
+      text-transform: uppercase; color: rgba(219,185,106,.7);
+      margin-bottom: 2px;
+    }
+    .brand-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(20px, 2.5vw, 28px); font-weight: 700;
+      line-height: 1.1; letter-spacing: .02em;
+      color: var(--gold-pale);
+      text-shadow: 0 2px 8px rgba(28,21,16,.3);
+    }
+    .brand-sub {
+      font-size: 10px; font-weight: 600;
+      color: rgba(240,221,176,.58);
+      margin-top: 3px;
+      letter-spacing: .04em;
+    }
+
+    /* Segmented control */
+    .segmented {
+      display: flex;
+      gap: 2px;
+      padding: 4px;
+      border-radius: 14px;
+      background: rgba(28,21,16,.35);
+      border: 1px solid rgba(219,185,106,.2);
+    }
+    .segmented button {
+      position: relative;
+      height: 36px;
+      padding: 0 18px;
+      border-radius: 11px;
+      font-size: 10.5px; font-weight: 800;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: rgba(240,221,176,.55);
+      transition: all .2s ease;
+    }
+    .segmented button:hover { color: rgba(240,221,176,.85); }
+    .segmented button.active {
+      background: linear-gradient(160deg, var(--gold-l), var(--gold));
+      color: var(--lacquer-d);
+      box-shadow: 0 4px 16px rgba(28,21,16,.25), inset 0 1px 0 rgba(255,255,255,.25);
+    }
+
+    /* ─── Birthday Notice Bar ─── */
+    .notice {
+      position: relative;
+      z-index: 50;
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 12px;
+      min-height: 44px;
+      padding: 6px clamp(12px, 3vw, 28px);
+      background: linear-gradient(90deg, var(--gold-pale) 0%, #fef8e7 48%, var(--gold-pale) 100%);
+      border-bottom: 1px solid rgba(184,137,60,.2);
+      overflow: hidden;
+    }
+    .notice::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent 180px, rgba(184,137,60,.04) 180px, rgba(184,137,60,.04) 181px);
+    }
+    .notice-badge {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 26px; padding: 0 12px;
+      border-radius: 999px;
+      background: var(--lacquer);
+      color: var(--gold-pale);
+      font-size: 9px; font-weight: 900; letter-spacing: .1em;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(123,45,36,.3);
+    }
+    .notice marquee { font-size: 11.5px; font-weight: 700; color: var(--lacquer-d); letter-spacing: .02em; }
+
+    /* ─── Main area ─── */
+    main { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+
+    /* ─── List View ─── */
+    .list-scroll {
+      position: absolute; inset: 0;
+      overflow-y: auto; overflow-x: hidden;
+      padding: 16px 12px 100px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.3) transparent;
+    }
+    .list-scroll::-webkit-scrollbar { width: 5px; }
+    .list-scroll::-webkit-scrollbar-thumb { background: rgba(184,137,60,.3); border-radius: 4px; }
+
+    .list-inner { width: min(860px, 100%); margin: 0 auto; }
+
+    /* Sticky toolbar */
+    .toolbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px;
+      padding: 12px 0 16px;
+      background: linear-gradient(180deg, var(--paper-warm) 60%, transparent);
+    }
+    .section-kicker {
+      font-size: 9px; font-weight: 900; letter-spacing: .2em;
+      text-transform: uppercase; color: rgba(123,45,36,.55);
+    }
+    .section-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px; font-weight: 700; color: var(--lacquer-d);
+      letter-spacing: .01em;
+    }
+
+    /* Action buttons */
+    .action-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      min-height: 38px; padding: 0 16px;
+      border-radius: var(--r-sm);
+      background: var(--cream);
+      border: 1px solid rgba(123,45,36,.12);
+      color: var(--lacquer);
+      font-size: 10.5px; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-sm);
+      transition: all .18s ease;
+    }
+    .action-button:hover { border-color: rgba(184,137,60,.3); box-shadow: var(--shadow-md); }
+    .action-button:active { transform: scale(.98); }
+
+    /* ─── Search Panel ─── */
+    .search-panel {
+      margin-bottom: 14px;
+      padding: 12px;
+      border-radius: var(--r-md);
+      background: rgba(255,252,245,.85);
+      border: 1px solid rgba(184,137,60,.14);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(12px);
+    }
+    .search-box { position: relative; display: flex; align-items: center; }
+    .search-box .s-icon {
+      position: absolute; left: 14px;
+      color: rgba(123,45,36,.5);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%; min-height: 44px;
+      padding: 0 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(184,137,60,.18);
+      background: var(--ivory);
+      color: var(--ink);
+      font-size: 13px; font-weight: 600;
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+      box-shadow: inset 0 1px 3px rgba(28,21,16,.04);
+    }
+    .search-input:focus { border-color: rgba(184,137,60,.4); box-shadow: 0 0 0 3px rgba(184,137,60,.1); }
+    .search-input::placeholder { color: rgba(122,106,90,.5); }
+    .clear-search {
+      position: absolute; right: 6px;
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      border-radius: 8px;
+      color: var(--lacquer);
+      transition: background .15s;
+    }
+    .clear-search:hover { background: rgba(123,45,36,.08); }
+    .search-summary {
+      margin: 8px 2px 0;
+      font-size: 10.5px; font-weight: 700;
+      color: rgba(28,21,16,.45);
+      letter-spacing: .03em;
+    }
+    .search-results { margin-top: 10px; display: grid; gap: 6px; }
+    .search-result {
+      display: grid; grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px; align-items: center;
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: var(--ivory);
+      border: 1px solid rgba(184,137,60,.1);
+      text-align: left;
+      cursor: pointer;
+      transition: all .16s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-result:hover { border-color: rgba(184,137,60,.28); background: var(--cream); transform: translateX(2px); }
+    .search-result-name { color: var(--lacquer-d); font-size: 12.5px; font-weight: 800; line-height: 1.35; }
+    .search-result-path { display: block; margin-top: 3px; color: rgba(28,21,16,.45); font-size: 10px; font-weight: 600; }
+    .search-empty {
+      margin-top: 10px; padding: 14px;
+      border-radius: 12px;
+      background: rgba(123,45,36,.04);
+      color: rgba(28,21,16,.5);
+      font-size: 12px; font-weight: 600;
+      text-align: center;
+    }
+
+    /* ─── Family Card ─── */
+    .family-card {
+      position: relative;
+      margin-bottom: 8px;
+      border-radius: var(--r-md);
+      overflow: hidden;
+      cursor: pointer;
+      background: linear-gradient(170deg, var(--cream) 0%, var(--ivory) 100%);
+      border: 1px solid rgba(184,137,60,.12);
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .family-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold-l), var(--gold), rgba(184,137,60,.3));
+      border-radius: 4px 0 0 4px;
+    }
+    .family-card:hover {
+      transform: translateX(3px);
+      border-color: rgba(184,137,60,.26);
+      box-shadow: var(--shadow-md);
+    }
+    .family-card:active { transform: scale(.99) translateX(1px); }
+
+    /* Dark card (root) */
+    .family-card.dark {
+      background: linear-gradient(135deg, var(--lacquer-d) 0%, var(--lacquer) 100%);
+      border-color: rgba(219,185,106,.25);
+      color: var(--gold-pale);
+    }
+    .family-card.dark::before { background: linear-gradient(180deg, var(--gold-l), var(--gold-pale)); width: 4px; }
+    .family-card.dark:hover { transform: none; box-shadow: 0 12px 40px rgba(28,21,16,.22); }
+
+    /* Branch card */
+    .family-card.branch {
+      background: linear-gradient(170deg, #fffbf2 0%, var(--paper-mid) 100%);
+      border-color: rgba(184,137,60,.2);
+    }
+    .family-card.branch::before {
+      background: linear-gradient(180deg, var(--lacquer), var(--lacquer-l), rgba(184,137,60,.4));
+      width: 4px;
+    }
+
+    /* Birthday highlight */
+    .family-card.birthday {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px rgba(184,137,60,.15), var(--shadow-md);
+    }
+
+    .card-body {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 12px;
+      padding: 16px 16px 14px 20px;
+    }
+    .card-body.has-deceased { padding-left: 52px; }
+
+    /* Deceased ribbon */
+    .deceased-mark {
+      position: absolute; inset: 0 auto auto 0;
+      width: 46px; height: 46px;
+      overflow: hidden; z-index: 3; pointer-events: none;
+    }
+    .deceased-mark::before {
+      content: "";
+      position: absolute; top: 8px; left: -22px;
+      width: 68px; height: 16px;
+      transform: rotate(-45deg);
+      background: linear-gradient(90deg, #1c1510, #2e241c);
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    }
+
+    /* Birthday ribbon */
+    .birthday-ribbon {
+      position: absolute; top: 0; right: 0; z-index: 4;
+      display: inline-flex; align-items: center; gap: 4px;
+      height: 22px; padding: 0 10px;
+      border-bottom-left-radius: 12px;
+      background: linear-gradient(135deg, var(--lacquer), var(--gold));
+      color: #fff8e7;
+      font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em;
+      pointer-events: none;
+    }
+
+    /* Title pill */
+    .title-pill {
+      display: inline-flex; align-items: center;
+      height: 20px; padding: 0 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(184,137,60,.15), rgba(184,137,60,.08));
+      border: 1px solid rgba(184,137,60,.2);
+      color: var(--gold);
+      font-size: 8.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em;
+    }
+    .dark .title-pill {
+      background: rgba(240,221,176,.12);
+      border-color: rgba(240,221,176,.2);
+      color: var(--gold-pale);
+    }
+
+    /* Name */
+    .name {
+      margin-top: 6px;
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(17px, 1.9vw, 22px);
+      font-weight: 700; line-height: 1.18;
+      color: var(--lacquer-d);
+      letter-spacing: .01em;
+    }
+    .dark .name { color: var(--gold-pale); }
+    .branch .name { color: var(--lacquer); }
+
+    /* Meta chips */
+    .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .meta-item {
+      display: inline-flex; align-items: center; gap: 5px;
+      min-height: 26px; padding: 4px 9px;
+      border-radius: 8px;
+      background: rgba(184,137,60,.06);
+      border: 1px solid rgba(184,137,60,.1);
+      color: var(--muted);
+      font-size: 10.5px; font-weight: 600;
+      line-height: 1.3;
+    }
+    .meta-item b { color: var(--ink-soft); }
+    .dark .meta-item {
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.1);
+      color: rgba(240,221,176,.7);
+    }
+    .dark .meta-item b { color: var(--gold-pale); }
+    .meta-item.death { color: var(--lacquer-l); }
+    .meta-item.death b { color: var(--lacquer); }
+    .dark .meta-item.death { color: var(--gold-l); }
+    .dark .meta-item.death b { color: var(--gold-pale); }
+
+    .info {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: rgba(184,137,60,.05);
+      border-left: 2px solid rgba(184,137,60,.25);
+      color: var(--muted);
+      font-size: 10.5px; font-style: italic; line-height: 1.5;
+    }
+    .dark .info { background: rgba(255,255,255,.06); border-left-color: rgba(240,221,176,.25); color: rgba(240,221,176,.65); }
+
+    /* Toggle button */
+    .toggle-btn {
+      flex-shrink: 0; align-self: flex-start;
+      margin-top: 4px;
+      width: 40px; height: 40px;
+      display: grid; place-items: center;
+      border-radius: 12px;
+      background: rgba(184,137,60,.08);
+      border: 1px solid rgba(184,137,60,.15);
+      color: var(--gold);
+      transition: all .18s;
+    }
+    .toggle-btn:hover { background: rgba(184,137,60,.14); }
+    .dark .toggle-btn {
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.15);
+      color: var(--gold-pale);
+    }
+
+    /* Branch tree */
+    .branch-list {
+      margin: 0 0 6px 18px;
+      padding-left: 14px;
+      border-left: 2px solid rgba(184,137,60,.2);
+      position: relative;
+    }
+    .branch-list::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -1px;
+      width: 1px; height: 12px;
+      background: linear-gradient(180deg, rgba(184,137,60,.4), transparent);
+    }
+    .branch-list .branch-list .branch-list {
+      margin-left: 10px; padding-left: 10px;
+      border-left-style: dashed;
+    }
+
+    /* ─── Tree View ─── */
+    .tree-stage {
+      position: absolute; inset: 0;
+      overflow: hidden;
+      cursor: grab; touch-action: none; user-select: none;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(184,137,60,.06) 0%, transparent 60%),
+        linear-gradient(180deg, var(--paper-warm), var(--paper-mid));
+      background-size: cover;
+    }
+    .tree-stage::before {
+      content: "";
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(184,137,60,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184,137,60,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .tree-stage:active { cursor: grabbing; }
+    .tree-canvas {
+      position: absolute; inset: 0;
+      display: flex; justify-content: center;
+      padding-top: 36px;
+      transform-origin: top center;
+      transition: transform .06s linear;
+    }
+
+    /* Tree nodes */
+    .tree-branch {
+      position: relative;
+      display: flex;
+      padding-top: 44px;
+    }
+    .tree-item {
+      position: relative;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 44px 16px 0;
+    }
+    .tree-item::before {
+      content: "";
+      position: absolute; top: 0; left: 50%;
+      width: 2px; height: 44px;
+      transform: translateX(-50%);
+      background: var(--line);
+    }
+    .tree-item::after {
+      content: "";
+      position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+      background: var(--line);
+    }
+    .tree-item:first-child::after, .tree-item:last-child::after, .tree-item:only-child::after { display: none; }
+    .tree-item:first-child::before {
+      left: 50%; width: 50%; transform: none;
+      border-top: 2px solid var(--line); border-left: 2px solid var(--line);
+      border-top-left-radius: 16px; background: transparent;
+    }
+    .tree-item:last-child::before {
+      left: 0; width: 50%; transform: none;
+      border-top: 2px solid var(--line); border-right: 2px solid var(--line);
+      border-top-right-radius: 16px; background: transparent;
+    }
+    .tree-item:only-child::before {
+      left: 50%; width: 2px; transform: translateX(-50%);
+      border: 0; background: var(--line);
+    }
+    .root-node { padding-top: 0; }
+    .root-node::before, .root-node::after { display: none; }
+
+    /* Tree card */
+    .tree-card {
+      position: relative;
+      width: 290px; min-height: 200px;
+      border-radius: var(--r-md);
+      overflow: visible;
+      border: 1px solid rgba(184,137,60,.14);
+      background: var(--cream);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .tree-card::before {
+      content: "";
+      position: absolute; inset: 0 0 auto;
+      height: 3px;
+      border-radius: var(--r-md) var(--r-md) 0 0;
+      background: linear-gradient(90deg, rgba(184,137,60,.15), var(--gold-l) 40%, rgba(184,137,60,.1));
+      z-index: 3; pointer-events: none;
+    }
+    .tree-card:hover { border-color: rgba(184,137,60,.3); box-shadow: var(--shadow-lg); }
+    .tree-card.dark {
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-color: rgba(219,185,106,.28);
+    }
+    .tree-card.dark::before {
+      background: linear-gradient(90deg, rgba(219,185,106,.4), var(--gold-pale) 40%, rgba(219,185,106,.2));
+    }
+    .tree-card.branch {
+      background: linear-gradient(170deg, #fffbf2, var(--paper-mid));
+      border-color: rgba(184,137,60,.22);
+    }
+    .tree-card.branch::before {
+      height: 4px;
+      background: linear-gradient(90deg, var(--lacquer), var(--gold-l) 48%, rgba(184,137,60,.1));
+    }
+    .tree-card.spouse {
+      background: linear-gradient(135deg, #fffaf2, var(--paper));
+      border-color: rgba(184,137,60,.16);
+    }
+    .tree-card-content {
+      position: relative; z-index: 2;
+      height: 100%; padding: 18px;
+      overflow: hidden; border-radius: var(--r-md);
+    }
+    .tree-card .name { text-align: center; font-size: 17px; }
+    .tree-card.dark .name { color: var(--gold-pale); }
+    .parent-line {
+      position: absolute; left: 50%; bottom: -44px;
+      width: 2px; height: 44px;
+      transform: translateX(-50%);
+      background: var(--line); z-index: 1;
+    }
+    .parent-line::after {
+      content: "";
+      position: absolute; bottom: 0; left: 50%;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      transform: translate(-50%, 50%);
+      background: var(--gold);
+      box-shadow: 0 0 0 3px rgba(184,137,60,.15);
+    }
+
+    /* Tree controls */
+    .tree-controls {
+      position: absolute; right: 18px; bottom: 18px;
+      z-index: 30;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .icon-button {
+      width: 44px; height: 44px;
+      display: grid; place-items: center;
+      border-radius: 13px;
+      background: rgba(255,252,245,.95);
+      color: var(--lacquer);
+      border: 1px solid rgba(184,137,60,.15);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(8px);
+      transition: all .18s;
+    }
+    .icon-button:hover { box-shadow: var(--shadow-lg); background: var(--cream); }
+    .icon-button.primary {
+      background: linear-gradient(160deg, var(--lacquer-l), var(--lacquer));
+      color: var(--gold-pale);
+      border-color: rgba(219,185,106,.22);
+    }
+    .icon-button.primary:hover { background: linear-gradient(160deg, var(--lacquer), var(--lacquer-d)); }
+
+    /* ─── Modal ─── */
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      background: rgba(16,11,8,.6);
+      backdrop-filter: blur(12px);
+      animation: fade-in .2s ease both;
+    }
+    @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+    .modal {
+      width: min(440px, 100%);
+      max-height: min(680px, 90vh);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      border-radius: var(--r-lg);
+      background: var(--ivory);
+      border: 1px solid rgba(184,137,60,.28);
+      box-shadow: 0 32px 80px rgba(16,11,8,.4), 0 0 0 1px rgba(255,255,255,.05);
+      animation: pop .25s cubic-bezier(.22,.68,0,1.2) both;
+    }
+    @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(.97) } to { opacity: 1; transform: none } }
+
+    .modal-head {
+      padding: 26px 26px 22px;
+      text-align: center;
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-bottom: 1px solid rgba(219,185,106,.2);
+      position: relative;
+    }
+    .modal-head::after {
+      content: "";
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(219,185,106,.4), transparent);
+    }
+    .modal-icon { color: var(--gold-l); }
+    .modal-list {
+      padding: 14px;
+      overflow-y: auto;
+      display: grid; gap: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.25) transparent;
+    }
+    .reminder-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px; align-items: center;
+      padding: 13px 14px;
+      border-radius: var(--r-sm);
+      background: var(--cream);
+      border: 1px solid rgba(184,137,60,.1);
+      transition: border-color .16s;
+    }
+    .reminder-row:hover { border-color: rgba(184,137,60,.22); }
+    .reminder-name { font-size: 12.5px; font-weight: 800; color: var(--ink-soft); line-height: 1.3; }
+    .modal-date { margin-top: 3px; font-size: 10px; font-weight: 700; color: var(--lacquer-l); }
+    .days-pill {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(184,137,60,.12);
+      color: var(--gold);
+      font-size: 9.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em;
+      white-space: nowrap; border: 1px solid rgba(184,137,60,.18);
+    }
+    .days-pill.today { background: var(--lacquer); color: var(--gold-pale); border-color: rgba(219,185,106,.25); }
+    .modal-close {
+      background: linear-gradient(160deg, var(--lacquer-l), var(--lacquer)) !important;
+      color: var(--gold-pale) !important;
+      border-color: rgba(219,185,106,.22) !important;
+    }
+    .modal-close:hover { opacity: .9; }
+
+    /* ─── Detail Modal ─── */
+    .detail-modal { width: min(580px, 100%); }
+    .detail-head {
+      padding: 22px 52px 20px 22px;
+      background: linear-gradient(140deg, var(--lacquer-d), var(--lacquer));
+      border-bottom: 1px solid rgba(219,185,106,.2);
+      position: relative;
+    }
+    .detail-head-name {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 26px; font-weight: 700; line-height: 1.15;
+      color: var(--gold-pale); letter-spacing: .01em;
+    }
+    .detail-subtitle { margin-top: 6px; font-size: 12px; font-weight: 600; color: rgba(240,221,176,.65); }
+    .detail-tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .detail-tag {
+      display: inline-flex; align-items: center;
+      min-height: 22px; padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(240,221,176,.15);
+      color: rgba(240,221,176,.85);
+      font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .detail-close {
+      position: absolute; top: 14px; right: 14px;
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      border-radius: 10px;
+      color: rgba(240,221,176,.8);
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.1);
+      transition: all .16s;
+    }
+    .detail-close:hover { background: rgba(255,255,255,.18); color: var(--gold-pale); }
+
+    .detail-body {
+      padding: 14px;
+      overflow-y: auto;
+      display: grid; gap: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.25) transparent;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+    }
+    .detail-field {
+      padding: 12px 13px;
+      border-radius: 12px;
+      background: var(--cream);
+      border: 1px solid rgba(184,137,60,.1);
+      transition: border-color .16s;
+    }
+    .detail-field:hover { border-color: rgba(184,137,60,.2); }
+    .detail-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em;
+      color: rgba(123,45,36,.55);
+    }
+    .detail-value {
+      margin-top: 6px;
+      font-size: 13px; font-weight: 700; line-height: 1.45;
+      color: var(--ink-soft);
+    }
+
+    /* Lineage box */
+    .lineage-box {
+      padding: 13px 14px;
+      border-radius: 13px;
+      background: linear-gradient(170deg, var(--cream), var(--ivory));
+      border: 1px solid rgba(184,137,60,.14);
+    }
+    .lineage-path {
+      margin-top: 8px;
+      font-size: 12.5px; font-weight: 700; line-height: 1.6;
+      color: var(--ink-soft);
+      display: flex; flex-wrap: wrap; align-items: center; gap: 3px;
+    }
+    .lineage-step { display: inline-flex; align-items: center; }
+    .lineage-separator { color: rgba(123,45,36,.3); font-weight: 700; margin: 0 3px; }
+    .lineage-heart { color: #e11d48; margin: 0 3px; display: inline-flex; align-items: center; }
+
+    /* Bio */
+    .bio-content {
+      margin-top: 9px;
+      font-size: 12.5px; font-weight: 500; line-height: 1.75;
+      color: var(--ink-soft); font-style: italic;
+      white-space: pre-wrap; max-height: 180px;
+      overflow-y: auto; padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,137,60,.2) transparent;
+    }
+
+    .child-list { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .child-chip {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(184,137,60,.07);
+      border: 1px solid rgba(184,137,60,.12);
+      color: var(--lacquer-d);
+      font-size: 11px; font-weight: 700;
+      transition: background .15s;
+    }
+    .child-chip:hover { background: rgba(184,137,60,.13); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 700px) {
+      .topbar {
+        min-height: 112px;
+        align-items: flex-start;
+        flex-direction: column;
+        padding-top: 12px; padding-bottom: 12px;
+      }
+      .segmented { width: 100%; }
+      .segmented button { flex: 1; padding: 0 8px; }
+      .notice { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .card-body { grid-template-columns: 1fr; padding: 14px 14px 13px 18px; }
+      .branch-list { margin-left: 8px; padding-left: 9px; }
+      .tree-controls { right: 10px; bottom: 10px; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .detail-head { padding: 22px 52px 20px 18px; }
+      .modal { border-radius: 18px; }
+    }
+
+    /* ─── Animations ─── */
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .family-card { animation: slide-in .22s ease both; }
+
+    /* ─── Share feature ─── */
+    .share-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      min-height: 38px; padding: 0 16px;
+      border-radius: var(--r-sm);
+      background: linear-gradient(135deg, #1a7a4a, #15653e);
+      border: 1px solid rgba(21,101,62,.4);
+      color: #d4f5e4;
+      font-size: 10.5px; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase;
+      box-shadow: 0 4px 14px rgba(21,101,62,.25);
+      transition: all .18s ease;
+      flex: 1;
+    }
+    .share-btn:hover { background: linear-gradient(135deg, #1f9459, #1a7a4a); box-shadow: 0 6px 20px rgba(21,101,62,.3); }
+    .share-btn:active { transform: scale(.98); }
+
+    .modal-footer {
+      padding: 12px 14px 14px;
+      display: flex; gap: 8px;
+      border-top: 1px solid rgba(184,137,60,.1);
+    }
+    .modal-footer .action-button.modal-close { flex: 1; justify-content: center; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(0);
+      z-index: 2000;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: #1a1410;
+      color: #d4f5e4;
+      font-size: 12px; font-weight: 700;
+      box-shadow: 0 8px 28px rgba(0,0,0,.35);
+      white-space: nowrap;
+      animation: toast-in .22s cubic-bezier(.22,.68,0,1.2) both;
+    }
+    .toast.hide { animation: toast-out .2s ease both; }
+    @keyframes toast-in  { from { opacity:0; transform: translateX(-50%) translateY(10px) scale(.95) } to { opacity:1; transform: translateX(-50%) translateY(0) scale(1) } }
+    @keyframes toast-out { from { opacity:1; transform: translateX(-50%) translateY(0) } to { opacity:0; transform: translateX(-50%) translateY(6px) } }
+
+    /* Share preview overlay */
+    .share-overlay {
+      position: fixed; inset: 0; z-index: 1500;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 0 0 0;
+      background: rgba(16,11,8,.55);
+      backdrop-filter: blur(8px);
+      animation: fade-in .18s ease both;
+    }
+    .share-sheet {
+      width: min(560px, 100%);
+      border-radius: 24px 24px 0 0;
+      background: var(--ivory);
+      border: 1px solid rgba(184,137,60,.2);
+      border-bottom: none;
+      box-shadow: 0 -12px 48px rgba(16,11,8,.22);
+      animation: sheet-up .26s cubic-bezier(.22,.68,0,1.2) both;
+      display: flex; flex-direction: column;
+      max-height: 82vh;
+    }
+    @keyframes sheet-up { from { transform: translateY(100%) } to { transform: translateY(0) } }
+    .share-sheet-head {
+      padding: 16px 18px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(184,137,60,.12);
+      flex-shrink: 0;
+    }
+    .share-sheet-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 17px; font-weight: 700;
+      color: var(--lacquer-d);
+    }
+    .share-sheet-body {
+      flex: 1; overflow-y: auto; padding: 14px 16px;
+    }
+    .share-text-box {
+      width: 100%;
+      min-height: 160px;
+      padding: 13px 14px;
+      border-radius: var(--r-md);
+      background: var(--cream);
+      border: 1px solid rgba(184,137,60,.18);
+      font-family: "Be Vietnam Pro", sans-serif;
+      font-size: 12.5px; font-weight: 500;
+      line-height: 1.75;
+      color: var(--ink-soft);
+      resize: none;
+      outline: none;
+      box-shadow: inset 0 1px 3px rgba(28,21,16,.04);
+    }
+    .share-text-box:focus { border-color: rgba(184,137,60,.38); }
+    .share-actions {
+      padding: 12px 16px 20px;
+      display: flex; gap: 8px;
+      flex-shrink: 0;
+    }
+    .share-copy-btn {
+      flex: 1;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      height: 44px;
+      border-radius: var(--r-sm);
+      background: linear-gradient(135deg, var(--lacquer), #9a3a2e);
+      color: var(--gold-pale);
+      font-size: 11.5px; font-weight: 800; letter-spacing: .05em;
+      text-transform: uppercase;
+      border: none;
+      box-shadow: 0 4px 14px rgba(123,45,36,.25);
+      transition: all .18s;
+    }
+    .share-copy-btn:hover { opacity: .92; }
+    .share-copy-btn:active { transform: scale(.98); }
+    .share-copy-btn.copied {
+      background: linear-gradient(135deg, #1a7a4a, #15653e);
+      box-shadow: 0 4px 14px rgba(21,101,62,.25);
+    }
+    .share-hint {
+      margin-top: 10px;
+      font-size: 10.5px; font-weight: 600;
+      color: rgba(122,106,90,.6);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* Branch filter */
+    .branch-filter {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: var(--r-md);
+      background: rgba(255,252,245,.82);
+      border: 1px solid rgba(184,137,60,.12);
+      backdrop-filter: blur(10px);
+    }
+    .filter-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9.5px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(122,106,90,.6);
+      white-space: nowrap;
+      align-self: center;
+      padding-right: 4px;
+      border-right: 1px solid rgba(184,137,60,.18);
+      margin-right: 2px;
+    }
+    .branch-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .01em;
+      border: 1px solid rgba(184,137,60,.18);
+      background: var(--ivory);
+      color: var(--muted);
+      transition: all .18s ease;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .branch-chip:hover {
+      border-color: rgba(184,137,60,.35);
+      color: var(--lacquer);
+      background: rgba(184,137,60,.07);
+    }
+    .branch-chip.active {
+      background: linear-gradient(135deg, var(--lacquer), #9a3a2e);
+      border-color: transparent;
+      color: var(--gold-pale);
+      box-shadow: 0 4px 14px rgba(123,45,36,.25);
+    }
+    .branch-chip .chip-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 900;
+      background: rgba(184,137,60,.15);
+      color: inherit;
+      transition: background .18s;
+    }
+    .branch-chip.active .chip-count {
+      background: rgba(255,255,255,.2);
+      color: var(--gold-pale);
+    }
+    .branch-chip.all-chip {
+      background: var(--paper-warm);
+      border-color: rgba(184,137,60,.2);
+    }
+    .branch-chip.all-chip.active {
+      background: linear-gradient(135deg, var(--lacquer-d), var(--lacquer));
+    }
+
+    /* ─── Màu viền theo đời ─── */
+    .gen-1 { border-left-color: #7b2d24 !important; }
+    .gen-1:not(.dark) .name { color: #3e1410; }
+    .gen-2 { border-left-color: #9c6b2e !important; }
+    .gen-2:not(.dark) .name { color: #5a3a10; }
+    .gen-3 { border-left-color: #3d7a55 !important; }
+    .gen-3:not(.dark) .name { color: #1e4d33; }
+    .gen-4 { border-left-color: #2a6585 !important; }
+    .gen-4:not(.dark) .name { color: #12425e; }
+    .gen-5 { border-left-color: #6b4a8a !important; }
+    .gen-5:not(.dark) .name { color: #422d5c; }
+
+    .gen-badge {
+      position: absolute; bottom: 9px; right: 11px;
+      font-size: 8.5px; font-weight: 900; letter-spacing: .06em;
+      color: currentColor; opacity: .3; pointer-events: none;
+      font-family: "Cormorant Garamond", serif; text-transform: uppercase;
+    }
+    .family-card::before { width: 4px; }
+
+    /* Divider ornament */
+    .ornament-divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 4px 0 10px; color: rgba(184,137,60,.4);
+      font-size: 10px;
+    }
+    .ornament-divider::before, .ornament-divider::after {
+      content: ""; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(184,137,60,.25));
+    }
+    .ornament-divider::after { background: linear-gradient(270deg, transparent, rgba(184,137,60,.25)); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useEffect, useMemo, useRef, useState } = React;
+    const now = new Date();
+    const CURRENT_SOLAR_MONTH = now.getMonth() + 1;
+    const CURRENT_SOLAR_DAY = now.getDate();
+    const GIA_PHA_DATA = {
+      name: "PHẠM HƯƠNG CHỬ",
+      birth: "1891 Tân Mão",
+      death: "20-03-1953 Quý Tỵ",
+      info: "Con út thứ tư trong gia đình",
+      title: "Thủy tổ",
+      deceased: true,
+      children: [
+        {
+          name: "Bà cả: BÙI THỊ VÍCH",
+          birth: "1888 Mậu Tý",
+          death: "23-10-1957 Đinh Dậu",
+          deceased: true,
+          branch: "Chi bà cả",
+          children: [
+            {
+              name: "PHẠM VĂN COỎNG",
+              title: "Trưởng họ",
+              birth: "1909 Kỷ Dậu",
+              death: "13-09-1949 Kỷ Sửu",
+              deceased: true,
+              children: [
+                {
+                  name: "Bà cả: VŨ THỊ PHIẾM",
+                  birth: "1908",
+                  death: "03-11-2014 Giáp Ngọ",
+                  deceased: true,
+                  children: [
+                    {
+                      name: "PHẠM NGỌC CHƯ",
+                      title: "Trưởng họ",
+                      birth: "1932 Nhâm Thân",
+                      death: "1998 Mậu Dần",
+                      deceased: true,
+                      children: [
+                        {
+                          name: "Vợ: PHẠM THỊ UYÊN",
+                          birth: "1933 Quý Dậu",
+                          children: [
+                            {
+                              name: "PHẠM NGỌC CHI",
+                              title: "Trưởng họ",
+                              birth: "01-05-1956 (21-03 Bính Thân)",
+                              children: [
+                                {
+                                  name: "Vợ: NGUYỄN THỊ SEN",
+                                  birth: "21-10-1959 (19-9 Kỷ hợi)",
+                                  children: [
+                                    { name: "PHẠM TUYẾT THU", birth: "07-12-1984 (15-11 Giáp tý)" },
+                                    { name: "PHẠM THỊ THƯƠNG HUYỀN", birth: "08-05-1987 (11-04 Đinh Mão)" }
+                                  ]
+                                }
+                              ]
+                            },
+                            { name: "PHẠM HUY CẨN", birth: "09-05-1962 (05-04 Nhâm Dần)", children: [{ name: "PHẠM THỊ THÙY LINH", birth: "13-04-1999 (28-02 Kỷ Mão)" }] },
+                            { name: "PHẠM THỊ XUÂN", birth: "10-12-1965 (18-11 Ất tỵ)" },
+                            {
+                              name: "PHẠM ANH TIẾN",
+                              birth: "26-09-1969 (15-08 Kỷ Dậu)",
+                              children: [
+                                { name: "Vợ: PHÌN THỊ THÙY", birth: "26-07-1977 (12-06 Đinh Tỵ)", children: [{ name: "PHẠM THÁ thái BÌNH", birth: "24-11-2003 (01-10 Quý Mùi)" }, { name: "PHẠM NGỌC DIỆU GIANG", birth: "12-07-2011 (11-06 Tân Mão)" }] }
+                              ]
+                            },
+                            { name: "PHẠM MINH CHÁNH", birth: "01-05-1971", death: "Đã Mất", info: "Chưa vợ", deceased: true },
+                            {
+                              name: "PHẠM TRỌNG TUỆ",
+                              birth: "26-08-1977 (12-07 Đinh Tỵ)",
+                              children: [
+                                { name: "Vợ: TRẦN THỊ THÁI", children: [{ name: "PHẠM KHÁNH VY", birth: "19-03-2008 (12-02 Mậu tý)" }, { name: "PHẠM NGỌC MINH", birth: "22-05-2012 (02-04 Nhâm Thìn)" }] }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    { name: "PHẠM THỊ NÙI", birth: "1938 Mậu Dần", death: "......", deceased: true },
+                    { name: "PHẠM THỊ DUNG", birth: "1940 Canh Thìn", death: "16-07-1986 Bính Dần", deceased: true },
+                    {
+                      name: "PHẠM TUẤN KHANH",
+                      birth: "1942 Nhâm Ngọ",
+                      death: "16-11-2013 Quý Hợi",
+                      deceased: true,
+                      children: [
+                        {
+                          name: "Vợ: ĐINH THỊ CÚC",
+                          birth: "1946 Bính Tuất",
+                          children: [
+                            { name: "PHẠM TUYÊN", birth: "1969 Kỷ Dậu", death: "30-09-1999 Kỷ Mão", deceased: true, children: [{ name: "Vợ: NGUYỄN THỊ VÂN", birth: "1971 Tân Hợi", children: [{ name: "PHẠM THỊ LAN HƯƠNG", birth: "13-03-1996 (23-01 Bính Tý)" }] }] },
+                            { name: "PHẠM TUẤN DƯƠNG", birth: "28-09-1970 (28-08 Canh Tuất)", children: [{ name: "Vợ: TRẦN THỊ HUYỀN", birth: "19-06-1977 (03-05 Đinh Tỵ)", children: [{ name: "PHẠM TRẦN KHIÊM", death: " ", deceased: true }, { name: "PHẠM PHƯƠNG THẢO", birth: "18-12-2005 (17-11 Ất Dậu)" }] }] },
+                            { name: "PHẠM KIỀU VÂN", birth: "22-04-1976 Bính Thìn", info: "Sống ở Hà Giang" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                { name: "Bà hai: NGUYỄN THỊ VIÊM", birth: "1927 Đinh Mão", children: [{ name: "PHẠM THỊ DINH", birth: "1950 Canh Dần" }] }
+              ]
+            },
+            { name: "PHẠM NGỌC XIÊM", birth: "1920 Canh Thân", death: "18-02-1945 Ất Dậu", info: "Mất ở đồn điền Cao Su", deceased: true },
+            {
+              name: "PHẠM NGỌC CƠ",
+              birth: "1922 Nhâm Tuất",
+              death: "02-04-1977 Đinh Tỵ",
+              deceased: true,
+              children: [
+                {
+                  name: "Vợ: NGUYỄN THỊ CÚC",
+                  birth: "1923 Quý Hợi",
+                  death: "26-09-1963 Quý Mão",
+                  deceased: true,
+                  children: [
+                    { name: "PHẠM THỊ NUI", death: "24/4", deceased: true },
+                    { name: "PHẠM THỊ KHUY", death: "24/4", deceased: true },
+                    { name: "PHẠM THỊ HƯỜNG", death: "Đã mất", deceased: true },
+                    { name: "PHẠM THỊ NHẠN", birth: "1944 Giáp Thân", info: "Có 2 con sống cùng con gái ở Vĩnh Phúc" },
+                    { name: "PHẠM THỊ NHIÊN", birth: "1948 Mậu Tý", info: "Có 5 người con sống ở Diêm Điền" },
+                    { name: "CON TRAI (THỨ 6)", death: "Mất sớm, chưa đặt tên", deceased: true },
+                    {
+                      name: "PHẠM MINH ĐỨC",
+                      birth: "18-10-1953 Quý Tỵ",
+                      death: "02-08-2022 Nhâm Dần",
+                      deceased: true,
+                      bio: "Từ năm 1953 - 1962: còn nhỏ sống phụ thuộc gia đình\nTừ năm 1963 - 1967: là học sinh trường Thái Xuyên tại Xã Thái Xuyên – Thái Thụy – Thái Bình.\nTừ năm 11/1970 – 5/1975: là bộ đội chiến đấu tại Chiến trường B Thành cổ Quảng trị.\nTừ năm 6/1975 – 3/1977: là bộ đội phục viên tham gia hợp tác xã nông nghiệp xã Thái Xuyên.\nTừ 4/1977 – 12/1981: là cán bộ tại trường Kế hoạch tỉnh Sơn La.\nTừ 01/1982 – 6/1986: là cán bộ tại Ban quản lý đất đai (nay là Sở Tài nguyên và Môi trường).\nTừ 7/1986 đến 2022: nghỉ mất sức và hưởng chế độ thương binh",
+                      children: [
+                        {
+                          name: "Vợ: HOÀNG THỊ XUYẾN",
+                          birth: "01-10-1949 Kỷ Sửu",
+                          death: "24-02-2025 Ất Tỵ",
+                          deceased: true,
+                          bio: "Từ năm 1952 đến 1962: còn nhỏ sống phụ thuộc gia đình\nTừ năm 1963 đến 1967: là học sinh Trường Thanh Niên huyện Quỳnh Nhai.\nTừ năm 6/1968 đến 5/1972: là bộ đội và công tác tại Tỉnh Đội Sơn La (nay là Bộ Chỉ huy Quân sự Tỉnh Sơn La).\nTừ năm 6/1973 đến 3/1993: là cán bộ công chức tại Ban tổ chức chính quyền tỉnh Sơn La (nay là Sở Nội Vụ).\nTừ năm 4/1993 đến 2025: Hưu trí tại Tổ 09 Phường Tô Hiệu – Thành Phố Sơn La – tỉnh Sơn La.",
+                          children: [
+                            { name: "PHẠM THỊ KIM XUÂN", birth: "02-08-1979 (10-06 Kỷ Mùi)", bio: "Từ năm 1979 đến năm 1985 học trường mẫu giáo Tô Hiệu thành phố Sơn La tỉnh Sơn La.\nTừ năm 1986 đến năm 1990 là học sinh trường tiểu học Tô Hiệu thành phố Sơn La tỉnh Sơn La.\nTừ năm 1991 đến năm 1994 là học sinh trường trung học cơ sở Tô Hiệu thành phố Sơn La tỉnh Sơn La. \nTừ năm 1995 đến năm 1998 là học sinh trường phổ thông chuyên ban Tô Hiệu thành phố Sơn La tỉnh Sơn La. \n Từ năm 1999 đến năm 2005 học đại học tại trường đại học quốc gia Hà Nội. \nTừ năm 2006 đến năm 2018 công tác tại sở Thông tin và Truyền thông tỉnh Sơn La\nTừ ngày 29 tháng 1 năm 2018 công tác tại trung tâm công nghệ và truyền thông tỉnh Sơn La." },
+                            { name: "PHẠM PHƯƠNG ĐÔNG", birth: "29-12-1981 (04-12 Tân Dậu)", bio: "Từ 1981-1986: là học sinh Trường Mẫu giáo Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1987– 5/1993: là học sinh Trường Tiểu học Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1993 – 5/1997: là học sinh Trường Trung học cơ sở Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 9/1997 – 5/2000: là học sinh Trường Trung học phổ thông Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La\nTừ 12/2001 – 5/2006: là sinh viên Trường Đại Học Quốc Gia Hà Nội - Khoa Công nghệ Điện tử Viễn thông\nTừ 6/2006 – 9/2007:  ở nhà giúp gia đình\nTừ 10/2007 đến nay: Công tác tại công ty cổ phần cấp nước Sơn La", children: [{ name: "Vợ: HOÀNG THANH HUYỀN", birth: "02-09-1985 (Ất Sửu)",bio:"Quê quán: xã Đông La huyện Đông Hưng tỉnh Thái Bình.\nTừ năm 1996 đến năm 2000 học cấp 2 tại trường trung học cơ sở Nguyễn Trãi thành phố Sơn La tỉnh Sơn La. \n Từ năm 2000 đến năm 2003 học cấp 3 tại trường Trung học phổ thông Chuyên Sơn La thành phố Sơn La tỉnh Sơn La. \n Từ năm 2003 đến năm 2007 học đại học tại Trường đại học sư phạm Thái Nguyên tỉnh Thái Nguyên. \n Từ năm 2007 đến năm 2009 ở nhà giúp gia đình. \n Từ năm 2009 đến nay công tác tại sở văn hóa thể thao và Du lịch Tỉnh Sơn La.", children: [{ name: "PHẠM HOÀNG DƯƠNG", birth: "14-06-2011 (Tân Mão)"}] }] },
+                            { name: "PHẠM PHƯƠNG NAM", birth: "20-10-1984 (26-09 Giáp tý)", bio: "Từ 1984 - 1988: là học sinh Trường Mẫu giáo Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La;\nTừ 9/1990 – 5/1995: là học sinh Trường Tiểu học Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La; \nTừ 9/1995 – 5/1999: là học sinh Trường Trung học cơ sở Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La; \nTừ 9/2000 – 5/2002: là học sinh Trường Trung học phổ thông chuyên ban Tô Hiệu - Thành phố Sơn La - Tỉnh Sơn La; \nTừ 9/2002 – 5/2007: là sinh viên Trường Đại Học Kỹ thuật Công nghiệp Thái Nguyên \nTừ 9/2009 đến nay: là cán bộ tại Phân xưởng sửa chữa điện - Ban dự án Thủy điện Sơn La",children: [{ name: "Vợ: PHAN THỊ HỒNG", birth: "04-10-1989 (Kỷ Tỵ)", children: [{ name: "PHẠM THỦY PHƯƠNG ANH", birth: "07-12-2012 (04-11 Nhâm Thìn)" }, { name: "PHẠM NAM ANH", birth: "29-08-2016 (27-07 Bính Thân)" }] }] }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      name: "PHẠM NGỌC THANH",
+                      birth: "13-09-1959 Kỷ Hợi",
+                      death: "19-08-2008 Mậu Tý",
+                      deceased: true,
+                      children: [
+                        {
+                          name: "Vợ: ĐẶNG PHƯƠNG DUNG",
+                          birth: "21-10-1960 (01-09 Canh tí)",
+                          children: [
+                            { name: "PHẠM DIỆU HƯƠNG", birth: "20-11-1983 (16-10 Quý Hợi)" },
+                            { name: "PHẠM DIỆU VÂN", birth: "31-07-1986 (25-06 Bính Dần)" },
+                            { name: "PHẠM MINH ĐÔ", birth: "27-08-1990 (06-07 Canh Ngọ)", children: [{ name: "Vợ: NGUYỄN THỊ LÝ HƯỜNG", birth: "22-05-1990 (28-04 Canh Ngọ)", children: [{ name: "PHẠM TRÚC LAM", birth: "22-12-2017 (05-11 Đinh Dậu)" }, { name: "PHẠM MINH QUÂN", birth: "08-09-2020 (21-07 Canh Tý)" }, { name: "PHẠM MINH DƯƠNG", birth: "10-07-2024 (05-06 Giáp Thìn)" }] }] }
+                          ]
+                        }
+                      ]
+                    },
+                    { name: "CON TRAI (ÚT)", death: "Mất sớm, chưa đặt tên", deceased: true }
+                  ]
+                }
+              ]
+            },
+            { name: "PHẠM THỊ NŨ", birth: "1926 Bính Dần", death: "Đã Mất", deceased: true },
+            { name: "PHẠM NGỌC THỞ", birth: "1929 Kỷ Tỵ", death: "15-08-1945 Ất Dậu", deceased: true },
+            {
+              name: "PHẠM NGỌC NHẬT",
+              birth: "1931 Tân Mùi",
+              death: "03-05-1987 Đinh Mão",
+              deceased: true,
+              children: [
+                {
+                  name: "Vợ: ĐINH THỊ LOÁN",
+                  birth: "1933 Quý Mão",
+                  death: "17-02-1982 Nhâm Tuất",
+                  deceased: true,
+                  children: [
+                    { name: "PHẠM NGỌC TUẤN", birth: "30-10-1960 (11-09 Canh tí)", children: [{ name: "Vợ: TRẦN THỊ PHƯƠNG", birth: "31-08-1959 (27-07 Kỷ Hợi)", children: [{ name: "PHẠM NGỌC ANH", birth: "18-01-1987 (18-12 Bính Dần)" }, { name: "PHẠM TRÂN TUÂN", birth: "27-12-1999 (20-11 Kỷ Mão)" }, { name: "PHẠM THỊ HƯƠNG LAN", birth: "25-07-2002 (20-06 Nhâm Ngọ)" }] }] },
+                    { name: "PHẠM THỊ TÚ", birth: "1962 Nhâm Dần" },
+                    { name: "PHẠM THỊ TÂN", birth: "01-06-1965 (02-05 Ất tỵ)" },
+                    { name: "PHẠM THỊ TƯ", birth: "1968 Mậu Thân", death: "28-03-1978 Mậu Ngọ", deceased: true },
+                    { name: "PHẠM ĐỨC CƯỜNG", birth: "10-05-1971 (15-04 Tân Hợi)", children: [{ name: "Vợ: NGUYỄN THỊ HỒNG NGA", birth: "30-03-1973 (26-02 Quý Sửu)", children: [{ name: "PHẠM ĐỨC MẠNH", birth: "26-03-1995 (26-02 ẤT Hợi)" }, { name: "PHẠM ĐỨC CÔNG", birth: "08-10-2000 (11-09-2000 Canh Thìn)" }] }] }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Bà hai: NGUYỄN THỊ YẾN",
+          birth: "1895 Ất Mùi",
+          death: "21-04-1945 Ất Dậu",
+          deceased: true,
+          branch: "Chi bà hai",
+          children: [
+            {
+              name: "PHẠM NGỌC THẠCH",
+              birth: "1929 Kỷ tỵ",
+              death: "Đã Mất",
+              deceased: true,
+              children: [
+                {
+                  name: "Bà cả: NGUYỄN THỊ KIM NGÂN",
+                  birth: "1937 Đinh Sửu",
+                  children: [
+                    { name: "PHẠM THỊ NGA", birth: "13-09-1962 (15-08 Nhâm Dần)" },
+                    { name: "PHẠM NGỌC SƠN", birth: "17-11-1964 (13-10 Giáp Thìn)", children: [{ name: "Vợ: DƯƠNG THỊ HUỆ", birth: "02-12-1969 (26-10 Kỷ Dậu)", children: [{ name: "PHẠM THỊ THỦY", birth: "09-05-1993 (18-04 Quý Dậu)" }, { name: "PHẠM ĐÔNG TRIỀU", birth: "10-11-1996 (30-09 Bính Tý)" }] }] },
+                    { name: "PHẠM THỊ ĐÀO", birth: "25-01-1972 (08-12 Tân Hợi)" },
+                    { name: "PHẠM THỊ ÁNH", birth: "29-04-1974 (08-04 Giáp Dần)" },
+                    { name: "PHẠM HỒNG THẮNG", birth: "31-08-1976 (14-07 Bính Thìn)", children: [{ name: "Vợ: DƯƠNG THỊ TUYẾT HUỆ", birth: "23-11-1985 (12-10 Ất Sửu)", children: [{ name: "PHẠM KHÁNH DUY", birth: "12-03-2007 (23-01 Đinh Hợi)" }, { name: "PHẠM HẢI YẾN", birth: "15-02-2009 (21-01 Kỷ Sửu)" }] }] }
+                  ]
+                },
+                { name: "Bà hai: PHẠM THỊ THU", birth: "1952 Nhâm Thìn", children: [{ name: "PHẠM THỊ ANH ANH", birth: "07-05-1995 (08-04 Ất Hợi)", info: "Phổ Yên - Thái Nguyên" }] }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Bà ba: NGUYỄN THỊ HOA",
+          birth: "1889 Kỷ Sửu",
+          death: "25-01-2001 Tân tỵ",
+          deceased: true,
+          branch: "Chi bà ba",
+          children: [
+            {
+              name: "PHẠM NGỌC SINH",
+              birth: "1947 Đinh Hợi",
+              children: [
+                {
+                  name: "Vợ: BÙI THỊ RỤNG",
+                  birth: "1945 Ất Dậu",
+                  children: [
+                    { name: "PHẠM THỊ NHUNG", birth: "16-05-1996 (10-04 Kỷ Dậu)" },
+                    { name: "PHẠM VĂN NGỌC", birth: "18-08-1973 (20-07 Quý Sửu)", children: [{ name: "Vợ: LÊ THỊ HÀ", birth: "1975 Ất mão", children: [{ name: "PHẠM THỊ YẾN", birth: "18-10-1998 (02-09 Mậu Dần)" }, { name: "PHẠM THỊ LINH", birth: "08-12-2005 (08-11 Ất Dậu)" }, { name: "PHẠM MINH ANH", birth: "29-12-2013 (27-11 Quý Tỵ)" }] }] },
+                    { name: "PHẠM ĐỨC CƯỜNG", birth: "26-03-1975 (15-02 Ất Mão)", children: [{ name: "Vợ: ĐỖ THỊ LOAN", birth: "22-08-1979 (27-06 Quý Mùi)", children: [{ name: "PHẠM QUỲNH ANH", birth: "21-02-2002 (10-01 Nhâm Ngọ)" }, { name: "PHẠM QUỲNH GIAO", birth: "01-06-2013 (23-04 Quý Tỵ)" }] }] },
+                    { name: "PHẠM VĂN TUẤN", birth: "25-09-1978 (22-08 Mậu Ngọ)", children: [{ name: "Vợ: ĐÀO THỊ NỤ", birth: "17-05-1983 (11-04 Quý Hợi)", children: [{ name: "PHẠM THÙY TRANG", birth: "16-02-2008 (10-01 Mậu Tý)" }, { name: "PHẠM DUY KHÁNH", birth: "02-12-2010 (25-10 Canh Dần)" }] }] },
+                    { name: "PHẠM VĂN TRỌNG", birth: "17-11-1980 (10-10 Canh Thân)", children: [{ name: "Vợ: TRẦN THỊ NGA", birth: "25-04-1988 (09-03 Mậu THìn)", children: [{ name: "PHẠM MINH THƯ", birth: "17-12-2011 (22-11 Tân Mão)" }, { name: "PHẠM MINH TUYỀN", birth: "25-05-2013 (15-04 Quý Tỵ)" }, { name: "PHẠM THỦY TIÊN", birth: "05-10-2016 (03-09 Bính Thân)" }] }] },
+                    { name: "PHẠM THỊ THỦY", birth: "28-10-1983 (25-09 Quý Hợi)" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+    const isSpouse = (name = "") => /^(Vợ:|Bà cả:|Bà hai:|Bà ba:)/i.test(name);
+    const cleanName = (name = "") => name.replace(/^(Vợ:|Bà cả:|Bà hai:|Bà ba:)\s*/i, "").trim();
+    const getNameRole = (name = "") => {
+      const match = name.match(/^(Vợ|Bà cả|Bà hai|Bà ba):/i);
+      return match ? match[1] : "";
+    };
+    const formatPersonName = (node) => {
+      const role = getNameRole(node.name);
+      return role ? `${cleanName(node.name)} (${role})` : cleanName(node.name);
+    };
+    const CAN = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
+    const CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+    const VN_TIMEZONE = 7;
+    const INT = Math.floor;
+    const VietnameseLunarCalendar = (() => {
+      const PI = Math.PI;
+      const jdFromDate = (dd, mm, yy) => {
+        const a = INT((14 - mm) / 12);
+        const y = yy + 4800 - a;
+        const m = mm + 12 * a - 3;
+        let jd = dd + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - INT(y / 100) + INT(y / 400) - 32045;
+        if (jd < 2299161) {
+          jd = dd + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - 32083;
+        }
+        return jd;
+      };
+      const jdToDate = (jd) => {
+        let a, b, c;
+        if (jd > 2299160) {
+          a = jd + 32044;
+          b = INT((4 * a + 3) / 146097);
+          c = a - INT((b * 146097) / 4);
+        } else {
+          b = 0;
+          c = jd + 32082;
+        }
+        const d = INT((4 * c + 3) / 1461);
+        const e = c - INT((1461 * d) / 4);
+        const m = INT((5 * e + 2) / 153);
+        const day = e - INT((153 * m + 2) / 5) + 1;
+        const month = m + 3 - 12 * INT(m / 10);
+        const year = b * 100 + d - 4800 + INT(m / 10);
+        return { d: day, m: month, y: year };
+      };
+      const newMoon = (k) => {
+        const t = k / 1236.85;
+        const t2 = t * t;
+        const t3 = t2 * t;
+        const dr = PI / 180;
+        let jd1 = 2415020.75933 + 29.53058868 * k + 0.0001178 * t2 - 0.000000155 * t3;
+        jd1 += 0.00033 * Math.sin((166.56 + 132.87 * t - 0.009173 * t2) * dr);
+        const m = 359.2242 + 29.10535608 * k - 0.0000333 * t2 - 0.00000347 * t3;
+        const mpr = 306.0253 + 385.81691806 * k + 0.0107306 * t2 + 0.00001236 * t3;
+        const f = 21.2964 + 390.67050646 * k - 0.0016528 * t2 - 0.00000239 * t3;
+        let c1 = (0.1734 - 0.000393 * t) * Math.sin(m * dr) + 0.0021 * Math.sin(2 * dr * m);
+        c1 -= 0.4068 * Math.sin(mpr * dr) + 0.0161 * Math.sin(2 * dr * mpr);
+        c1 -= 0.0004 * Math.sin(3 * dr * mpr);
+        c1 += 0.0104 * Math.sin(2 * dr * f) - 0.0051 * Math.sin((m + mpr) * dr);
+        c1 -= 0.0074 * Math.sin((m - mpr) * dr) + 0.0004 * Math.sin((2 * f + m) * dr);
+        c1 -= 0.0004 * Math.sin((2 * f - m) * dr) - 0.0006 * Math.sin((2 * f + mpr) * dr);
+        c1 += 0.0010 * Math.sin((2 * f - mpr) * dr) + 0.0005 * Math.sin((2 * mpr + m) * dr);
+        const deltaT = t < -11
+          ? 0.001 + 0.000839 * t + 0.0002261 * t2 - 0.00000845 * t3 - 0.000000081 * t * t3
+          : -0.000278 + 0.000265 * t + 0.000262 * t2;
+        return jd1 + c1 - deltaT;
+      };
+      const getNewMoonDay = (k, timeZone) => INT(newMoon(k) + 0.5 + timeZone / 24);
+      const getSunLongitude = (jdn, timeZone) => {
+        const t = (jdn - 2451545.5 - timeZone / 24) / 36525;
+        const t2 = t * t;
+        const dr = PI / 180;
+        const m = 357.52910 + 35999.05030 * t - 0.0001559 * t2 - 0.00000048 * t * t2;
+        const l0 = 280.46645 + 36000.76983 * t + 0.0003032 * t2;
+        let dl = (1.914600 - 0.004817 * t - 0.000014 * t2) * Math.sin(dr * m);
+        dl += (0.019993 - 0.000101 * t) * Math.sin(2 * dr * m) + 0.000290 * Math.sin(3 * dr * m);
+        let l = (l0 + dl) * dr;
+        l -= PI * 2 * INT(l / (PI * 2));
+        return INT(l / PI * 6);
+      };
+      const getLunarMonth11 = (yy, timeZone) => {
+        const off = jdFromDate(31, 12, yy) - 2415021;
+        const k = INT(off / 29.530588853);
+        let nm = getNewMoonDay(k, timeZone);
+        const sunLong = getSunLongitude(nm, timeZone);
+        if (sunLong >= 9) nm = getNewMoonDay(k - 1, timeZone);
+        return nm;
+      };
+      const getLeapMonthOffset = (a11, timeZone) => {
+        const k = INT((a11 - 2415021.076998695) / 29.530588853 + 0.5);
+        let last = 0;
+        let i = 1;
+        let arc = getSunLongitude(getNewMoonDay(k + i, timeZone), timeZone);
+        do {
+          last = arc;
+          i += 1;
+          arc = getSunLongitude(getNewMoonDay(k + i, timeZone), timeZone);
+        } while (arc !== last && i < 14);
+        return i - 1;
+      };
+      const solarToLunar = (dd, mm, yy, timeZone = VN_TIMEZONE) => {
+        const dayNumber = jdFromDate(dd, mm, yy);
+        const k = INT((dayNumber - 2415021.076998695) / 29.530588853);
+        let monthStart = getNewMoonDay(k + 1, timeZone);
+        if (monthStart > dayNumber) monthStart = getNewMoonDay(k, timeZone);
+        let a11 = getLunarMonth11(yy, timeZone);
+        let b11 = a11;
+        let lunarYear;
+        if (a11 >= monthStart) {
+          lunarYear = yy;
+          a11 = getLunarMonth11(yy - 1, timeZone);
+        } else {
+          lunarYear = yy + 1;
+          b11 = getLunarMonth11(yy + 1, timeZone);
+        }
+        const lunarDay = dayNumber - monthStart + 1;
+        const diff = INT((monthStart - a11) / 29);
+        let lunarLeap = false;
+        let lunarMonth = diff + 11;
+        if (b11 - a11 > 365) {
+          const leapMonthDiff = getLeapMonthOffset(a11, timeZone);
+          if (diff >= leapMonthDiff) {
+            lunarMonth = diff + 10;
+            if (diff === leapMonthDiff) lunarLeap = true;
+          }
+        }
+        if (lunarMonth > 12) lunarMonth -= 12;
+        if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
+        return { d: lunarDay, m: lunarMonth, y: lunarYear, leap: lunarLeap };
+      };
+      const lunarToSolar = (lunarDay, lunarMonth, lunarYear, lunarLeap = false, timeZone = VN_TIMEZONE) => {
+        let a11, b11;
+        if (lunarMonth < 11) {
+          a11 = getLunarMonth11(lunarYear - 1, timeZone);
+          b11 = getLunarMonth11(lunarYear, timeZone);
+        } else {
+          a11 = getLunarMonth11(lunarYear, timeZone);
+          b11 = getLunarMonth11(lunarYear + 1, timeZone);
+        }
+        const k = INT(0.5 + (a11 - 2415021.076998695) / 29.530588853);
+        let off = lunarMonth - 11;
+        if (off < 0) off += 12;
+        if (b11 - a11 > 365) {
+          const leapOff = getLeapMonthOffset(a11, timeZone);
+          let leapMonth = leapOff - 2;
+          if (leapMonth < 0) leapMonth += 12;
+          if (lunarLeap && lunarMonth !== leapMonth) return null;
+          if (lunarLeap || off >= leapOff) off += 1;
+        }
+        return jdToDate(getNewMoonDay(k + off, timeZone) + lunarDay - 1);
+      };
+      const getLunarToday = () => {
+        const current = new Date();
+        const lunar = solarToLunar(current.getDate(), current.getMonth() + 1, current.getFullYear(), VN_TIMEZONE);
+        return { ...lunar, label: `${lunar.d}/${lunar.m}${lunar.leap ? " nhuận" : ""}/${lunar.y} Âm lịch` };
+      };
+      return { jdFromDate, jdToDate, solarToLunar, lunarToSolar, getLunarToday };
+    })();
+    const getCanChiYear = (year) => `${CAN[(year + 6) % 10]} ${CHI[(year + 8) % 12]}`;
+    const pad2 = (value) => String(value).padStart(2, "0");
+    const formatSolarDate = (date) => {
+      if (!date) return "";
+      if (date.d && date.m && date.y) return `${pad2(date.d)}/${pad2(date.m)}/${date.y}`;
+      if (date.y) return `${date.y}`;
+      return "";
+    };
+    const formatLunarDate = (date) => {
+      if (!date) return "";
+      const base = date.d && date.m ? `${pad2(date.d)}/${pad2(date.m)}${date.y ? `/${date.y}` : ""}` : (date.y ? `${date.y}` : "");
+      const suffix = date.y ? ` ${getCanChiYear(date.y)}` : (date.canChi ? ` ${date.canChi}` : "");
+      return `${base}${date.leap ? " nhuận" : ""}${suffix}`.trim();
+    };
+    const isDuplicateCanChiNote = (note, date) => !!(note && date?.y && normalizeText(note) === normalizeText(getCanChiYear(date.y)));
+
+    const getThoDuongLabel = (birthSolar, birthLunar, deathSolar, deathLunar) => {
+      const bY = birthLunar?.y || birthSolar?.y;
+      const dY = deathLunar?.y || deathSolar?.y;
+      if (!bY || !dY) return "";
+      const age = dY - bY + 1;
+      return age >= 60 ? `Hưởng Thọ ${age} tuổi` : `Hưởng Dương ${age} tuổi`;
+    };
+
+    // ĐÃ LOẠI BỎ HOÀN TOÀN HIỂN THỊ NGÀY ÂM LỊCH TẠI MỤC NGÀY SINH CỦA THÀNH VIÊN
+    const formatBirth = (data) => {
+      const parts = [];
+      if (data.birthSolar) parts.push(`${formatSolarDate(data.birthSolar)}`);
+      if (data.birthNote && !isDuplicateCanChiNote(data.birthNote, data.birthLunar || data.birthSolar)) parts.push(data.birthNote);
+      return parts.join(" · ");
+    };
+    const formatDeath = (data) => {
+      const parts = [];
+      if (data.deathLunar) parts.push(`Âm Lịch: ${formatLunarDate(data.deathLunar)}`);
+      if (data.deathSolar) parts.push(`Dương Lịch: ${formatSolarDate(data.deathSolar)}`);
+      if (data.deathNote && !isDuplicateCanChiNote(data.deathNote, data.deathLunar || data.deathSolar)) parts.push(data.deathNote);
+
+      const thoDuong = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
+      if (thoDuong) parts.push(thoDuong);
+
+      return parts.join(" · ");
+    };
+    const shortSolarDate = (date) => date?.d && date?.m ? `${pad2(date.d)}/${pad2(date.m)}` : "";
+    const parseDateToken = (text = "") => {
+      const match = String(text).match(/(\d{1,2})[-/](\d{1,2})(?:[-/](\d{2,4}))?/);
+      if (!match) return null;
+      const year = match[3] ? Number(match[3].length === 2 ? `19${match[3]}` : match[3]) : null;
+      return { d: Number(match[1]), m: Number(match[2]), y: year, raw: match[0] };
+    };
+    const parseYearToken = (text = "") => {
+      const match = String(text).match(/\b(18|19|20)\d{2}\b/);
+      return match ? Number(match[0]) : null;
+    };
+    const cleanDateNote = (text = "") =>
+      String(text)
+        .replace(/\([^)]*\)/g, " ")
+        .replace(/\d{1,2}[-/]\d{1,2}(?:[-/]\d{2,4})?/g, " ")
+        .replace(/\b(18|19|20)\d{2}\b/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    const isUnspecifiedDateText = (text = "") => {
+      const value = String(text).trim();
+      return !value || /^[.\s]+$/.test(value) || /^(đã\s*mất|mất\s*sớm|chưa\s*rõ)$/i.test(value);
+    };
+    const splitBirthDate = (raw = "", personName = "") => {
+      const source = String(raw || "").trim();
+      const warnings = [];
+      if (!source) return { birthSolar: null, birthLunar: null, birthNote: "", dateWarnings: warnings };
+      const parenthetical = source.match(/\(([^)]*)\)/);
+      const parentText = parenthetical ? parenthetical[1] : "";
+      const parentDate = parseDateToken(parentText);
+      const leadingText = source.replace(/\([^)]*\)/g, " ").trim();
+      const leadingDate = parseDateToken(leadingText);
+      const yearOnly = parseYearToken(leadingText);
+      let birthSolar = null;
+      let birthLunar = null;
+      const noteParts = [];
+      if (leadingDate?.y) {
+        birthSolar = { d: leadingDate.d, m: leadingDate.m, y: leadingDate.y, source: "recorded" };
+        const computed = VietnameseLunarCalendar.solarToLunar(leadingDate.d, leadingDate.m, leadingDate.y, VN_TIMEZONE);
+        birthLunar = { ...computed, source: "computed-from-solar" };
+      } else if (leadingDate) {
+        birthSolar = { d: leadingDate.d, m: leadingDate.m, source: "recorded-no-year" };
+      } else if (yearOnly) {
+        birthSolar = { y: yearOnly, source: "year-only" };
+        birthLunar = { y: yearOnly, canChi: getCanChiYear(yearOnly), source: "year-only-lunar" };
+      }
+      if (!birthLunar && parentDate) {
+        birthLunar = { d: parentDate.d, m: parentDate.m, y: parentDate.y || null, source: "recorded" };
+      }
+
+      if (!birthLunar?.canChi && /\b(Tân Mão|Mậu Tý|Kỷ Dậu|Nhâm Thân|Quý Dậu|Bính Thân|Kỷ hợi|Giáp tý|Đinh Mão|Nhâm Dần|Kỷ Mão|Ất tỵ|Kỷ Dậu|Đinh Tỵ|Quý Mùi|Tân Mão|Mậu tý|Nhâm Thìn|Canh Thìn|Nhâm Ngọ|Bính Tuất|Canh Tuất|Bính Thìn|Đinh Mão|Canh Thân|Ất Dậu|Nhâm Tuất|Quý Hợi|Quý Mão|Giáp Thân|Mậu Tý|Quý Tỵ|Kỷ Sửu|Ất Tỵ|Kỷ Mùi|Tân Mão|Giáp tý|Bính Thân|Kỷ Tỵ|Nhâm Thìn|Kỷ Hợi|Canh tý|Quý Hợi|Bính Dần|Canh Ngọ|Đinh Dậu|Canh Tý|Giáp Thìn|Bính Dần|Tân Mùi|Đinh Mão|Nhâm Tuất|Canh tý|Kỷ Hợi|Bính Dần|Kỷ Mão|Nhâm Ngọ|Tân Hợi|Quý Sửu|Ất Hợi|Canh Thìn|Ất Mùi|Đinh Sửu|Giáp Thìn|Giáp Dần|Bính Thìn|Đinh Hợi|Kỷ Sửu|Tân tỵ|Đinh Hợi|Ất Dậu|Kỷ Dậu|Quý Sửu|Ất mão|Mậu Dần|Ất Mão|Quý Mùi|Quý Tỵ|Mậu Ngọ|Quý Hợi|Canh Dần|Canh Thân|Mậu THìn|Tân Mão|Bính Thân)\b/i.test(source)) {
+        const matchedCanChi = source.match(/\b(Tân Mão|Mậu Tý|Kỷ Dậu|Nhâm Thân|Quý Dậu|Bính Thân|Kỷ hợi|Giáp tý|Đinh Mão|Nhâm Dần|Kỷ Mão|Ất tỵ|Kỷ Dậu|Đinh Tỵ|Quý Mùi|Tân Mão|Mậu tý|Nhâm Thìn|Canh Thìn|Nhâm Ngọ|Bính Tuất|Canh Tuất|Bính Thìn|Đinh Mão|Canh Thân|Ất Dậu|Nhâm Tuất|Quý Hợi|Quý Mão|Giáp Thân|Mậu Tý|Quý Tỵ|Kỷ Sửu|Ất Tỵ|Kỷ Mùi|Tân Mão|Giáp tý|Bính Thân|Kỷ Tỵ|Nhâm Thìn|Kỷ Hợi|Canh tý|Quý Hợi|Bính Dần|Canh Ngọ|Đinh Dậu|Canh Tý|Giáp Thìn|Bính Dần|Tân Mùi|Đinh Mão|Nhâm Tuất|Canh tý|Kỷ Hợi|Bính Dần|Kỷ Mão|Nhâm Ngọ|Tân Hợi|Quý Sửu|Ất Hợi|Canh Thìn|Ất Mùi|Đinh Sửu|Giáp Thìn|Giáp Dần|Bính Thìn|Đinh Hợi|Kỷ Sửu|Tân tỵ|Đinh Hợi|Ất Dậu|Kỷ Dậu|Quý Sửu|Ất mão|Mậu Dần|Ất Mão|Quý Mùi|Quý Tỵ|Mậu Ngọ|Quý Hợi|Canh Dần|Canh Thân|Mậu THìn|Tân Mão|Bính Thân)\b/i);
+        if (birthLunar) birthLunar.canChi = matchedCanChi[0];
+        else birthLunar = { y: yearOnly, canChi: matchedCanChi[0], source: "text-extracted" };
+      }
+
+      const parentNote = cleanDateNote(parentText);
+      const leadingNoteClean = cleanDateNote(leadingText);
+      if (parentNote && !/^(Âm|AL)$/i.test(parentNote)) noteParts.push(parentNote);
+      if (leadingNoteClean) noteParts.push(leadingNoteClean);
+      return {
+        birthSolar,
+        birthLunar,
+        birthNote: [...new Set(noteParts)].join(" · "),
+        dateWarnings: []
+      };
+    };
+    const splitDeathDate = (raw = "") => {
+      const source = String(raw || "").trim();
+      if (!source) return { deathSolar: null, deathLunar: null, deathNote: "", dateWarnings: [] };
+      const parsed = parseDateToken(source);
+      const note = cleanDateNote(source);
+
+      let deathLunar = null;
+      let deathSolar = null;
+
+      if (parsed) {
+        deathLunar = { d: parsed.d, m: parsed.m, y: parsed.y || null, source: "recorded-anniversary" };
+      }
+
+      if (/\b(Quý Tỵ|Đinh Dậu|Kỷ Sửu|Giáp Ngọ|Mậu Dần|Bính Dần|Quý Hợi|Kỷ Mão|Ất Dậu|Đinh Tỵ|Quý Mão|Nhâm Dần|Ất Tỵ|Mậu Tý|Nhâm Tuất|Mậu Ngọ|Ất Mùi|Tân tỵ)\b/i.test(source)) {
+        const matchedCanChi = source.match(/\b(Quý Tỵ|Đinh Dậu|Kỷ Sửu|Giáp Ngọ|Mậu Dần|Bính Dần|Quý Hợi|Kỷ Mão|Ất Dậu|Đinh Tỵ|Quý Mão|Nhâm Dần|Ất Tỵ|Mậu Tý|Nhâm Tuất|Mậu Ngọ|Ất Mùi|Tân tỵ)\b/i);
+        if (deathLunar) deathLunar.canChi = matchedCanChi[0];
+        else deathLunar = { y: parsed?.y || null, canChi: matchedCanChi[0], source: "text-extracted-death" };
+      }
+
+      if (!parsed) {
+        return { deathSolar: null, deathLunar: null, deathNote: isUnspecifiedDateText(source) ? "Đã mất, chưa rõ ngày giỗ" : source, dateWarnings: [] };
+      }
+      return {
+        deathSolar,
+        deathLunar,
+        deathNote: note,
+        dateWarnings: []
+      };
+    };
+    const GENDER_OVERRIDES = {
+      "PHẠM HƯƠNG CHỬ": "male",
+      "PHẠM TRÚC LAM": "female",
+      "PHẠM MINH QUÂN": "male",
+      "PHẠM MINH DƯƠNG": "male",
+      "PHẠM HOÀNG DƯƠNG": "male",
+      "PHẠM NAM ANH": "male",
+      "PHẠM NGỌC ANH": "female",
+      "PHẠM TRÂN TUÂN": "male",
+      "PHẠM MINH ANH": "female"
+    };
+
+    const deriveGender = (name = "") => {
+      const displayName = cleanName(name).toUpperCase();
+      if (GENDER_OVERRIDES[displayName]) return GENDER_OVERRIDES[displayName];
+      if (isSpouse(name) || displayName.includes(" THỊ ") || displayName.startsWith("THỊ ") || displayName.includes("BÀ ")) return "female";
+      if (displayName.includes("CON TRAI") || displayName.includes(" VĂN ") || displayName.includes(" ĐỨC ")) return "male";
+      const femaleHints = ["HUYỀN", "THẢO", "VÂN", "LAN", "HƯƠNG", "LINH", "XUÂN", "CÚC", "LOÁN", "TÚ", "TÂN", "TƯ", "ĐÀO", "ÁNH", "HUỆ", "YẾN", "NỤ", "NGA", "SEN", "THÙY", "THÁI", "NHẠN", "NHIÊN", "DIỆU", "KIM", "QUỲNH", "TRANG", "THƯ", "TUYỀN", "TIÊN", "RỤNG"];
+      const maleHints = ["COỎNG", "CHƯ", "CHI", "CẨN", "TIẾN", "CHÁNH", "TUỆ", "KHANH", "TUYÊN", "DƯƠNG", "ĐỨC", "ĐÔ", "NAM", "THANH", "TUẤN", "CƯỜNG", "SƠN", "THẠCH", "SINH", "NGỌC", "TRỌNG", "THẮNG", "KHÁNH", "MẠNH", "CÔNG"];
+      if (femaleHints.some((hint) => displayName.includes(hint))) return "female";
+      if (maleHints.some((hint) => displayName.includes(hint))) return "male";
+      return "unknown";
+    };
+    const getGenderLabel = (gender) => gender === "male" ? "Nam" : gender === "female" ? "Nữ" : "Chưa rõ";
+
+    const getNormalizedRole = (node) => {
+      const roleName = getNameRole(node.name);
+      if (node.isCurrentHead) return "Trưởng họ";
+      if (node.title === "Trưởng họ" && node.deceased) return "Trưởng họ";
+      if (node.title) return node.title;
+      if (roleName) return roleName;
+      return "";
+    };
+    const normalizeGenealogy = (node, inheritedBranch = "") => {
+      const ownBranch = node.branch || "";
+      const branchLine = ownBranch || inheritedBranch;
+      const birthParts = splitBirthDate(node.birth, node.name);
+      const deathParts = splitDeathDate(node.death);
+      const clean = cleanName(node.name);
+      const isCurrentHead = clean === "PHẠM NGỌC CHI" && !node.deceased;
+      const normalized = {
+        ...node,
+        ...birthParts,
+        ...deathParts,
+        branch: branchLine,
+        branchRoot: ownBranch,
+        dateWarnings: [],
+        gender: node.gender || deriveGender(node.name),
+        role: node.role || getNormalizedRole({ ...node, isCurrentHead }),
+        branchLine,
+        isCurrentHead,
+        isSpouse: isSpouse(node.name)
+      };
+      normalized.children = node.children?.map((child) => normalizeGenealogy(child, branchLine));
+      return normalized;
+    };
+
+    const getGenTitle = (person, gen) => {
+      const name = typeof person === "string" ? person : person.name;
+      const gender = typeof person === "string" ? deriveGender(person) : (person.gender || deriveGender(person.name));
+      const femaleKeywords = ["THỊ", "BÀ ", "XUYẾN", "NỤ", "NGA", "SEN", "THÙY", "THÁI", "CÚC", "VÂN", "HUYỀN", "THẢO", "NHẠN", "NHIÊN", "XUÂN", "LAM", "LOÁN", "TÚ", "TÂN", "TƯ", "ĐÀO", "ÁNH", "HUỆ", "YẾN", "RỤNG", "NHUNG", "HÀ", "LINH", "TRANG", "THƯ", "TUYỀN", "TIÊN", "PHIẾM", "UYÊN", "VÍCH", "VIÊM", "DINH", "HƯỜNG", "NŨ", "NGÂN"];
+      const isFemale = cleanName(name) !== "PHẠM HƯƠNG CHỬ" && (gender === "female" || isSpouse(name) || femaleKeywords.some((k) => name.toUpperCase().includes(k)));
+      if (gen === 1) return isFemale ? "Cụ tổ bà" : "Cụ tổ ông";
+      if (gen === 2) return isFemale ? "Cụ bà" : "Cụ ông";
+      if (gen === 3) return isFemale ? "Bà" : "Ông";
+      return "";
+    };
+    const describeNode = (node, parentNode, grandparentNode, gen) => {
+      const titlePrefix = getGenTitle(node, gen);
+      const displayName = cleanName(node.name);
+      let relation = "";
+      if (isSpouse(node.name) && parentNode) {
+        const husbandTitle = getGenTitle(parentNode, gen) || "ông";
+        relation = `Vợ ${husbandTitle.toLowerCase()} ${cleanName(parentNode.name)}`;
+      } else if (parentNode) {
+        const father = isSpouse(parentNode.name) ? grandparentNode : parentNode;
+        if (father && cleanName(father.name) !== "PHẠM HƯƠNG CHỬ") {
+          const fatherTitle = getGenTitle(father, gen - 1) || "bố";
+          relation = `Con ${fatherTitle.toLowerCase()} ${cleanName(father.name)}`;
+        }
+      }
+      return `${titlePrefix ? `${titlePrefix} ` : ""}${displayName}${relation ? ` (${relation})` : ""}`;
+    };
+    const visitTree = (node, parentNode, grandparentNode, gen, visitor) => {
+      const currentGen = parentNode === null ? 1 : (isSpouse(node.name) ? gen : gen + 1);
+      visitor(node, parentNode, grandparentNode, currentGen);
+      node.children?.forEach((child) => visitTree(child, node, parentNode, currentGen, visitor));
+    };
+    const normalizeText = (value = "") =>
+      String(value)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toLowerCase();
+    const buildMemberEntries = (treeData) => {
+      const entries = [];
+      const walk = (node, parentNode, grandparentNode, gen, branchName, pathNodes) => {
+        const currentGen = parentNode === null ? 1 : (isSpouse(node.name) ? gen : gen + 1);
+        const currentBranch = node.branchLine || node.branch || branchName || "";
+
+        const currentPath = [...pathNodes, node];
+        const fullName = describeNode(node, parentNode, grandparentNode, currentGen);
+        const pathNames = currentPath.map(n => cleanName(n.name));
+
+        const searchText = normalizeText([
+          node.name,
+          cleanName(node.name),
+          node.title,
+          node.role,
+          node.branch,
+          node.branchRoot,
+          node.branchLine,
+          formatBirth(node),
+          formatDeath(node),
+          node.info,
+          node.bio,
+          getGenderLabel(node.gender),
+          currentBranch,
+          pathNames.join(" "),
+          fullName
+        ].filter(Boolean).join(" "));
+        entries.push({
+          id: pathNames.join(" > "),
+          data: node,
+          parentNode,
+          grandparentNode,
+          gen: currentGen,
+          branchName: currentBranch,
+          pathNodes: currentPath,
+          pathNames: pathNames,
+          fullName,
+          searchText
+        });
+        node.children?.forEach((child) => walk(child, node, parentNode, currentGen, currentBranch, currentPath));
+      };
+      walk(treeData, null, null, 1, "", []);
+      return entries;
+    };
+    const getBirthdays = (treeData) => {
+      const list = [];
+      visitTree(treeData, null, null, 1, (node, parentNode, grandparentNode, gen) => {
+        const date = node.birthSolar;
+        if (!node.deceased && date?.d && date?.m && date.m === CURRENT_SOLAR_MONTH && date.d >= CURRENT_SOLAR_DAY) {
+          list.push({ fullName: describeNode(node, parentNode, grandparentNode, gen), birthSolar: date, day: date.d });
+        }
+      });
+      return list.sort((a, b) => a.day - b.day);
+    };
+    const getReminders = (treeData, todayLunar) => {
+      const list = [];
+      const current = new Date();
+      const todayJdn = VietnameseLunarCalendar.jdFromDate(current.getDate(), current.getMonth() + 1, current.getFullYear());
+      visitTree(treeData, null, null, 1, (node, parentNode, grandparentNode, gen) => {
+        const death = node.deathLunar;
+        if (!death?.d || !death?.m) return;
+        let targetSolar = VietnameseLunarCalendar.lunarToSolar(death.d, death.m, todayLunar.y, death.leap || false, VN_TIMEZONE);
+        if (!targetSolar) return;
+        let targetJdn = VietnameseLunarCalendar.jdFromDate(targetSolar.d, targetSolar.m, targetSolar.y);
+        if (targetJdn < todayJdn) {
+          targetSolar = VietnameseLunarCalendar.lunarToSolar(death.d, death.m, todayLunar.y + 1, death.leap || false, VN_TIMEZONE);
+          if (!targetSolar) return;
+          targetJdn = VietnameseLunarCalendar.jdFromDate(targetSolar.d, targetSolar.m, targetSolar.y);
+        }
+        const days = targetJdn - todayJdn;
+        if (days >= 0 && days <= 20) {
+          list.push({ fullName: describeNode(node, parentNode, grandparentNode, gen), date: formatLunarDate(death), days });
+        }
+      });
+      return list.sort((a, b) => a.days - b.days);
+    };
+    const Icon = ({ name, size = 16, className = "" }) => {
+      useEffect(() => { window.lucide?.createIcons(); }, [name]);
+      return <i data-lucide={name} className={className} style={{ width: size, height: size, display: "inline-block" }} />;
+    };
+
+    const Meta = ({ data, dark = false }) => (
+      <>
+        <div className="meta">
+          {(data.birthSolar || data.birthLunar || data.birthNote) && (
+            <span className="meta-item">
+              <Icon name="sun" size={12} />
+              Sinh: <b>{formatBirth(data)}</b>
+            </span>
+          )}
+          {data.deceased && (data.deathLunar || data.deathSolar || data.deathNote) && (
+            <span className="meta-item death">
+              <Icon name="moon" size={12} />
+              Mất: <b>{formatDeath(data)}</b>
+            </span>
+          )}
+        </div>
+        {data.info && <div className="info">{data.info}</div>}
+      </>
+    );
+
+    const buildShareText = (data, displayName, gen, titleLabel, branchLabel, relation, pathNodes, children) => {
+      const lines = [];
+      const sep = "─────────────────────";
+      lines.push("📜 GIA PHẢ PHẠM TỘC");
+      lines.push(sep);
+      lines.push(`👤 ${displayName}`);
+      if (titleLabel) lines.push(`   Vai vế: ${titleLabel}`);
+      lines.push(`   Đời thứ: ${gen}`);
+      lines.push(`   Chi nhánh: ${branchLabel}`);
+      if (relation) lines.push(`   Quan hệ: ${relation}`);
+      lines.push("");
+
+      const birth = formatBirth(data);
+      const death = formatDeath(data);
+      if (birth) lines.push(`🌅 Ngày sinh: ${birth}`);
+      if (data.deceased) {
+        lines.push(`🕯 Ngày mất: ${death || "Chưa rõ"}`);
+      } else {
+        lines.push(`✅ Trạng thái: Còn sống`);
+      }
+
+      const ancestors = pathNodes
+        .filter((_, i) => i < pathNodes.length - 1)
+        .map(n => cleanName(n.name));
+      if (ancestors.length > 0) {
+        lines.push("");
+        lines.push(`🌳 Ông bà/Bố mẹ:`);
+        lines.push(`   ${ancestors.join(" › ")}`);
+      }
+
+      const childNames = children
+        .filter(c => !isSpouse(c.name))
+        .map(c => cleanName(c.name));
+      const spouseNames = children
+        .filter(c => isSpouse(c.name))
+        .map(c => cleanName(c.name));
+      if (spouseNames.length > 0) lines.push(`\n💑 Vợ/Chồng: ${spouseNames.join(", ")}`);
+      if (childNames.length > 0) lines.push(`👶 Con cái: ${childNames.join(", ")}`);
+
+      if (data.info) { lines.push(""); lines.push(`📝 Ghi chú: ${data.info}`); }
+
+      lines.push("");
+      lines.push(sep);
+      lines.push("Gia Phả Phạm Tộc 🏮");
+      return lines.join("\n");
+    };
+
+    const PersonDetailModal = ({ person, onClose }) => {
+      if (!person) return null;
+      const [showShare, setShowShare] = useState(false);
+      const [copied, setCopied] = useState(false);
+      const [toastVisible, setToastVisible] = useState(false);
+      const [toastHide, setToastHide] = useState(false);
+      const textareaRef = useRef(null);
+      const { data, parentNode, grandparentNode, gen, branchName, pathNodes } = person;
+      const children = data.children || [];
+      const thoDuongText = getThoDuongLabel(data.birthSolar, data.birthLunar, data.deathSolar, data.deathLunar);
+      const status = data.deceased ? (thoDuongText ? `Đã mất (${thoDuongText})` : "Đã mất") : "Còn sống";
+      const actualParent = parentNode && isSpouse(parentNode.name) ? grandparentNode : parentNode;
+      const displayName = cleanName(data.name);
+      const roleName = getNameRole(data.name);
+      const genTitle = getGenTitle(data, gen);
+      const roleTags = [...new Set([data.role, roleName, genTitle, data.branchRoot].filter(Boolean))];
+      const relation = parentNode
+        ? (isSpouse(data.name) ? `${roleName || "Vợ"} của ${cleanName(parentNode.name)}` : `Con của ${actualParent ? cleanName(actualParent.name) : cleanName(parentNode.name)}`)
+        : "Thủy tổ của gia phả";
+      const titleLabel = [...new Set([genTitle, roleName, data.role])].filter(Boolean).join(" - ");
+      const branchLabel = data.branchLine || branchName || "Gốc gia phả";
+
+      const shareText = useMemo(() =>
+        buildShareText(data, displayName, gen, titleLabel, branchLabel, relation, pathNodes, children),
+        [data, displayName, gen, titleLabel, branchLabel, relation, pathNodes, children]
+      );
+
+      const showToast = (msg) => {
+        setToastVisible(true); setToastHide(false);
+        setTimeout(() => { setToastHide(true); setTimeout(() => setToastVisible(false), 220); }, 2000);
+      };
+
+      const handleCopy = async () => {
+        try {
+          await navigator.clipboard.writeText(shareText);
+        } catch {
+          if (textareaRef.current) { textareaRef.current.select(); document.execCommand("copy"); }
+        }
+        setCopied(true);
+        showToast("Đã sao chép!");
+        setTimeout(() => setCopied(false), 2500);
+      };
+      return (
+        <div className="modal-backdrop" onClick={onClose}>
+          {/* Toast */}
+          {toastVisible && (
+            <div className={`toast ${toastHide ? "hide" : ""}`}>
+              <Icon name="check-circle" size={15} /> Đã sao chép vào bộ nhớ tạm!
+            </div>
+          )}
+
+          {/* Share bottom sheet */}
+          {showShare && (
+            <div className="share-overlay" onClick={() => setShowShare(false)}>
+              <div className="share-sheet" onClick={e => e.stopPropagation()}>
+                <div className="share-sheet-head">
+                  <span className="share-sheet-title">
+                    <Icon name="share-2" size={15} style={{ marginRight: 7, verticalAlign: -2 }} />
+                    Chia sẻ thông tin
+                  </span>
+                  <button className="detail-close" style={{ position: "static" }} onClick={() => setShowShare(false)} aria-label="Đóng">
+                    <Icon name="x" size={16} />
+                  </button>
+                </div>
+                <div className="share-sheet-body">
+                  <textarea
+                    ref={textareaRef}
+                    className="share-text-box"
+                    value={shareText}
+                    readOnly
+                    onFocus={e => e.target.select()}
+                  />
+                  <p className="share-hint">
+                    Nhấn "Sao chép" rồi dán vào Zalo, Messenger, Facebook...
+                  </p>
+                </div>
+                <div className="share-actions">
+                  <button
+                    className={`share-copy-btn ${copied ? "copied" : ""}`}
+                    onClick={handleCopy}
+                  >
+                    <Icon name={copied ? "check" : "copy"} size={15} />
+                    {copied ? "Đã sao chép!" : "Sao chép nội dung"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <section className="modal detail-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="detail-head">
+              <button className="detail-close" onClick={onClose} aria-label="Đóng"><Icon name="x" size={17} /></button>
+              <h2 className="font-display detail-head-name">{displayName}</h2>
+              <p className="detail-subtitle">{relation}</p>
+              {roleTags.length > 0 && (
+                <div className="detail-tags">
+                  {roleTags.map((tag) => <span className="detail-tag" key={tag}>{tag}</span>)}
+                </div>
+              )}
+            </div>
+            <div className="detail-body">
+              <div className="detail-grid">
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="signature" size={12} /> Họ tên</p>
+                  <p className="detail-value font-serif">{displayName}</p>
+                </div>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="layers" size={12} /> Đời / vai vế</p>
+                  <p className="detail-value">Đời thứ {gen}{titleLabel ? ` · ${titleLabel}` : ""}</p>
+                </div>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="sun" size={12} /> Ngày sinh</p>
+                  <p className="detail-value">{formatBirth(data) || "Chưa có dữ liệu"}</p>
+                </div>
+                {data.deceased && (
+                  <div className="detail-field">
+                    <p className="detail-label"><Icon name="moon" size={12} /> Ngày Mất</p>
+                    <p className="detail-value">{formatDeath(data) || "Chưa có dữ liệu"}</p>
+                  </div>
+                )}
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="badge-check" size={12} /> Trạng thái</p>
+                  <p className="detail-value" style={{ color: data.deceased ? "var(--lacquer)" : "#16a34a", fontWeight: 800 }}>{status}</p>
+                </div>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="user-round" size={12} /> Giới tính</p>
+                  <p className="detail-value">{getGenderLabel(data.gender)}</p>
+                </div>
+                <div className="detail-field">
+                  <p className="detail-label"><Icon name="git-branch" size={12} /> Chi nhánh</p>
+                  <p className="detail-value">{branchLabel}</p>
+                </div>
+              </div>
+
+              <div className="lineage-box">
+                <p className="detail-label"><Icon name="route" size={12} /> Ông bà / Bố mẹ</p>
+                <p className="lineage-path">
+                  {pathNodes.map((node, idx) => {
+                    const nodeName = cleanName(node.name);
+                    if (idx === 0) return <span className="lineage-step" key={`${nodeName}-${idx}`}>{nodeName}</span>;
+                    if (node.isSpouse) return (
+                      <React.Fragment key={`${nodeName}-${idx}`}>
+                        <span className="lineage-heart">❤</span>
+                        <span className="lineage-step">{nodeName}</span>
+                      </React.Fragment>
+                    );
+                    return (
+                      <React.Fragment key={`${nodeName}-${idx}`}>
+                        <span className="lineage-separator">›</span>
+                        <span className="lineage-step">{nodeName}</span>
+                      </React.Fragment>
+                    );
+                  })}
+                </p>
+              </div>
+
+              {data.bio && (
+                <div className="lineage-box">
+                  <p className="detail-label"><Icon name="book-open" size={12} /> Lý lịch / Tiểu sử</p>
+                  <div className="bio-content">{data.bio}</div>
+                </div>
+              )}
+
+              {data.info && (
+                <div className="lineage-box">
+                  <p className="detail-label"><Icon name="notebook-text" size={12} /> Ghi chú</p>
+                  <p className="lineage-path">{data.info}</p>
+                </div>
+              )}
+
+              <div className="lineage-box">
+                <p className="detail-label"><Icon name="users" size={12} /> Vợ chồng / Con cái</p>
+                {children.length ? (
+                  <div className="child-list">
+                    {children.map((child, idx) => (
+                      <span className="child-chip" key={`${child.name}-${idx}`}>{formatPersonName(child)}</span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="lineage-path" style={{ color: "var(--muted)", fontStyle: "italic" }}>Chưa có dữ liệu vợ chồng &amp; con cái.</p>
+                )}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="share-btn" onClick={() => setShowShare(true)}>
+                <Icon name="share-2" size={14} /> Chia sẻ
+              </button>
+              <button className="action-button modal-close" onClick={onClose}>
+                <Icon name="x" size={14} /> Đóng
+              </button>
+            </div>
+          </section>
+        </div>
+      );
+    };
+
+    const SearchPanel = ({ query, onQueryChange, results, total, onSelect }) => (
+      <section className="search-panel">
+        <div className="search-box">
+          <span className="s-icon"><Icon name="search" size={16} /></span>
+          <input
+            className="search-input"
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+            placeholder="Tìm tên, ngày sinh, ngày giỗ, chi nhánh..."
+          />
+          {query && (
+            <button className="clear-search" onClick={() => onQueryChange("")} aria-label="Xóa">
+              <Icon name="x" size={15} />
+            </button>
+          )}
+        </div>
+        {query.trim() && (
+          <>
+            <p className="search-summary">Tìm thấy {results.length} / {total} thành viên</p>
+            {results.length ? (
+              <div className="search-results">
+                {results.slice(0, 12).map((item) => (
+                  <button className="search-result" key={item.id} onClick={() => onSelect(item)}>
+                    <span style={{ minWidth: 0 }}>
+                      <span className="search-result-name font-serif">{item.data.name}</span>
+                      <span className="search-result-path">{item.pathNames.join(" › ")}</span>
+                    </span>
+                    <Icon name="panel-right-open" size={16} />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="search-empty">Không tìm thấy thành viên phù hợp.</div>
+            )}
+          </>
+        )}
+      </section>
+    );
+
+    const MemberItem = ({ data, level = 0, forceOpen, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
+      const [open, setOpen] = useState(level < 1);
+      const hasChildren = data.children?.length > 0;
+      const bDate = data.birthSolar;
+      const isBirthday = !data.deceased && bDate?.d && bDate?.m && bDate.m === CURRENT_SOLAR_MONTH && bDate.d >= CURRENT_SOLAR_DAY;
+      const dark = level === 0;
+      const branch = !!data.branchRoot;
+      const currentGen = parentNode === null ? 1 : (isSpouse(data.name) ? gen : gen + 1);
+      const currentBranch = data.branchLine || data.branch || branchName || "";
+      const currentPath = [...pathNodes, data];
+      const person = {
+        data, parentNode, grandparentNode,
+        gen: currentGen, branchName: currentBranch,
+        pathNodes: currentPath,
+        fullName: describeNode(data, parentNode, grandparentNode, currentGen)
+      };
+      useEffect(() => { if (forceOpen !== null) setOpen(forceOpen); }, [forceOpen]);
+      return (
+        <div>
+          <article
+            className={`family-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isBirthday ? "birthday" : ""} gen-${Math.min(currentGen, 5)}`}
+            onClick={() => onSelect(person)}
+          >
+            {data.deceased && <div className="deceased-mark" />}
+            {isBirthday && <div className="birthday-ribbon"><Icon name="cake" size={10} /> Sinh nhật</div>}
+            <span className="gen-badge">Đời {currentGen}</span>
+            <div className={`card-body ${data.deceased ? "has-deceased" : ""}`}>
+              <div>
+                {(() => {
+                  const nameRole = getNameRole(data.name);
+                  const mainRole = data.role || data.branchRoot;
+                  const showNameRole = nameRole && nameRole !== mainRole;
+                  const showMainRole = mainRole && mainRole !== nameRole;
+                  return (showNameRole || showMainRole) ? (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 2 }}>
+                      {showNameRole && <span className="title-pill" style={{ background: "rgba(184,137,60,.09)", borderColor: "rgba(184,137,60,.18)" }}>{nameRole}</span>}
+                      {showMainRole && <span className="title-pill">{mainRole}</span>}
+                    </div>
+                  ) : null;
+                })()}
+                <h3 className="name font-display">{cleanName(data.name)}</h3>
+                <Meta data={data} dark={dark} />
+              </div>
+              {hasChildren && (
+                <button
+                  className="toggle-btn"
+                  aria-label={open ? "Thu gọn" : "Mở rộng"}
+                  onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+                >
+                  <Icon name={open ? "chevron-up" : "chevron-down"} size={17} />
+                </button>
+              )}
+            </div>
+          </article>
+          {hasChildren && open && (
+            <div className="branch-list">
+              {data.children.map((child, i) => (
+                <MemberItem
+                  key={`${child.name}-${i}`}
+                  data={child} level={level + 1}
+                  forceOpen={forceOpen} onSelect={onSelect}
+                  parentNode={data} grandparentNode={parentNode}
+                  gen={currentGen} branchName={currentBranch} pathNodes={currentPath}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const TreeNode = ({ data, level = 0, onSelect, parentNode = null, grandparentNode = null, gen = 1, branchName = "", pathNodes = [] }) => {
+      const [open, setOpen] = useState(level < 1);
+      const hasChildren = data.children?.length > 0;
+      const bDate = data.birthSolar;
+      const isBirthday = !data.deceased && bDate?.d && bDate?.m && bDate.m === CURRENT_SOLAR_MONTH && bDate.d >= CURRENT_SOLAR_DAY;
+      const dark = level === 0;
+      const branch = !!data.branchRoot;
+      const currentGen = parentNode === null ? 1 : (isSpouse(data.name) ? gen : gen + 1);
+      const currentBranch = data.branchLine || data.branch || branchName || "";
+      const currentPath = [...pathNodes, data];
+      const person = {
+        data, parentNode, grandparentNode,
+        gen: currentGen, branchName: currentBranch, pathNodes: currentPath,
+        fullName: describeNode(data, parentNode, grandparentNode, currentGen)
+      };
+      return (
+        <div className={`tree-item ${level === 0 ? "root-node" : ""}`}>
+          <article
+            className={`tree-card ${dark ? "dark" : ""} ${branch ? "branch" : ""} ${isSpouse(data.name) ? "spouse" : ""} ${isBirthday ? "birthday" : ""}`}
+            onClick={() => onSelect(person)}
+          >
+            {data.deceased && <div className="deceased-mark" />}
+            {isBirthday && <div className="birthday-ribbon"><Icon name="cake" size={10} /> Sinh nhật</div>}
+            <div className="tree-card-content">
+              {(() => {
+                const nameRole = getNameRole(data.name);
+                const mainRole = data.role || data.branchRoot;
+                const showNameRole = nameRole && nameRole !== mainRole;
+                const showMainRole = mainRole && mainRole !== nameRole;
+                return (showNameRole || showMainRole) ? (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4, justifyContent: "center", marginBottom: 4 }}>
+                    {showNameRole && <span className="title-pill" style={{ background: "rgba(184,137,60,.09)", borderColor: "rgba(184,137,60,.18)" }}>{nameRole}</span>}
+                    {showMainRole && <span className="title-pill">{mainRole}</span>}
+                  </div>
+                ) : null;
+              })()}
+              <h3 className="name font-display">{cleanName(data.name)}</h3>
+              <Meta data={data} dark={dark} />
+              {hasChildren && (
+                <button
+                  style={{ display: "flex", margin: "10px auto 0", width: 32, height: 32, alignItems: "center", justifyContent: "center", borderRadius: 10, opacity: .65 }}
+                  onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
+                  aria-label={open ? "Thu gọn" : "Mở rộng"}
+                >
+                  <Icon name={open ? "chevron-up" : "chevron-down"} size={16} />
+                </button>
+              )}
+            </div>
+            {hasChildren && open && <div className="parent-line" />}
+          </article>
+          {hasChildren && open && (
+            <div className="tree-branch">
+              {data.children.map((child, i) => (
+                <TreeNode
+                  key={`${child.name}-${i}`}
+                  data={child} level={level + 1} onSelect={onSelect}
+                  parentNode={data} grandparentNode={parentNode}
+                  gen={currentGen} branchName={currentBranch} pathNodes={currentPath}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const App = () => {
+      const [viewMode, setViewMode] = useState("list");
+      const [scale, setScale] = useState(.48);
+      const [pos, setPos] = useState({ x: 0, y: 72 });
+      const [allOpen, setAllOpen] = useState(null);
+      const [showModal, setShowModal] = useState(false);
+      const [searchQuery, setSearchQuery] = useState("");
+      const [selectedPerson, setSelectedPerson] = useState(null);
+      const dragging = useRef(false);
+      const start = useRef({ x: 0, y: 0 });
+      const pinchDist = useRef(null);
+      const familyData = useMemo(() => normalizeGenealogy(GIA_PHA_DATA), []);
+      const todayLunar = useMemo(() => VietnameseLunarCalendar.getLunarToday(), []);
+      const birthdays = useMemo(() => getBirthdays(familyData), [familyData]);
+      const reminders = useMemo(() => getReminders(familyData, todayLunar), [familyData, todayLunar]);
+      const memberEntries = useMemo(() => buildMemberEntries(familyData), [familyData]);
+
+      const searchResults = useMemo(() => {
+        const terms = normalizeText(searchQuery).split(/\s+/).filter(Boolean);
+        if (!terms.length) return [];
+        return memberEntries.filter((item) => terms.every((term) => item.searchText.includes(term)));
+      }, [memberEntries, searchQuery]);
+
+
+      useEffect(() => {
+        if (reminders.length) setShowModal(true);
+        if (window.ToanAppGiaPha) window.ToanAppGiaPha.postMessage(reminders.length.toString());
+      }, [reminders.length]);
+
+      const beginDrag = (x, y) => {
+        dragging.current = true;
+        start.current = { x: x - pos.x, y: y - pos.y };
+      };
+      const moveDrag = (x, y) => {
+        if (!dragging.current) return;
+        setPos({ x: x - start.current.x, y: y - start.current.y });
+      };
+      const getDist = (t) => {
+        const dx = t[0].clientX - t[1].clientX;
+        const dy = t[0].clientY - t[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+      };
+      const handleTouchStart = (e) => {
+        if (e.touches.length === 2) {
+          pinchDist.current = getDist(e.touches);
+        } else {
+          beginDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      };
+      const handleTouchMove = (e) => {
+        if (e.touches.length === 2 && pinchDist.current !== null) {
+          e.preventDefault();
+          const newDist = getDist(e.touches);
+          const ratio = newDist / pinchDist.current;
+          pinchDist.current = newDist;
+          setScale((s) => Math.min(1.8, Math.max(.16, s * ratio)));
+        } else if (e.touches.length === 1) {
+          moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      };
+      const handleTouchEnd = () => {
+        dragging.current = false;
+        pinchDist.current = null;
+      };
+
+      return (
+        <div className="shell">
+          <PersonDetailModal person={selectedPerson} onClose={() => setSelectedPerson(null)} />
+
+          {/* Reminder Modal */}
+          {showModal && (
+            <div className="modal-backdrop">
+              <section className="modal">
+                <div className="modal-head">
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                    <Icon name="bell-ring" size={34} className="modal-icon" />
+                  </div>
+                  <h2 className="font-display" style={{ fontSize: 24, fontWeight: 700, color: "var(--gold-pale)", textAlign: "center" }}>Ngày giỗ sắp tới</h2>
+                  <p style={{ marginTop: 6, fontSize: 11, fontWeight: 600, color: "rgba(240,221,176,.6)", textAlign: "center" }}>
+                    {todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch
+                  </p>
+                </div>
+                <div className="modal-list">
+                  {reminders.map((item, idx) => (
+                    <div className="reminder-row" key={idx}>
+                      <div>
+                        <p className="reminder-name font-serif">{item.fullName}</p>
+                        <p className="modal-date">Ngày: {item.date}</p>
+                      </div>
+                      <span className={`days-pill ${item.days === 0 ? "today" : ""}`}>
+                        {item.days === 0 ? "Hôm nay" : `Còn ${item.days} ngày`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ padding: "10px 14px 14px" }}>
+                  <button className="action-button modal-close" style={{ width: "100%", justifyContent: "center" }} onClick={() => setShowModal(false)}>
+                    <Icon name="x" size={14} /> Đóng
+                  </button>
+                </div>
+              </section>
+            </div>
+          )}
+
+          {/* Top Bar */}
+          <header className="topbar">
+            <div className="topbar-brand">
+              <div className="crest">
+                <span className="crest-icon"><Icon name="scroll-text" size={24} /></span>
+              </div>
+              <div className="brand-text">
+                <p className="brand-kicker">Lưu trữ thế hệ</p>
+                <h1 className="brand-title">Gia Phả Phạm Tộc</h1>
+                <p className="brand-sub">{todayLunar.label} · Tháng {CURRENT_SOLAR_MONTH} dương lịch</p>
+              </div>
+            </div>
+            <nav className="segmented" aria-label="Chế độ xem">
+              <button className={viewMode === "list" ? "active" : ""} onClick={() => setViewMode("list")}>
+                Danh sách
+              </button>
+              <button className={viewMode === "tree" ? "active" : ""} onClick={() => setViewMode("tree")}>
+                Sơ đồ cây
+              </button>
+            </nav>
+          </header>
+
+          {/* Birthday Bar */}
+          {birthdays.length > 0 && (
+            <section className="notice">
+              <span className="notice-badge">
+                <Icon name="cake" size={12} /> Sinh nhật tháng {CURRENT_SOLAR_MONTH}
+              </span>
+              <marquee scrollamount="4">
+                {birthdays.map((m) => `Chúc mừng sinh nhật: ${m.fullName} (${shortSolarDate(m.birthSolar)})`).join("   •   ")}
+              </marquee>
+            </section>
+          )}
+
+          <main>
+            {viewMode === "list" ? (
+              <div className="list-scroll">
+                <div className="list-inner">
+                  <div className="toolbar">
+                    <div>
+                      <p className="section-kicker">Dòng họ Phạm</p>
+                      <h2 className="section-title font-display">Danh sách thành viên</h2>
+                    </div>
+                    <button className="action-button" onClick={() => setAllOpen(!allOpen)}>
+                      <Icon name={allOpen ? "folder-minus" : "folder-plus"} size={14} />
+                      {allOpen ? "Thu gọn" : "Mở hết"}
+                    </button>
+                  </div>
+                  <SearchPanel
+                    query={searchQuery}
+                    onQueryChange={setSearchQuery}
+                    results={searchResults}
+                    total={memberEntries.length}
+                    onSelect={setSelectedPerson}
+                  />
+
+                  <MemberItem data={familyData} forceOpen={allOpen} onSelect={setSelectedPerson} />
+                </div>
+              </div>
+            ) : (
+              <div
+                className="tree-stage"
+                onWheel={(e) => { e.preventDefault(); setScale((s) => Math.min(1.8, Math.max(.16, s + (e.deltaY > 0 ? -.04 : .04)))); }}
+                onMouseDown={(e) => beginDrag(e.clientX, e.clientY)}
+                onMouseMove={(e) => moveDrag(e.clientX, e.clientY)}
+                onMouseUp={() => dragging.current = false}
+                onMouseLeave={() => dragging.current = false}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <div className="tree-canvas" style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})` }}>
+                  <TreeNode data={familyData} onSelect={setSelectedPerson} />
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    };
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
