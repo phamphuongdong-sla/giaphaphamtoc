@@ -1060,7 +1060,104 @@
       opacity: .75;
     }
 
-    /* Divider ornament */
+    /* ─── Splash Screen ─── */
+    .splash {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: linear-gradient(160deg, var(--lacquer-d) 0%, #2a0e09 50%, #1a0a06 100%);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .splash-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(184,137,60,.18) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 30% at 50% 110%, rgba(123,45,36,.4) 0%, transparent 70%);
+    }
+    .splash-pattern {
+      position: absolute; inset: 0; pointer-events: none; opacity: .06;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L55 30 L30 55 L5 30 Z' fill='none' stroke='%23dbb96a' stroke-width='0.5'/%3E%3C/svg%3E");
+    }
+    .splash-crest {
+      position: relative; z-index: 1;
+      width: 110px; height: 110px; border-radius: 50%;
+      background: conic-gradient(from 0deg, #c8a040, #f0d070, #b07820, #f0d070, #c8a040);
+      display: grid; place-items: center;
+      box-shadow: 0 0 0 8px rgba(184,137,60,.12), 0 0 0 16px rgba(184,137,60,.06), 0 20px 60px rgba(0,0,0,.5);
+      animation: splash-pulse 3s ease-in-out infinite;
+    }
+    @keyframes splash-pulse {
+      0%, 100% { box-shadow: 0 0 0 8px rgba(184,137,60,.12), 0 0 0 16px rgba(184,137,60,.06), 0 20px 60px rgba(0,0,0,.5); }
+      50%       { box-shadow: 0 0 0 11px rgba(184,137,60,.18), 0 0 0 24px rgba(184,137,60,.07), 0 20px 60px rgba(0,0,0,.5); }
+    }
+    .splash-crest::before {
+      content: ""; position: absolute; inset: 5px; border-radius: 50%;
+      background: radial-gradient(circle at 38% 35%, #e8c060, #7a4010);
+    }
+    .splash-crest-icon { position: relative; z-index: 1; color: #fff8e0; filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+    .splash-content {
+      position: relative; z-index: 1; text-align: center;
+      margin-top: 32px; padding: 0 32px;
+      animation: splash-up .8s cubic-bezier(.22,.68,0,1.1) .1s both;
+    }
+    @keyframes splash-up { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+    .splash-kicker { font-size: 10px; font-weight: 900; letter-spacing: .3em; text-transform: uppercase; color: rgba(219,185,106,.55); margin-bottom: 10px; }
+    .splash-title { font-family: "Cormorant Garamond", serif; font-size: clamp(32px,7vw,46px); font-weight: 700; line-height: 1.1; color: var(--gold-pale); letter-spacing: .04em; text-shadow: 0 4px 20px rgba(0,0,0,.4); }
+    .splash-divider { margin: 18px auto; width: 60px; height: 1px; background: linear-gradient(90deg, transparent, rgba(184,137,60,.6), transparent); position: relative; }
+    .splash-divider::before { content: "❖"; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: rgba(184,137,60,.7); font-size: 12px; background: #2a0e09; padding: 0 6px; }
+    .splash-year { font-size: 12px; font-weight: 600; color: rgba(240,221,176,.5); letter-spacing: .15em; margin-bottom: 14px; }
+    .splash-quote { font-family: "Cormorant Garamond", serif; font-size: 14px; font-style: italic; line-height: 1.8; color: rgba(240,221,176,.65); max-width: 280px; margin: 0 auto 32px; }
+    .splash-enter {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 46px; padding: 0 28px; border-radius: 999px;
+      background: linear-gradient(135deg, rgba(184,137,60,.25), rgba(184,137,60,.12));
+      border: 1px solid rgba(184,137,60,.35); color: var(--gold-l);
+      font-size: 11px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); transition: all .2s;
+      animation: splash-up .8s cubic-bezier(.22,.68,0,1.1) .4s both;
+    }
+    .splash-enter:hover { background: linear-gradient(135deg, rgba(184,137,60,.38), rgba(184,137,60,.2)); border-color: rgba(184,137,60,.55); }
+    .splash-hint { position: absolute; bottom: 28px; left: 0; right: 0; text-align: center; font-size: 10px; font-weight: 600; color: rgba(240,221,176,.22); letter-spacing: .08em; animation: splash-up .8s ease .7s both; }
+    .splash-exit { animation: splash-fade-out .5s ease both; }
+    @keyframes splash-fade-out { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(1.03); } }
+
+    /* ─── Tab Lịch ─── */
+    .lich-scroll { position: absolute; inset: 0; overflow-y: auto; padding: 16px 12px 80px; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(184,137,60,.3) transparent; }
+    .lich-scroll::-webkit-scrollbar { width: 5px; }
+    .lich-scroll::-webkit-scrollbar-thumb { background: rgba(184,137,60,.3); border-radius: 4px; }
+    .lich-inner { width: min(860px,100%); margin: 0 auto; }
+    .lich-year-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .lich-year-btn { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; background: var(--cream); border: 1px solid rgba(184,137,60,.15); color: var(--lacquer); box-shadow: var(--shadow-sm); transition: all .16s; }
+    .lich-year-btn:hover { background: rgba(184,137,60,.08); }
+    .lich-year-label { font-family: "Cormorant Garamond", serif; font-size: 20px; font-weight: 700; color: var(--lacquer-d); }
+    .lich-tab-row { display: grid; grid-template-columns: repeat(6,1fr); gap: 5px; margin-bottom: 14px; }
+    .lich-tab-btn { height: 36px; border-radius: 10px; font-size: 10.5px; font-weight: 800; background: var(--cream); border: 1px solid rgba(184,137,60,.12); color: var(--muted); transition: all .15s; position: relative; }
+    .lich-tab-btn:hover { border-color: rgba(184,137,60,.28); color: var(--lacquer); }
+    .lich-tab-btn.active { background: linear-gradient(135deg,var(--lacquer),#9a3a2e); border-color: transparent; color: var(--gold-pale); box-shadow: 0 4px 12px rgba(123,45,36,.22); }
+    .lich-tab-btn .dot { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+    .lich-tab-btn.active .dot { background: rgba(240,221,176,.7); }
+    .lich-section { margin-bottom: 10px; }
+    .lich-section-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px 12px 0 0; font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .lich-section-head.gio { background: linear-gradient(135deg,var(--lacquer-d),var(--lacquer)); color: var(--gold-pale); }
+    .lich-section-head.sinh { background: linear-gradient(135deg,#1a5a3a,#1f7a4a); color: #d4f5e4; }
+    .lich-rows { border-radius: 0 0 12px 12px; overflow: hidden; border: 1px solid rgba(184,137,60,.1); border-top: none; }
+    .lich-row { display: grid; grid-template-columns: 52px minmax(0,1fr) auto; gap: 10px; align-items: center; padding: 11px 13px; background: var(--cream); border-bottom: 1px solid rgba(184,137,60,.07); transition: background .14s; }
+    .lich-row:last-child { border-bottom: none; }
+    .lich-row:hover { background: rgba(184,137,60,.05); }
+    .lich-day { display: flex; flex-direction: column; align-items: center; padding: 6px 4px; border-radius: 10px; background: rgba(184,137,60,.08); border: 1px solid rgba(184,137,60,.12); }
+    .lich-day-num { font-size: 17px; font-weight: 900; color: var(--lacquer); line-height: 1; }
+    .lich-day-label { font-size: 8.5px; font-weight: 800; color: var(--muted); margin-top: 2px; letter-spacing: .04em; text-transform: uppercase; }
+    .lich-name { font-size: 12.5px; font-weight: 800; color: var(--ink-soft); line-height: 1.3; }
+    .lich-meta { font-size: 10px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+    .lich-days-badge { padding: 4px 9px; border-radius: 999px; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    .lich-days-badge.past   { background: rgba(28,21,16,.05); color: var(--muted); }
+    .lich-days-badge.soon   { background: rgba(123,45,36,.1); color: var(--lacquer); border: 1px solid rgba(123,45,36,.15); }
+    .lich-days-badge.today  { background: var(--lacquer); color: var(--gold-pale); }
+    .lich-days-badge.future { background: rgba(184,137,60,.1); color: var(--gold); border: 1px solid rgba(184,137,60,.15); }
+    .lich-empty { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 12.5px; font-weight: 600; font-style: italic; }
+
+    /* ─── Ornament Divider */
     .ornament-divider {
       display: flex; align-items: center; gap: 10px;
       margin: 4px 0 10px; color: rgba(184,137,60,.4);
@@ -1789,6 +1886,46 @@
       });
       return list.sort((a, b) => a.days - b.days);
     };
+
+    const getAllLichData = (treeData, year) => {
+      // year = dương lịch để quy chiếu, trả về mảng sự kiện có tháng âm lịch
+      const gio = [];
+      const sinh = [];
+      const todayJdn = VietnameseLunarCalendar.jdFromDate(
+        new Date().getDate(), new Date().getMonth() + 1, new Date().getFullYear()
+      );
+      visitTree(treeData, null, null, 1, (node, parentNode, grandparentNode, gen) => {
+        const fullName = describeNode(node, parentNode, grandparentNode, gen);
+        // Giỗ — theo âm lịch
+        if (node.deathLunar?.d && node.deathLunar?.m) {
+          const d = node.deathLunar;
+          // thử chuyển sang dương lịch trong năm được chọn
+          const solar = VietnameseLunarCalendar.lunarToSolar(d.d, d.m, year, d.leap || false, VN_TIMEZONE);
+          if (solar) {
+            const jdn = VietnameseLunarCalendar.jdFromDate(solar.d, solar.m, solar.y);
+            const days = jdn - todayJdn;
+            gio.push({
+              fullName, lunarDay: d.d, lunarMonth: d.m,
+              solarDay: solar.d, solarMonth: solar.m, solarYear: solar.y,
+              days, type: "gio"
+            });
+          }
+        }
+        // Sinh nhật — theo dương lịch
+        if (!node.deceased && node.birthSolar?.d && node.birthSolar?.m) {
+          const b = node.birthSolar;
+          const targetYear = year;
+          const jdn = VietnameseLunarCalendar.jdFromDate(b.d, b.m, targetYear);
+          const days = jdn - todayJdn;
+          sinh.push({
+            fullName, lunarDay: null, lunarMonth: null,
+            solarDay: b.d, solarMonth: b.m, solarYear: targetYear,
+            days, type: "sinh"
+          });
+        }
+      });
+      return { gio, sinh };
+    };
     const Icon = ({ name, size = 16, className = "" }) => {
       useEffect(() => { window.lucide?.createIcons(); }, [name]);
       return <i data-lucide={name} className={className} style={{ width: size, height: size, display: "inline-block" }} />;
@@ -2231,7 +2368,11 @@
     };
 
     const App = () => {
+      const [splash, setSplash] = useState(true);
+      const [splashExit, setSplashExit] = useState(false);
       const [viewMode, setViewMode] = useState("list");
+      const [lichYear, setLichYear] = useState(new Date().getFullYear());
+      const [lichMonth, setLichMonth] = useState(new Date().getMonth() + 1);
       const [scale, setScale] = useState(.48);
       const [pos, setPos] = useState({ x: 0, y: 72 });
       const [allOpen, setAllOpen] = useState(null);
@@ -2252,6 +2393,13 @@
         if (!terms.length) return [];
         return memberEntries.filter((item) => terms.every((term) => item.searchText.includes(term)));
       }, [memberEntries, searchQuery]);
+
+      const lichData = useMemo(() => getAllLichData(familyData, lichYear), [familyData, lichYear]);
+
+      const enterApp = () => {
+        setSplashExit(true);
+        setTimeout(() => setSplash(false), 500);
+      };
 
 
       useEffect(() => {
@@ -2297,6 +2445,32 @@
 
       return (
         <div className="shell">
+          {/* Splash Screen */}
+          {splash && (
+            <div className={`splash ${splashExit ? "splash-exit" : ""}`} onClick={enterApp}>
+              <div className="splash-bg" />
+              <div className="splash-pattern" />
+              <div className="splash-crest" style={{ animation: "splash-pulse 3s ease-in-out infinite" }}>
+                <span className="splash-crest-icon"><Icon name="scroll-text" size={44} /></span>
+              </div>
+              <div className="splash-content">
+                <p className="splash-kicker">Gia tộc · Truyền thống · Tâm linh</p>
+                <h1 className="splash-title">Gia Phả<br/>Phạm Tộc</h1>
+                <div className="splash-divider" />
+                <p className="splash-year">THỦY TỔ 1891 · TÂN MÃO</p>
+                <p className="splash-quote">
+                  "Uống nước nhớ nguồn,<br/>
+                  ăn quả nhớ kẻ trồng cây."
+                </p>
+                <button className="splash-enter" onClick={enterApp}>
+                  <Icon name="door-open" size={16} />
+                  Vào gia phả
+                </button>
+              </div>
+              <p className="splash-hint">Chạm màn hình để tiếp tục</p>
+            </div>
+          )}
+
           <PersonDetailModal person={selectedPerson} onClose={() => setSelectedPerson(null)} />
 
           {/* Reminder Modal */}
@@ -2350,8 +2524,11 @@
               <button className={viewMode === "list" ? "active" : ""} onClick={() => setViewMode("list")}>
                 Danh sách
               </button>
+              <button className={viewMode === "lich" ? "active" : ""} onClick={() => setViewMode("lich")}>
+                Lịch giỗ
+              </button>
               <button className={viewMode === "tree" ? "active" : ""} onClick={() => setViewMode("tree")}>
-                Sơ đồ cây
+                Sơ đồ
               </button>
             </nav>
           </header>
@@ -2406,6 +2583,91 @@
                     onSelect={setSelectedPerson}
                   />
                   <MemberItem data={familyData} forceOpen={allOpen} onSelect={setSelectedPerson} />
+                </div>
+              </div>
+            ) : viewMode === "lich" ? (
+              <div className="lich-scroll">
+                <div className="lich-inner">
+                  <div className="toolbar">
+                    <div>
+                      <p className="section-kicker">Âm lịch · Dương lịch</p>
+                      <h2 className="section-title font-display">Lịch giỗ & Sinh nhật</h2>
+                    </div>
+                  </div>
+                  <div className="lich-year-nav">
+                    <button className="lich-year-btn" onClick={() => setLichYear(y => y - 1)}><Icon name="chevron-left" size={18} /></button>
+                    <span className="lich-year-label">Năm {lichYear}</span>
+                    <button className="lich-year-btn" onClick={() => setLichYear(y => y + 1)}><Icon name="chevron-right" size={18} /></button>
+                  </div>
+                  <div className="lich-tab-row">
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const m = i + 1;
+                      const hasGio  = lichData.gio.some(e => e.solarMonth === m);
+                      const hasSinh = lichData.sinh.some(e => e.solarMonth === m);
+                      return (
+                        <button key={m} className={`lich-tab-btn ${lichMonth === m ? "active" : ""}`} onClick={() => setLichMonth(m)}>
+                          Th.{m}
+                          {(hasGio || hasSinh) && <span className="dot" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {(() => {
+                    const gioThisMonth = lichData.gio.filter(e => e.solarMonth === lichMonth).sort((a,b) => a.solarDay - b.solarDay);
+                    const sinhThisMonth = lichData.sinh.filter(e => e.solarMonth === lichMonth).sort((a,b) => a.solarDay - b.solarDay);
+                    const getBadge = (e) => {
+                      if (e.days === 0)              return { cls: "today",  label: "Hôm nay" };
+                      if (e.days > 0 && e.days <= 7) return { cls: "soon",   label: `${e.days} ngày nữa` };
+                      if (e.days > 0)                return { cls: "future", label: `${e.days} ngày nữa` };
+                      return { cls: "past", label: "Đã qua" };
+                    };
+                    const LichRow = ({ e }) => {
+                      const badge = getBadge(e);
+                      return (
+                        <div className="lich-row">
+                          <div className="lich-day">
+                            <span className="lich-day-num">{e.solarDay}</span>
+                            <span className="lich-day-label">Th.{e.solarMonth}</span>
+                          </div>
+                          <div>
+                            <p className="lich-name font-serif">{e.fullName}</p>
+                            <p className="lich-meta">
+                              {e.type === "gio" ? `Âm lịch: ${e.lunarDay}/${e.lunarMonth}` : `Dương lịch: ${e.solarDay}/${e.solarMonth}/${e.solarYear}`}
+                            </p>
+                          </div>
+                          <span className={`lich-days-badge ${badge.cls}`}>{badge.label}</span>
+                        </div>
+                      );
+                    };
+                    return (
+                      <>
+                        <div className="lich-section">
+                          <div className="lich-section-head gio">
+                            <Icon name="moon" size={13} />
+                            Ngày giỗ · Tháng {lichMonth} · {gioThisMonth.length} ngày
+                          </div>
+                          <div className="lich-rows">
+                            {gioThisMonth.length
+                              ? gioThisMonth.map((e,i) => <LichRow key={i} e={e} />)
+                              : <p className="lich-empty">Không có ngày giỗ trong tháng này</p>
+                            }
+                          </div>
+                        </div>
+                        <div className="lich-section">
+                          <div className="lich-section-head sinh">
+                            <Icon name="cake" size={13} />
+                            Sinh nhật · Tháng {lichMonth} · {sinhThisMonth.length} người
+                          </div>
+                          <div className="lich-rows">
+                            {sinhThisMonth.length
+                              ? sinhThisMonth.map((e,i) => <LichRow key={i} e={e} />)
+                              : <p className="lich-empty">Không có sinh nhật trong tháng này</p>
+                            }
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             ) : (
