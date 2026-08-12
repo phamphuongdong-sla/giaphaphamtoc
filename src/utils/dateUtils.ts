@@ -1,4 +1,8 @@
 import { DateInfo } from '@/types';
+import {
+  solarToLunar as _solarToLunar,
+  lunarToSolar as _lunarToSolar,
+} from '@baostudio/viet-lunar';
 
 export const CAN = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
 export const CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
@@ -8,50 +12,18 @@ export const getCanChiYear = (year: number): string => {
   const chi = CHI[(year + 8) % 12];
   return `${can} ${chi}`;
 };
+
 const VN_TIMEZONE = 7;
-const INT = Math.floor;
-const PI = Math.PI;
 
-// ===== JULIAN DATE FUNCTIONS =====
-export const jdFromDate = (dd: number, mm: number, yy: number): number => {
-  const a = INT((14 - mm) / 12);
-  const y = yy + 4800 - a;
-  const m = mm + 12 * a - 3;
-  let jd = dd + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - INT(y / 100) + INT(y / 400) - 32045;
-  if (jd < 2299161) {
-    jd = dd + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - 32083;
-  }
-  return jd;
-};
-
-export const jdToDate = (jd: number): { d: number; m: number; y: number } => {
-  let a, b, c;
-  if (jd > 2299160) {
-    a = jd + 32044;
-    b = INT((4 * a + 3) / 146097);
-    c = a - INT((b * 146097) / 4);
-  } else {
-    b = 0;
-    c = jd + 32082;
-  }
-  const d = INT((4 * c + 3) / 1461);
-  const e = c - INT((1461 * d) / 4);
-  const m = INT((5 * e + 2) / 153);
-  const day = e - INT((153 * m + 2) / 5) + 1;
-  const month = m + 3 - 12 * INT(m / 10);
-  const year = b * 100 + d - 4800 + INT(m / 10);
-  return { d: day, m: month, y: year };
-};
-
-// ===== PUBLIC LUNAR FUNCTIONS =====
-export const solarToLunar = (dd: number, mm: number, yy: number, timeZone: number = VN_TIMEZONE): {
+// ===== PUBLIC LUNAR FUNCTIONS (dùng @baostudio/viet-lunar - chuẩn múi giờ Việt Nam) =====
+export const solarToLunar = (dd: number, mm: number, yy: number, _timeZone: number = VN_TIMEZONE): {
   d: number;
   m: number;
   y: number;
   leap: boolean;
 } => {
-  const lunar = getLunarDate(dd, mm, yy);
-  return { d: lunar.day, m: lunar.month, y: lunar.year, leap: lunar.leap };
+  const lunar = _solarToLunar({ day: dd, month: mm, year: yy });
+  return { d: lunar.day, m: lunar.month, y: lunar.year, leap: lunar.leapMonth };
 };
 
 export const lunarToSolar = (
@@ -59,13 +31,13 @@ export const lunarToSolar = (
   lunarMonth: number,
   lunarYear: number,
   lunarLeap: boolean = false,
-  timeZone: number = VN_TIMEZONE
+  _timeZone: number = VN_TIMEZONE
 ): { d: number; m: number; y: number } | null => {
   try {
-    const solar = getSolarDate(lunarDay, lunarMonth, lunarYear, lunarLeap);
+    const solar = _lunarToSolar({ day: lunarDay, month: lunarMonth, year: lunarYear, leapMonth: lunarLeap });
     if (!solar || !solar.day) return null;
     return { d: solar.day, m: solar.month, y: solar.year };
-  } catch (err) {
+  } catch {
     return null;
   }
 };
@@ -73,7 +45,7 @@ export const lunarToSolar = (
 // ===== GET TODAY LUNAR =====
 export const getLunarToday = (): { d: number; m: number; y: number; leap: boolean; label: string } => {
   const current = new Date();
-  const lunar = solarToLunar(current.getDate(), current.getMonth() + 1, current.getFullYear(), VN_TIMEZONE);
+  const lunar = solarToLunar(current.getDate(), current.getMonth() + 1, current.getFullYear());
   return {
     ...lunar,
     label: `${lunar.d}/${lunar.m}${lunar.leap ? ' nhuận' : ''}/${lunar.y} Âm lịch`
@@ -167,27 +139,27 @@ export const getDaysUntilLunarAnniversary = (lunarDay: number, lunarMonth: numbe
   today.setHours(0, 0, 0, 0);
 
   // 1. Chuyển đổi ngày Dương lịch hôm nay sang Âm lịch để lấy năm Âm lịch hiện hành
-  const currentLunar = solarToLunar(today.getDate(), today.getMonth() + 1, today.getFullYear(), VN_TIMEZONE);
+  const currentLunar = solarToLunar(today.getDate(), today.getMonth() + 1, today.getFullYear());
   let targetLunarYear = currentLunar.y;
 
   // 2. Thử tìm ngày Dương lịch tương ứng của ngày giỗ trong năm Âm lịch này
-  let targetSolarObj = lunarToSolar(lunarDay, lunarMonth, targetLunarYear, false, VN_TIMEZONE);
+  let targetSolarObj = lunarToSolar(lunarDay, lunarMonth, targetLunarYear, false);
   if (!targetSolarObj) return -1;
 
   let targetSolarDate = new Date(targetSolarObj.y, targetSolarObj.m - 1, targetSolarObj.d);
   targetSolarDate.setHours(0, 0, 0, 0);
 
-  // 3. Nếu ngày giỗ Âm lịch của năm nay đã qua mất rồi, ta phải lấy ngày giỗ của năm Âm lịch kế tiếp (năm sau)
+  // 3. Nếu ngày giỗ Âm lịch của năm nay đã qua, lấy ngày giỗ của năm Âm lịch kế tiếp
   if (targetSolarDate < today) {
     targetLunarYear += 1;
-    targetSolarObj = lunarToSolar(lunarDay, lunarMonth, targetLunarYear, false, VN_TIMEZONE);
+    targetSolarObj = lunarToSolar(lunarDay, lunarMonth, targetLunarYear, false);
     if (targetSolarObj) {
       targetSolarDate = new Date(targetSolarObj.y, targetSolarObj.m - 1, targetSolarObj.d);
       targetSolarDate.setHours(0, 0, 0, 0);
     }
   }
 
-  // 4. Tính khoảng cách số ngày thực tế giữa ngày Dương lịch đó với hôm nay
+  // 4. Tính khoảng cách số ngày thực tế
   const diffTime = targetSolarDate.getTime() - today.getTime();
-  return Math.round(diffTime / (1000 * 60 * 60 * 24)); 
+  return Math.round(diffTime / (1000 * 60 * 60 * 24));
 };
