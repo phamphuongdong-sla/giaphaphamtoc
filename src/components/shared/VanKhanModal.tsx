@@ -267,13 +267,13 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             </button>
           </div>
 
-          {/* Hàng 2: Danh mục văn khấn vuốt ngang */}
+          {/* Hàng 2: Danh mục văn khấn tự động sắp xếp gọn gàng không bị tràn màn hình */}
           <div style={{ 
             display: 'flex', 
+            flexWrap: 'wrap',
             gap: 6, 
-            overflowX: 'auto', 
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch',
+            width: '100%',
+            boxSizing: 'border-box',
             paddingBottom: 2
           }}>
             {[
@@ -287,13 +287,15 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  padding: '6px 14px',
+                  flex: '1 1 auto',
+                  minWidth: '85px',
+                  textAlign: 'center',
+                  padding: '7px 10px',
                   borderRadius: 8,
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: activeTab === tab.id ? 700 : 500,
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
-                  flexShrink: 0,
                   border: activeTab === tab.id ? '1px solid var(--gold)' : '1px solid rgba(255,255,255,0.08)',
                   background: activeTab === tab.id ? 'rgba(201,146,58,0.25)' : 'rgba(255,255,255,0.04)',
                   color: activeTab === tab.id ? 'var(--gold-light)' : 'var(--text-muted)',
