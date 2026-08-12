@@ -11,6 +11,7 @@ import { Icon } from './components/ui/Icon';
 import { InstallPrompt } from './components/shared/InstallPrompt';
 import { useNotificationSettings } from './hooks/useNotificationSettings';
 import { ManageAuthModal } from './components/shared/ManageAuthModal';
+import { VanKhanModal } from './components/shared/VanKhanModal';
 import { MemberEntry } from './types';
 import './styles/index.css';
 
@@ -29,6 +30,7 @@ function App() {
   const [showReminderModal, setShowReminderModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
+  const [showVanKhanModal, setShowVanKhanModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
@@ -288,6 +290,10 @@ function App() {
         <RulesModal onClose={() => setShowRulesModal(false)} />
       )}
 
+      {showVanKhanModal && (
+        <VanKhanModal onClose={() => setShowVanKhanModal(false)} />
+      )}
+
       <ManageAuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
@@ -310,6 +316,7 @@ function App() {
         onOpenSettings={() => setShowSettingsModal(true)}
         onOpenManage={handleOpenManage}
         onOpenRules={() => setShowRulesModal(true)}
+        onOpenVanKhan={() => setShowVanKhanModal(true)}
       />
 
       <NoticeBar birthdays={birthdays} onSelectPerson={setSelectedPerson} />

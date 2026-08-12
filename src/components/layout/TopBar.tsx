@@ -12,10 +12,11 @@ interface TopBarProps {
   onOpenSettings: () => void;
   onOpenManage: () => void;
   onOpenRules?: () => void;
+  onOpenVanKhan?: () => void;
   onOpenExport?: () => void;
 }
 
-export const TopBar = ({ viewMode, onViewChange, lunarLabel, solarLabel, theme, onThemeChange, remindersCount, onOpenReminders, onOpenSettings, onOpenManage, onOpenRules, onOpenExport: _onOpenExport }: TopBarProps) => {
+export const TopBar = ({ viewMode, onViewChange, lunarLabel, solarLabel, theme, onThemeChange, remindersCount, onOpenReminders, onOpenSettings, onOpenManage, onOpenRules, onOpenVanKhan, onOpenExport: _onOpenExport }: TopBarProps) => {
   const solarDate = solarLabel || new Date().toLocaleDateString('vi-VN', {
     day: '2-digit', month: '2-digit', year: 'numeric',
   });
@@ -84,6 +85,16 @@ export const TopBar = ({ viewMode, onViewChange, lunarLabel, solarLabel, theme, 
       </nav>
 
       <div className="topbar-tools">
+        {onOpenVanKhan && (
+          <button 
+            className="theme-toggle" 
+            onClick={onOpenVanKhan}
+            aria-label="Tủ Sách Văn Khấn Cổ Truyền"
+            title="Tủ Sách Văn Khấn Cổ Truyền"
+          >
+            <Icon name="notebook-text" size={15} />
+          </button>
+        )}
         {onOpenRules && (
           <button 
             className="theme-toggle" 
