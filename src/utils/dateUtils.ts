@@ -43,69 +43,6 @@ export const jdToDate = (jd: number): { d: number; m: number; y: number } => {
   return { d: day, m: month, y: year };
 };
 
-// ===== LUNAR CALCULATION FUNCTIONS =====
-export const newMoon = (k: number): number => {
-  const t = k / 1236.85;
-  const t2 = t * t;
-  const t3 = t2 * t;
-  const dr = PI / 180;
-  let jd1 = 2415020.75933 + 29.53058868 * k + 0.0001178 * t2 - 0.000000155 * t3;
-  jd1 += 0.00033 * Math.sin((166.56 + 132.87 * t - 0.009173 * t2) * dr);
-  const m = 359.2242 + 29.10535608 * k - 0.0000333 * t2 - 0.00000347 * t3;
-  const mpr = 306.0253 + 385.81691806 * k + 0.0107306 * t2 + 0.00001236 * t3;
-  const f = 21.2964 + 390.67050646 * k - 0.0016528 * t2 - 0.00000239 * t3;
-  let c1 = (0.1734 - 0.000393 * t) * Math.sin(m * dr) + 0.0021 * Math.sin(2 * dr * m);
-  c1 -= 0.4068 * Math.sin(mpr * dr) + 0.0161 * Math.sin(2 * dr * mpr);
-  c1 -= 0.0004 * Math.sin(3 * dr * mpr);
-  c1 += 0.0104 * Math.sin(2 * dr * f) - 0.0051 * Math.sin((m + mpr) * dr);
-  c1 -= 0.0074 * Math.sin((m - mpr) * dr) + 0.0004 * Math.sin((2 * f + m) * dr);
-  c1 -= 0.0004 * Math.sin((2 * f - m) * dr) - 0.0006 * Math.sin((2 * f + mpr) * dr);
-  c1 += 0.0010 * Math.sin((2 * f - mpr) * dr) + 0.0005 * Math.sin((2 * mpr + m) * dr);
-  const deltaT = t < -11
-    ? 0.001 + 0.000839 * t + 0.0002261 * t2 - 0.00000845 * t3 - 0.000000081 * t * t3
-    : -0.000278 + 0.000265 * t + 0.000262 * t2;
-  return jd1 + c1 - deltaT;
-};
-
-export const getNewMoonDay = (k: number, timeZone: number): number => {
-  return INT(newMoon(k) + 0.5 + timeZone / 24);
-};
-
-const getSunLongitude = (jdn: number, timeZone: number): number => {
-  const t = (jdn - 2451545.5 - timeZone / 24) / 36525;
-  const t2 = t * t;
-  const dr = PI / 180;
-  const m = 357.52910 + 35999.05030 * t - 0.0001559 * t2 - 0.00000048 * t * t2;
-  const l0 = 280.46645 + 36000.76983 * t + 0.0003032 * t2;
-  let dl = (1.914600 - 0.004817 * t - 0.000014 * t2) * Math.sin(dr * m);
-  dl += (0.019993 - 0.000101 * t) * Math.sin(2 * dr * m) + 0.000290 * Math.sin(3 * dr * m);
-  let l = (l0 + dl) * dr;
-  l -= PI * 2 * INT(l / (PI * 2));
-  return INT(l / PI * 6);
-};
-
-export const getLunarMonth11 = (yy: number, timeZone: number): number => {
-  const off = jdFromDate(31, 12, yy) - 2415021;
-  const k = INT(off / 29.530588853);
-  let nm = getNewMoonDay(k, timeZone);
-  const sunLong = getSunLongitude(nm, timeZone);
-  if (sunLong >= 9) nm = getNewMoonDay(k - 1, timeZone);
-  return nm;
-};
-
-export const getLeapMonthOffset = (a11: number, timeZone: number): number => {
-  const k = INT((a11 - 2415021.076998695) / 29.530588853 + 0.5);
-  let last = 0;
-  let i = 1;
-  let arc = getSunLongitude(getNewMoonDay(k + i, timeZone), timeZone);
-  do {
-    last = arc;
-    i += 1;
-    arc = getSunLongitude(getNewMoonDay(k + i, timeZone), timeZone);
-  } while (arc !== last && i < 14);
-  return i - 1;
-};
-
 // ===== PUBLIC LUNAR FUNCTIONS =====
 export const solarToLunar = (dd: number, mm: number, yy: number, timeZone: number = VN_TIMEZONE): {
   d: number;
@@ -113,34 +50,8 @@ export const solarToLunar = (dd: number, mm: number, yy: number, timeZone: numbe
   y: number;
   leap: boolean;
 } => {
-  const dayNumber = jdFromDate(dd, mm, yy);
-  const k = INT((dayNumber - 2415021.076998695) / 29.530588853);
-  let monthStart = getNewMoonDay(k + 1, timeZone);
-  if (monthStart > dayNumber) monthStart = getNewMoonDay(k, timeZone);
-  let a11 = getLunarMonth11(yy, timeZone);
-  let b11 = a11;
-  let lunarYear;
-  if (a11 >= monthStart) {
-    lunarYear = yy;
-    a11 = getLunarMonth11(yy - 1, timeZone);
-  } else {
-    lunarYear = yy + 1;
-    b11 = getLunarMonth11(yy + 1, timeZone);
-  }
-  const lunarDay = dayNumber - monthStart + 1;
-  const diff = INT((monthStart - a11) / 29);
-  let lunarLeap = false;
-  let lunarMonth = diff + 11;
-  if (b11 - a11 > 365) {
-    const leapMonthDiff = getLeapMonthOffset(a11, timeZone);
-    if (diff >= leapMonthDiff) {
-      lunarMonth = diff + 10;
-      if (diff === leapMonthDiff) lunarLeap = true;
-    }
-  }
-  if (lunarMonth > 12) lunarMonth -= 12;
-  if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
-  return { d: lunarDay, m: lunarMonth, y: lunarYear || 0, leap: lunarLeap };
+  const lunar = getLunarDate(dd, mm, yy);
+  return { d: lunar.day, m: lunar.month, y: lunar.year, leap: lunar.leap };
 };
 
 export const lunarToSolar = (
@@ -150,25 +61,13 @@ export const lunarToSolar = (
   lunarLeap: boolean = false,
   timeZone: number = VN_TIMEZONE
 ): { d: number; m: number; y: number } | null => {
-  let a11, b11;
-  if (lunarMonth < 11) {
-    a11 = getLunarMonth11(lunarYear - 1, timeZone);
-    b11 = getLunarMonth11(lunarYear, timeZone);
-  } else {
-    a11 = getLunarMonth11(lunarYear, timeZone);
-    b11 = getLunarMonth11(lunarYear + 1, timeZone);
+  try {
+    const solar = getSolarDate(lunarDay, lunarMonth, lunarYear, lunarLeap);
+    if (!solar || !solar.day) return null;
+    return { d: solar.day, m: solar.month, y: solar.year };
+  } catch (err) {
+    return null;
   }
-  const k = INT(0.5 + (a11 - 2415021.076998695) / 29.530588853);
-  let off = lunarMonth - 11;
-  if (off < 0) off += 12;
-  if (b11 - a11 > 365) {
-    const leapOff = getLeapMonthOffset(a11, timeZone);
-    let leapMonth = leapOff - 2;
-    if (leapMonth <= 0) leapMonth += 12;
-    if (lunarLeap && lunarMonth !== leapMonth) return null;
-    if (lunarLeap || off >= leapOff) off += 1;
-  }
-  return jdToDate(getNewMoonDay(k + off, timeZone) + lunarDay - 1);
 };
 
 // ===== GET TODAY LUNAR =====
