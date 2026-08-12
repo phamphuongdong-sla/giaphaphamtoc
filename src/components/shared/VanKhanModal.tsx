@@ -223,8 +223,8 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const lunarMonthStr = String(todayLunarObj.m).padStart(2, '0');
   const lunarDayStr = String(todayLunarObj.d).padStart(2, '0');
 
-  const handleCopy = (id: string, rawContent: string) => {
-    const finalContent = getProcessedContent(rawContent);
+  const handleCopy = (id: string, rawContent: string, category?: string) => {
+    const finalContent = getProcessedContent(rawContent, category);
     navigator.clipboard.writeText(finalContent).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2500);
@@ -239,9 +239,36 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     setFontSize((prev) => Math.max(prev - 2, 16));
   };
 
-  // Tự động gán ngày Âm lịch vào TẤT CẢ các bài văn khấn theo xưng hô phong tục Việt Nam
-  const getProcessedContent = (content: string) => {
+  // === Logic ngày & nhấp nháy ===
+  const ld = todayLunarObj.d;
+  const lm = todayLunarObj.m;
+
+  // Đúng ngày Rằm (15) hoặc Mùng 1 (1)
+  const isMung1Today = ld === 1;
+  const isRamToday   = ld === 15;
+  // Đúng dịp Tết: ngày 30 tháng Chạp hoặc Mùng 1 Tết
+  const isTetToday = (lm === 12 && ld >= 29) || (lm === 1 && ld === 1);
+
+  // Nhấp nháy trước 3 ngày
+  const isRamSoon   = ld >= 12 && ld <= 14;   // ngày 12,13,14 → Rằm sắp
+  const isMung1Soon = ld >= 28;               // ngày 28,29,30 → Mùng 1 sắp
+  const isTetSoon   = lm === 12 && ld >= 27;  // 27-30 Chạp → Tết sắp
+
+  // Kiểm tra bài khấn có nhấp nháy không
+  const shouldBlink = (category: string): boolean => {
+    if (category === 'ram') return isRamSoon || isMung1Soon || isMung1Today || isRamToday;
+    if (category === 'tet') return isTetSoon || isTetToday;
+    return false;
+  };
+
+  // Tự động gán ngày Âm lịch vào bài văn khấn theo danh mục
+  const getProcessedContent = (content: string, category?: string) => {
     if (!autoFillDate) return content;
+
+    // Bài Rằm/Mùng 1: chỉ điền khi đúng ngày
+    if (category === 'ram' && !isMung1Today && !isRamToday) return content;
+    // Bài Tết: chỉ điền khi đúng dịp
+    if (category === 'tet' && !isTetToday) return content;
     
     const getLunarDayPhrase = (d: number) => {
       if (d === 1) return 'ngày Mùng 1';
@@ -521,7 +548,8 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
         }}>
           {filteredItems.map((item) => {
             const isCopied = copiedId === item.id;
-            const processedContent = getProcessedContent(item.content);
+            const blink = shouldBlink(item.category);
+            const processedContent = getProcessedContent(item.content, item.category);
             return (
               <div
                 key={item.id}
@@ -583,7 +611,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                       </button>
                       {/* Nút Sao chép */}
                       <button
-                        onClick={() => handleCopy(item.id, item.content)}
+                        onClick={() => handleCopy(item.id, item.content, item.category)}
                         title="Sao chép toàn bộ bài văn khấn này"
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: 5,
@@ -601,8 +629,14 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                     </div>
                   </div>
 
-                  {/* Hàng 2: Tên bài đầy đủ — rộng toàn dòng */}
-                  <h3 className="font-serif" style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.35 }}>
+                  {/* Hàng 2: Tên bài — nhấp nháy nếu sắp đến ngày đặc biệt */}
+                  <h3 className="font-serif" style={{
+                    margin: 0, fontSize: 13.5, fontWeight: 700,
+                    color: blink ? '#fef08a' : 'var(--gold-light)',
+                    lineHeight: 1.35,
+                    animation: blink ? 'vanKhanBlink 1.4s ease-in-out infinite' : 'none',
+                  }}>
+                    {blink && <span style={{ marginRight: 5 }}>🔔</span>}
                     {item.title}
                   </h3>
 
