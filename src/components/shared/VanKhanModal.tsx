@@ -602,7 +602,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                   </div>
 
                   {/* Hàng 2: Tên bài đầy đủ — rộng toàn dòng */}
-                  <h3 className="font-serif" style={{ margin: 0, fontSize: 16.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.35 }}>
+                  <h3 className="font-serif" style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.35 }}>
                     {item.title}
                   </h3>
 
@@ -655,65 +655,54 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            justify: 'space-between',
+            justifyContent: 'space-between',
             background: 'rgba(0,0,0,0.4)',
             border: '1px solid var(--border-gold)',
             borderRadius: 10,
             padding: '6px 10px',
-            gap: 10
+            gap: 8
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold-mid)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Icon name="type" size={14} /> Cỡ chữ:
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <Icon name="type" size={13} style={{ color: 'var(--gold-mid)' }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold-mid)' }}>Cỡ chữ:</span>
               <span style={{ 
-                fontSize: 13, 
-                fontWeight: 700, 
-                color: 'var(--gold-light)', 
-                background: 'rgba(201,146,58,0.25)', 
-                padding: '3px 10px', 
-                borderRadius: 6, 
-                border: '1px solid rgba(201,146,58,0.4)' 
+                fontSize: 12, fontWeight: 700, color: 'var(--gold-light)', 
+                background: 'rgba(201,146,58,0.25)', padding: '3px 8px', 
+                borderRadius: 6, border: '1px solid rgba(201,146,58,0.4)' 
               }}>
                 {fontSize}px
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <button
                 onClick={decreaseFontSize}
                 disabled={fontSize <= 16}
                 style={{
-                  background: fontSize <= 16 ? 'rgba(255,255,255,0.02)' : 'rgba(201,146,58,0.25)',
+                  background: fontSize <= 16 ? 'rgba(255,255,255,0.04)' : 'rgba(201,146,58,0.2)',
                   border: '1px solid ' + (fontSize <= 16 ? 'rgba(255,255,255,0.08)' : 'var(--border-gold)'),
-                  borderRadius: 8,
-                  color: fontSize <= 16 ? 'var(--text-muted)' : 'var(--gold-light)',
-                  fontSize: 14,
-                  fontWeight: 700,
+                  borderRadius: 8, color: fontSize <= 16 ? 'var(--text-muted)' : 'var(--gold-light)',
+                  fontSize: 12, fontWeight: 700,
                   cursor: fontSize <= 16 ? 'default' : 'pointer',
-                  padding: '6px 14px',
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
+                  padding: '5px 11px', height: 32,
+                  display: 'inline-flex', alignItems: 'center',
                   transition: 'all 0.15s ease'
                 }}
               >
-                A- (Nhỏ)
+                A- Nhỏ
               </button>
 
               <button
                 onClick={() => setFontSize(20)}
                 style={{
-                  background: fontSize === 20 ? 'var(--gold-mid)' : 'rgba(255,255,255,0.06)',
+                  background: fontSize === 20 ? 'rgba(201,146,58,0.35)' : 'rgba(255,255,255,0.06)',
                   border: '1px solid ' + (fontSize === 20 ? 'var(--gold)' : 'rgba(255,255,255,0.12)'),
                   borderRadius: 8,
-                  color: fontSize === 20 ? '#000000' : 'var(--text-muted)',
-                  fontSize: 12,
-                  fontWeight: 700,
+                  color: fontSize === 20 ? 'var(--gold-light)' : 'var(--text-muted)',
+                  fontSize: 12, fontWeight: 700,
                   cursor: 'pointer',
-                  padding: '6px 10px',
-                  height: 36
+                  padding: '5px 11px', height: 32,
+                  display: 'inline-flex', alignItems: 'center'
                 }}
               >
                 20px
@@ -723,23 +712,17 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 onClick={increaseFontSize}
                 disabled={fontSize >= 32}
                 style={{
-                  background: fontSize >= 32 ? 'rgba(255,255,255,0.02)' : 'rgba(201,146,58,0.3)',
+                  background: fontSize >= 32 ? 'rgba(255,255,255,0.04)' : 'rgba(201,146,58,0.25)',
                   border: '1px solid ' + (fontSize >= 32 ? 'rgba(255,255,255,0.08)' : 'var(--gold)'),
-                  borderRadius: 8,
-                  color: fontSize >= 32 ? 'var(--text-muted)' : '#ffffff',
-                  fontSize: 15,
-                  fontWeight: 800,
+                  borderRadius: 8, color: fontSize >= 32 ? 'var(--text-muted)' : '#ffffff',
+                  fontSize: 12, fontWeight: 700,
                   cursor: fontSize >= 32 ? 'default' : 'pointer',
-                  padding: '6px 16px',
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  boxShadow: fontSize < 32 ? '0 2px 8px rgba(201,146,58,0.3)' : 'none',
+                  padding: '5px 11px', height: 32,
+                  display: 'inline-flex', alignItems: 'center',
                   transition: 'all 0.15s ease'
                 }}
               >
-                A+ (To)
+                A+ To
               </button>
             </div>
           </div>
