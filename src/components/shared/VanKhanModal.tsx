@@ -4,6 +4,7 @@ import { getLunarToday, getCanChiYear } from '@/utils/dateUtils';
 
 interface VanKhanModalProps {
   onClose: () => void;
+  initialTab?: 'gio' | 'taomo' | 'tet' | 'ram' | 'quychinh';
 }
 
 interface VanKhanItem {
@@ -179,14 +180,19 @@ const renderFormattedContent = (content: string) => {
   );
 };
 
-export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
-  const [activeTab, setActiveTab] = useState<string>('gio');
+export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
+  const [activeTab, setActiveTab] = useState<string>(initialTab || 'gio');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<number>(20);
   const [autoFillDate, setAutoFillDate] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  // Lắng nghe sự kiện thoát Toàn màn hình từ phím ESC hoặc thao tác thiết bị
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
   useEffect(() => {
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement) {
@@ -203,7 +209,6 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
         document.documentElement.requestFullscreen().catch(() => {});
       }
       setIsFullscreen(true);
-      // Wake Lock API: Giữ điện thoại luôn sáng màn hình khi khấn
       if ('wakeLock' in navigator) {
         (navigator as any).wakeLock.request('screen').catch(() => {});
       }
@@ -221,8 +226,8 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const lunarMonthStr = String(todayLunarObj.m).padStart(2, '0');
   const lunarDayStr = String(todayLunarObj.d).padStart(2, '0');
 
-  const handleCopy = (id: string, rawContent: string) => {
-    const finalContent = getProcessedContent(rawContent);
+  const handleCopy = (id: string, rawItem: VanKhanItem) => {
+    const finalContent = getProcessedContent(rawItem);
     navigator.clipboard.writeText(finalContent).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2500);
@@ -237,8 +242,9 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     setFontSize((prev) => Math.max(prev - 2, 16));
   };
 
-  // Tự động gán ngày Âm lịch vào TẤT CẢ các bài văn khấn theo xưng hô phong tục Việt Nam
-  const getProcessedContent = (content: string) => {
+  // Tự động gán ngày Âm lịch vào bài văn khấn CHỈ KHI ĐẾN ĐÚNG NGÀY
+  const getProcessedContent = (item: VanKhanItem) => {
+    const content = item.content;
     if (!autoFillDate) return content;
     
     const getLunarDayPhrase = (d: number) => {
@@ -250,28 +256,46 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
     const currentDayPhrase = getLunarDayPhrase(todayLunarObj.d);
 
-    // 1. Dạng Cúng Giỗ & Tảo Mộ
-    let result = content.replace(
-      /Hôm nay là ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
-      `Hôm nay là ${currentDayPhrase} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
-    );
+    // 1. Dạng Cúng Giỗ & Tảo Mộ: Tự động gán ngày Âm lịch hôm nay
+    if (item.id === 'gio-chinh' || item.id === 'tao-mo') {
+      return content.replace(
+        /Hôm nay là ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
+        `Hôm nay là ${currentDayPhrase} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+      );
+    }
 
-    // 2. Dạng Đêm Giao Thừa & Tất Niên
-    result = result.replace(
-      /Hôm nay là ngày 30 tháng Chạp năm \.{3,}/g,
-      `Hôm nay là ngày 30 tháng Chạp năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
-    );
+    // 2. Dạng Mùng 1 & Rằm: CHỈ TỰ ĐỘNG GÁN NẾU HÔM NAY ĐÚNG LÀ MÙNG 1 HOẶC RẰM
+    if (item.id === 'mung-1-ram') {
+      if (todayLunarObj.d === 1) {
+        return content.replace(
+          /Hôm nay là ngày mùng 1 \/ ngày Rằm tháng \.{3,} năm \.{3,}/g,
+          `Hôm nay là ngày Mùng 1 tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+        );
+      } else if (todayLunarObj.d === 15) {
+        return content.replace(
+          /Hôm nay là ngày mùng 1 \/ ngày Rằm tháng \.{3,} năm \.{3,}/g,
+          `Hôm nay là ngày Rằm (15) tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+        );
+      }
+      return content;
+    }
 
-    // 3. Dạng Mùng 1 & Rằm
-    result = result.replace(
-      /Hôm nay là ngày mùng 1 \/ ngày Rằm tháng \.{3,} năm \.{3,}/g,
-      `Hôm nay là ${currentDayPhrase} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
-    );
+    // 3. Dạng Tất Niên & Đêm Giao Thừa: CHỈ TỰ ĐỘNG GÁN NẾU HÔM NAY ĐÚNG LÀ 30 TẾT (Tháng 12, ngày >= 29)
+    if (item.id === 'giao-thua') {
+      if (todayLunarObj.m === 12 && todayLunarObj.d >= 29) {
+        return content.replace(
+          /Hôm nay là ngày 30 tháng Chạp năm \.{3,}/g,
+          `Hôm nay là ngày 30 tháng Chạp năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+        );
+      }
+      return content;
+    }
 
-    return result;
+    return content;
   };
 
   const filteredItems = VAN_KHAN_DATA.filter((item) => item.category === activeTab);
+  const activeItem = filteredItems[0] || VAN_KHAN_DATA[0];
 
   return (
     <div 
@@ -302,391 +326,452 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           background: '#0a0806'
         }}
       >
-        {/* Header */}
-        <div 
-          className="modal-head" 
-          style={{ 
-            padding: isFullscreen ? '10px 14px 8px' : '12px 14px 10px', 
-            borderBottom: '1px solid var(--border-gold-md)',
-            background: 'var(--bg-card)',
-            flexShrink: 0
-          }}
-        >
-          {/* Hàng 1: Tiêu đề & Nút Toàn màn hình + Nút Đóng */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{
-                width: 34, height: 34, borderRadius: 10,
-                background: 'linear-gradient(135deg, rgba(201,146,58,0.3), rgba(201,146,58,0.1))',
-                border: '1px solid var(--border-gold)',
-                display: 'grid', placeItems: 'center', flexShrink: 0
-              }}>
-                <Icon name="book-open" size={18} style={{ color: 'var(--gold-light)' }} />
-              </div>
+        {/* NẾU ĐANG BẬT TOÀN MÀN HÌNH: CHỈ HIỂN THỊ 100% NỘI DUNG BÀI KHẤN ĐANG CHỌN, ẨN TOÀN BỘ CÁC TAB VÀ HEADER PHỤ */}
+        {isFullscreen ? (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', background: '#080705', padding: '12px 14px' }}>
+            {/* Header rút gọn của bài khấn đang chọn */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, borderBottom: '1px solid rgba(201,146,58,0.25)', paddingBottom: 8, flexShrink: 0 }}>
               <div>
-                <h2 className="font-display" style={{ fontSize: 16.5, fontWeight: 700, color: 'var(--gold-light)', margin: 0, lineHeight: 1.2 }}>
-                  Tủ Sách Văn Khấn Cổ Truyền
-                </h2>
-                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                  {isFullscreen ? '📺 Đang mở Toàn màn hình · Giữ sáng điện thoại' : 'Gia Phả Phạm Tộc'}
+                <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--gold-mid)', background: 'rgba(201,146,58,0.15)', padding: '2px 8px', borderRadius: 4 }}>
+                  {activeItem.badge} · TOÀN MÀN HÌNH
                 </span>
+                <h2 className="font-serif" style={{ margin: '4px 0 0', fontSize: 18, fontWeight: 700, color: 'var(--gold-light)' }}>
+                  {activeItem.title}
+                </h2>
               </div>
-            </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {/* Nút Toàn Màn Hình Youtube-style */}
-              <button
-                onClick={toggleFullscreen}
-                title={isFullscreen ? "Thoát toàn màn hình" : "Mở toàn màn hình như xem Youtube"}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '6px 12px',
-                  borderRadius: 8,
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  background: isFullscreen ? 'rgba(201,146,58,0.35)' : 'rgba(201,146,58,0.18)',
-                  border: '1px solid var(--border-gold)',
-                  color: 'var(--gold-light)',
-                  cursor: 'pointer',
-                  height: 36,
-                  transition: 'all 0.15s ease',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-                }}
-              >
-                <Icon name={isFullscreen ? "minimize" : "maximize"} size={16} />
-                <span>{isFullscreen ? "Thu nhỏ" : "Toàn màn hình"}</span>
-              </button>
-
-              <button 
-                className="detail-close" 
-                onClick={onClose}
-                aria-label="Đóng tủ sách"
-                title="Đóng cửa sổ"
-                style={{ 
-                  background: 'rgba(255,255,255,0.08)', 
-                  border: '1px solid rgba(255,255,255,0.15)', 
-                  color: 'var(--gold-light)', 
-                  cursor: 'pointer', 
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  display: 'grid',
-                  placeItems: 'center',
-                  flexShrink: 0
-                }}
-              >
-                <Icon name="x" size={20} />
-              </button>
-            </div>
-          </div>
-
-          {/* Hàng 2: Tự động gán ngày Âm lịch */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justify: 'space-between',
-            background: 'rgba(201, 146, 58, 0.12)',
-            border: '1px solid rgba(201, 146, 58, 0.3)',
-            borderRadius: 8,
-            padding: '6px 10px',
-            marginBottom: 8,
-            fontSize: 12
-          }}>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--gold-light)', width: '100%' }}>
-              <input
-                type="checkbox"
-                checked={autoFillDate}
-                onChange={(e) => setAutoFillDate(e.target.checked)}
-                style={{ accentColor: 'var(--gold)', width: 15, height: 15, cursor: 'pointer' }}
-              />
-              <span>
-                Tự động điền ngày Âm lịch hôm nay cho <strong>TẤT CẢ</strong> bài khấn: <strong style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong>
-              </span>
-            </label>
-          </div>
-
-          {/* Hàng 3: Danh mục văn khấn */}
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap',
-            gap: 6, 
-            width: '100%',
-            boxSizing: 'border-box',
-            paddingBottom: 2
-          }}>
-            {[
-              { id: 'gio', label: 'Cúng Giỗ' },
-              { id: 'taomo', label: 'Tảo Mộ' },
-              { id: 'tet', label: 'Lễ Tết' },
-              { id: 'ram', label: 'Mùng 1 & Rằm' },
-              { id: 'quychinh', label: 'Quy Trình Lễ' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  flex: '1 1 auto',
-                  minWidth: '85px',
-                  textAlign: 'center',
-                  padding: '7px 10px',
-                  borderRadius: 8,
-                  fontSize: 12.5,
-                  fontWeight: activeTab === tab.id ? 700 : 500,
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  border: activeTab === tab.id ? '1px solid var(--gold)' : '1px solid rgba(255,255,255,0.08)',
-                  background: activeTab === tab.id ? 'rgba(201,146,58,0.25)' : 'rgba(255,255,255,0.04)',
-                  color: activeTab === tab.id ? 'var(--gold-light)' : 'var(--text-muted)',
-                  boxShadow: activeTab === tab.id ? '0 2px 8px rgba(201,146,58,0.2)' : 'none',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Khung đọc văn khấn toàn màn hình cực rộng */}
-        <div style={{ 
-          flex: 1, 
-          overflowY: 'auto', 
-          padding: isFullscreen ? '14px 16px' : '12px 14px', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: 12,
-          WebkitOverflowScrolling: 'touch'
-        }}>
-          {filteredItems.map((item) => {
-            const isCopied = copiedId === item.id;
-            const processedContent = getProcessedContent(item.content);
-            return (
-              <div
-                key={item.id}
-                style={{
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border-gold)',
-                  borderRadius: 14,
-                  padding: '14px 16px',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 10,
-                  height: isFullscreen ? '100%' : undefined
-                }}
-              >
-                {/* Header bài khấn */}
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  gap: 8, 
-                  borderBottom: '1px solid rgba(201,146,58,0.2)', 
-                  paddingBottom: 8 
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                    <div style={{ flex: 1 }}>
-                      <span style={{
-                        display: 'inline-block',
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        color: 'var(--gold-mid)',
-                        background: 'rgba(201,146,58,0.12)',
-                        padding: '2px 8px',
-                        borderRadius: 4,
-                        marginBottom: 4,
-                        border: '1px solid rgba(201,146,58,0.2)'
-                      }}>
-                        {item.badge}
-                      </span>
-                      <h3 className="font-serif" style={{ margin: 0, fontSize: isFullscreen ? 18 : 16.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.3 }}>
-                        {item.title}
-                      </h3>
-                    </div>
-
-                    <button
-                      onClick={() => handleCopy(item.id, item.content)}
-                      title="Sao chép toàn bộ bài văn khấn này"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 5,
-                        padding: '6px 12px',
-                        borderRadius: 8,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        background: isCopied ? 'rgba(61,168,112,0.25)' : 'rgba(201,146,58,0.18)',
-                        border: '1px solid ' + (isCopied ? '#3da870' : 'var(--border-gold)'),
-                        color: isCopied ? '#3da870' : 'var(--gold-light)',
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        height: 32,
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <Icon name={isCopied ? 'check' : 'copy'} size={13} />
-                      {isCopied ? 'Đã sao chép' : 'Sao chép'}
-                    </button>
-                  </div>
-
-                  <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.35 }}>
-                    {item.subtitle}
-                  </p>
-                </div>
-
-                {/* Khung văn khấn hiển thị cực lớn & dễ đọc */}
-                <div
-                  className="font-serif"
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  onClick={() => handleCopy(activeItem.id, activeItem)}
                   style={{
-                    margin: 0,
-                    padding: isFullscreen ? '20px 22px' : '16px 16px',
-                    borderRadius: 12,
-                    background: 'rgba(8, 7, 5, 0.75)',
-                    border: '1px solid rgba(201,146,58,0.25)',
-                    color: '#ffffff',
-                    fontSize: `${fontSize}px`,
-                    lineHeight: 1.85,
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                    fontFamily: 'Georgia, "Times New Roman", serif',
-                    letterSpacing: '0.015em',
-                    boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)',
-                    flex: isFullscreen ? 1 : undefined
+                    display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                    background: copiedId === activeItem.id ? 'rgba(61,168,112,0.25)' : 'rgba(201,146,58,0.18)',
+                    border: '1px solid ' + (copiedId === activeItem.id ? '#3da870' : 'var(--border-gold)'),
+                    color: copiedId === activeItem.id ? '#3da870' : 'var(--gold-light)', cursor: 'pointer', height: 34
                   }}
                 >
-                  {renderFormattedContent(processedContent)}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                  <Icon name={copiedId === activeItem.id ? 'check' : 'copy'} size={14} />
+                  {copiedId === activeItem.id ? 'Đã chép' : 'Sao chép'}
+                </button>
 
-        {/* Footer */}
-        <div 
-          style={{ 
-            padding: '10px 14px 12px', 
-            borderTop: '1px solid var(--border-gold-md)', 
-            background: 'var(--bg-card)', 
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8
-          }}
-        >
-          {/* Thanh chỉnh cỡ chữ */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justify: 'space-between',
-            background: 'rgba(0,0,0,0.4)',
-            border: '1px solid var(--border-gold)',
-            borderRadius: 10,
-            padding: '6px 10px',
-            gap: 10
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold-mid)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <Icon name="type" size={14} /> Cỡ chữ:
-              </span>
-              <span style={{ 
-                fontSize: 13, 
-                fontWeight: 700, 
-                color: 'var(--gold-light)', 
-                background: 'rgba(201,146,58,0.25)', 
-                padding: '3px 10px', 
-                borderRadius: 6, 
-                border: '1px solid rgba(201,146,58,0.4)' 
-              }}>
-                {fontSize}px
-              </span>
+                <button
+                  onClick={toggleFullscreen}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                    background: 'rgba(201,146,58,0.3)', border: '1px solid var(--gold)', color: '#ffffff', cursor: 'pointer', height: 34
+                  }}
+                >
+                  <Icon name="minimize" size={16} />
+                  <span>Thu nhỏ</span>
+                </button>
+              </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button
-                onClick={decreaseFontSize}
-                disabled={fontSize <= 16}
-                style={{
-                  background: fontSize <= 16 ? 'rgba(255,255,255,0.02)' : 'rgba(201,146,58,0.25)',
-                  border: '1px solid ' + (fontSize <= 16 ? 'rgba(255,255,255,0.08)' : 'var(--border-gold)'),
-                  borderRadius: 8,
-                  color: fontSize <= 16 ? 'var(--text-muted)' : 'var(--gold-light)',
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: fontSize <= 16 ? 'default' : 'pointer',
-                  padding: '6px 14px',
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                A- (Nhỏ)
-              </button>
+            {/* Nội dung bài khấn tràn ngập toàn bộ màn hình */}
+            <div
+              className="font-serif"
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                margin: '10px 0 0',
+                padding: '20px 22px',
+                borderRadius: 14,
+                background: 'rgba(5, 4, 3, 0.85)',
+                border: '1px solid rgba(201,146,58,0.3)',
+                color: '#ffffff',
+                fontSize: `${fontSize}px`,
+                lineHeight: 1.85,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                letterSpacing: '0.015em',
+                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6)',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {renderFormattedContent(getProcessedContent(activeItem))}
+            </div>
 
-              <button
-                onClick={() => setFontSize(20)}
-                style={{
-                  background: fontSize === 20 ? 'var(--gold-mid)' : 'rgba(255,255,255,0.06)',
-                  border: '1px solid ' + (fontSize === 20 ? 'var(--gold)' : 'rgba(255,255,255,0.12)'),
-                  borderRadius: 8,
-                  color: fontSize === 20 ? '#000000' : 'var(--text-muted)',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  padding: '6px 10px',
-                  height: 36
-                }}
-              >
-                20px
-              </button>
+            {/* Thanh điều khiển cỡ chữ dưới cùng khi ở Toàn màn hình */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingT: 10, flexShrink: 0, gap: 10, marginTop: 8 }}>
+              <span style={{ fontSize: 11.5, color: 'var(--gold-mid)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                💡 Đang tự động giữ sáng màn hình khi khấn
+              </span>
 
-              <button
-                onClick={increaseFontSize}
-                disabled={fontSize >= 32}
-                style={{
-                  background: fontSize >= 32 ? 'rgba(255,255,255,0.02)' : 'rgba(201,146,58,0.3)',
-                  border: '1px solid ' + (fontSize >= 32 ? 'rgba(255,255,255,0.08)' : 'var(--gold)'),
-                  borderRadius: 8,
-                  color: fontSize >= 32 ? 'var(--text-muted)' : '#ffffff',
-                  fontSize: 15,
-                  fontWeight: 800,
-                  cursor: fontSize >= 32 ? 'default' : 'pointer',
-                  padding: '6px 16px',
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  boxShadow: fontSize < 32 ? '0 2px 8px rgba(201,146,58,0.3)' : 'none',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                A+ (To)
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button onClick={decreaseFontSize} disabled={fontSize <= 16} style={{ background: 'rgba(201,146,58,0.25)', border: '1px solid var(--border-gold)', borderRadius: 6, color: 'var(--gold-light)', padding: '4px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  A-
+                </button>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#fef08a' }}>{fontSize}px</span>
+                <button onClick={increaseFontSize} disabled={fontSize >= 32} style={{ background: 'rgba(201,146,58,0.3)', border: '1px solid var(--gold)', borderRadius: 6, color: '#ffffff', padding: '4px 14px', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+                  A+
+                </button>
+              </div>
             </div>
           </div>
+        ) : (
+          /* NẾU Ở CHẾ ĐỘ THƯỜNG: HIỂN THỊ DANH MỤC & CÁC TAB NHƯ BÌNH THƯỜNG */
+          <>
+            {/* Header */}
+            <div 
+              className="modal-head" 
+              style={{ 
+                padding: '12px 14px 10px', 
+                borderBottom: '1px solid var(--border-gold-md)',
+                background: 'var(--bg-card)',
+                flexShrink: 0
+              }}
+            >
+              {/* Hàng 1: Tiêu đề & Nút Đóng X */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{
+                    width: 34, height: 34, borderRadius: 10,
+                    background: 'linear-gradient(135deg, rgba(201,146,58,0.3), rgba(201,146,58,0.1))',
+                    border: '1px solid var(--border-gold)',
+                    display: 'grid', placeItems: 'center', flexShrink: 0
+                  }}>
+                    <Icon name="book-open" size={18} style={{ color: 'var(--gold-light)' }} />
+                  </div>
+                  <div>
+                    <h2 className="font-display" style={{ fontSize: 16.5, fontWeight: 700, color: 'var(--gold-light)', margin: 0, lineHeight: 1.2 }}>
+                      Tủ Sách Văn Khấn Cổ Truyền
+                    </h2>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Gia Phả Phạm Tộc</span>
+                  </div>
+                </div>
 
-          <button
-            className="action-button modal-close"
-            style={{ 
-              width: '100%', 
-              justifyContent: 'center', 
-              padding: '10px 16px',
-              fontSize: 14,
-              fontWeight: 700,
-              borderRadius: 10,
-              background: 'linear-gradient(135deg, rgba(201,146,58,0.25), rgba(201,146,58,0.1))',
-              border: '1px solid var(--border-gold)',
-              color: 'var(--gold-light)'
-            }}
-            onClick={onClose}
-          >
-            Thoát Tủ Sách
-          </button>
-        </div>
+                <button 
+                  className="detail-close" 
+                  onClick={onClose}
+                  aria-label="Đóng tủ sách"
+                  title="Đóng cửa sổ"
+                  style={{ 
+                    background: 'rgba(255,255,255,0.08)', 
+                    border: '1px solid rgba(255,255,255,0.15)', 
+                    color: 'var(--gold-light)', 
+                    cursor: 'pointer', 
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    display: 'grid',
+                    placeItems: 'center',
+                    flexShrink: 0
+                  }}
+                >
+                  <Icon name="x" size={20} />
+                </button>
+              </div>
+
+              {/* Hàng 2: Tự động gán ngày Âm lịch đúng ngày */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justify: 'space-between',
+                background: 'rgba(201, 146, 58, 0.12)',
+                border: '1px solid rgba(201, 146, 58, 0.3)',
+                borderRadius: 8,
+                padding: '6px 10px',
+                marginBottom: 8,
+                fontSize: 12
+              }}>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--gold-light)', width: '100%' }}>
+                  <input
+                    type="checkbox"
+                    checked={autoFillDate}
+                    onChange={(e) => setAutoFillDate(e.target.checked)}
+                    style={{ accentColor: 'var(--gold)', width: 15, height: 15, cursor: 'pointer' }}
+                  />
+                  <span>
+                    Tự động gán ngày Âm lịch <strong style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong> khi đến đúng ngày lễ/giỗ
+                  </span>
+                </label>
+              </div>
+
+              {/* Hàng 3: Danh mục văn khấn */}
+              <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap',
+                gap: 6, 
+                width: '100%',
+                boxSizing: 'border-box',
+                paddingBottom: 2
+              }}>
+                {[
+                  { id: 'gio', label: 'Cúng Giỗ' },
+                  { id: 'taomo', label: 'Tảo Mộ' },
+                  { id: 'tet', label: 'Lễ Tết' },
+                  { id: 'ram', label: 'Mùng 1 & Rằm' },
+                  { id: 'quychinh', label: 'Quy Trình Lễ' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    style={{
+                      flex: '1 1 auto',
+                      minWidth: '85px',
+                      textAlign: 'center',
+                      padding: '7px 10px',
+                      borderRadius: 8,
+                      fontSize: 12.5,
+                      fontWeight: activeTab === tab.id ? 700 : 500,
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                      border: activeTab === tab.id ? '1px solid var(--gold)' : '1px solid rgba(255,255,255,0.08)',
+                      background: activeTab === tab.id ? 'rgba(201,146,58,0.25)' : 'rgba(255,255,255,0.04)',
+                      color: activeTab === tab.id ? 'var(--gold-light)' : 'var(--text-muted)',
+                      boxShadow: activeTab === tab.id ? '0 2px 8px rgba(201,146,58,0.2)' : 'none',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Khung đọc văn khấn */}
+            <div style={{ 
+              flex: 1, 
+              overflowY: 'auto', 
+              padding: '12px 14px', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 12,
+              WebkitOverflowScrolling: 'touch'
+            }}>
+              {filteredItems.map((item) => {
+                const isCopied = copiedId === item.id;
+                const processedContent = getProcessedContent(item);
+                return (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-gold)',
+                      borderRadius: 14,
+                      padding: '14px 16px',
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 10
+                    }}
+                  >
+                    {/* Header bài khấn: Tiêu đề + Nút Sao chép & Nút Toàn màn hình bài này */}
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      gap: 8, 
+                      borderBottom: '1px solid rgba(201,146,58,0.2)', 
+                      paddingBottom: 8 
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+                        <div style={{ flex: 1 }}>
+                          <span style={{
+                            display: 'inline-block',
+                            fontSize: 10.5,
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            color: 'var(--gold-mid)',
+                            background: 'rgba(201,146,58,0.12)',
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            marginBottom: 4,
+                            border: '1px solid rgba(201,146,58,0.2)'
+                          }}>
+                            {item.badge}
+                          </span>
+                          <h3 className="font-serif" style={{ margin: 0, fontSize: 16.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.3 }}>
+                            {item.title}
+                          </h3>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                          <button
+                            onClick={() => handleCopy(item.id, item)}
+                            title="Sao chép bài văn khấn này"
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                              background: isCopied ? 'rgba(61,168,112,0.25)' : 'rgba(201,146,58,0.15)',
+                              border: '1px solid ' + (isCopied ? '#3da870' : 'var(--border-gold)'),
+                              color: isCopied ? '#3da870' : 'var(--gold-light)', cursor: 'pointer', height: 32, transition: 'all 0.2s ease'
+                            }}
+                          >
+                            <Icon name={isCopied ? 'check' : 'copy'} size={13} />
+                            {isCopied ? 'Đã sao chép' : 'Sao chép'}
+                          </button>
+
+                          <button
+                            onClick={toggleFullscreen}
+                            title="Mở toàn màn hình riêng bài văn khấn này"
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                              background: 'rgba(201,146,58,0.25)', border: '1px solid var(--border-gold)', color: '#ffffff', cursor: 'pointer', height: 32, transition: 'all 0.2s ease'
+                            }}
+                          >
+                            <Icon name="maximize" size={13} />
+                            <span>Toàn màn hình</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.35 }}>
+                        {item.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Khung văn khấn hiển thị lớn */}
+                    <div
+                      className="font-serif"
+                      style={{
+                        margin: 0,
+                        padding: '16px 16px',
+                        borderRadius: 12,
+                        background: 'rgba(8, 7, 5, 0.75)',
+                        border: '1px solid rgba(201,146,58,0.25)',
+                        color: '#ffffff',
+                        fontSize: `${fontSize}px`,
+                        lineHeight: 1.85,
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        letterSpacing: '0.015em',
+                        boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)'
+                      }}
+                    >
+                      {renderFormattedContent(processedContent)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer */}
+            <div 
+              style={{ 
+                padding: '10px 14px 12px', 
+                borderTop: '1px solid var(--border-gold-md)', 
+                background: 'var(--bg-card)', 
+                flexShrink: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8
+              }}
+            >
+              {/* Thanh chỉnh cỡ chữ */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justify: 'space-between',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-gold)',
+                borderRadius: 10,
+                padding: '6px 10px',
+                gap: 10
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold-mid)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <Icon name="type" size={14} /> Cỡ chữ:
+                  </span>
+                  <span style={{ 
+                    fontSize: 13, 
+                    fontWeight: 700, 
+                    color: 'var(--gold-light)', 
+                    background: 'rgba(201,146,58,0.25)', 
+                    padding: '3px 10px', 
+                    borderRadius: 6, 
+                    border: '1px solid rgba(201,146,58,0.4)' 
+                  }}>
+                    {fontSize}px
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button
+                    onClick={decreaseFontSize}
+                    disabled={fontSize <= 16}
+                    style={{
+                      background: fontSize <= 16 ? 'rgba(255,255,255,0.02)' : 'rgba(201,146,58,0.25)',
+                      border: '1px solid ' + (fontSize <= 16 ? 'rgba(255,255,255,0.08)' : 'var(--border-gold)'),
+                      borderRadius: 8,
+                      color: fontSize <= 16 ? 'var(--text-muted)' : 'var(--gold-light)',
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: fontSize <= 16 ? 'default' : 'pointer',
+                      padding: '6px 14px',
+                      height: 36,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    A- (Nhỏ)
+                  </button>
+
+                  <button
+                    onClick={() => setFontSize(20)}
+                    style={{
+                      background: fontSize === 20 ? 'var(--gold-mid)' : 'rgba(255,255,255,0.06)',
+                      border: '1px solid ' + (fontSize === 20 ? 'var(--gold)' : 'rgba(255,255,255,0.12)'),
+                      borderRadius: 8,
+                      color: fontSize === 20 ? '#000000' : 'var(--text-muted)',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      padding: '6px 10px',
+                      height: 36
+                    }}
+                  >
+                    20px
+                  </button>
+
+                  <button
+                    onClick={increaseFontSize}
+                    disabled={fontSize >= 32}
+                    style={{
+                      background: fontSize >= 32 ? 'rgba(255,255,255,0.02)' : 'rgba(201,146,58,0.3)',
+                      border: '1px solid ' + (fontSize >= 32 ? 'rgba(255,255,255,0.08)' : 'var(--gold)'),
+                      borderRadius: 8,
+                      color: fontSize >= 32 ? 'var(--text-muted)' : '#ffffff',
+                      fontSize: 15,
+                      fontWeight: 800,
+                      cursor: fontSize >= 32 ? 'default' : 'pointer',
+                      padding: '6px 16px',
+                      height: 36,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      boxShadow: fontSize < 32 ? '0 2px 8px rgba(201,146,58,0.3)' : 'none',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    A+ (To)
+                  </button>
+                </div>
+              </div>
+
+              <button
+                className="action-button modal-close"
+                style={{ 
+                  width: '100%', 
+                  justifyContent: 'center', 
+                  padding: '10px 16px',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  borderRadius: 10,
+                  background: 'linear-gradient(135deg, rgba(201,146,58,0.25), rgba(201,146,58,0.1))',
+                  border: '1px solid var(--border-gold)',
+                  color: 'var(--gold-light)'
+                }}
+                onClick={onClose}
+              >
+                Thoát Tủ Sách
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
