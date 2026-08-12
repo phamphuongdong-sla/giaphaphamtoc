@@ -148,12 +148,12 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
 
 // Định dạng trực quan các vị trí điền thông tin cá nhân/ngày tháng
 const renderFormattedContent = (content: string) => {
-  const parts = content.split(/(\.{3,}|ngày (?:Mùng \d+|mùng \d+|\d+|Rằm|30) tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày 30 tháng Chạp năm [^\n(]+(?:\([^\n)]+\))?)/g);
+  const parts = content.split(/(\.{3,}|ngày (?:Mùng \d+|mùng \d+|\d+|Rằm(?:\s*\(\d+\))?|30) tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày 30 tháng Chạp năm [^\n(]+(?:\([^\n)]+\))?)/gi);
   return (
     <>
       {parts.map((part, idx) => {
-        if (/^\.{3,}$/.test(part) || /^ngày (?:Mùng|mùng|\d+|Rằm|30)/.test(part)) {
-          const isFilledDate = /^ngày (?:Mùng|mùng|\d+|Rằm|30)/.test(part);
+        if (/^\.{3,}$/.test(part) || /^ngày (?:Mùng|mùng|\d+|Rằm|30)/i.test(part)) {
+          const isFilledDate = /^ngày (?:Mùng|mùng|\d+|Rằm|30)/i.test(part);
           return (
             <span
               key={idx}
@@ -161,13 +161,13 @@ const renderFormattedContent = (content: string) => {
                 color: isFilledDate ? '#fef08a' : 'var(--gold-light)',
                 borderBottom: isFilledDate ? '2px solid var(--gold)' : '1.5px dashed var(--gold)',
                 fontWeight: 700,
-                padding: '2px 8px',
+                padding: '3px 8px',
                 margin: '0 3px',
-                background: isFilledDate ? 'rgba(201, 146, 58, 0.28)' : 'rgba(201, 146, 58, 0.18)',
+                background: isFilledDate ? 'rgba(201, 146, 58, 0.3)' : 'rgba(201, 146, 58, 0.18)',
                 borderRadius: '6px',
                 display: 'inline-block',
-                lineHeight: 1.35,
-                boxShadow: isFilledDate ? '0 0 8px rgba(201,146,58,0.25)' : 'none'
+                lineHeight: 1.4,
+                boxShadow: isFilledDate ? '0 0 10px rgba(201,146,58,0.3)' : 'none'
               }}
             >
               {part}
