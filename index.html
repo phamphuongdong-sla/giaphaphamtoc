@@ -4,38 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <!-- Anti-Cache Headers -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-
     <!-- SEO & App Meta -->
     <title>Gia Phả Phạm Tộc</title>
     <meta name="description" content="Ứng dụng lưu trữ và tra cứu gia phả dòng họ Phạm. Xem sơ đồ phả hệ, lịch giỗ âm lịch, sinh nhật thành viên." />
     <meta name="theme-color" content="#0c0c0c" />
 
-    <!-- Tự động dọn dẹp các Service Worker cũ nếu có (không reload vô hạn) -->
-    <script>
-      (function() {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for (var r of registrations) {
-              r.unregister();
-            }
-          });
-        }
-        if ('caches' in window) {
-          caches.keys().then(function(keys) {
-            keys.forEach(function(k) { caches.delete(k); });
-          });
-        }
-      })();
-    </script>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/giaphaphamtoc/manifest.json" />
 
-    <!-- PWA Manifest & Icons -->
-    <link rel="manifest" href="manifest.json" />
-    <link rel="icon" type="image/png" href="icons/icon-192.png" />
-    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" href="/giaphaphamtoc/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/giaphaphamtoc/icons/icon-192.png" />
 
     <!-- iOS PWA Support -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -49,11 +28,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Noto+Serif:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/giaphaphamtoc/assets/index-8ab4b6cc.js"></script>
+    <script type="module" crossorigin src="/giaphaphamtoc/assets/index-d5790adb.js"></script>
     <link rel="modulepreload" crossorigin href="/giaphaphamtoc/assets/vendor-core-fdd35676.js">
     <link rel="modulepreload" crossorigin href="/giaphaphamtoc/assets/vendor-tree-a8166c4f.js">
     <link rel="stylesheet" href="/giaphaphamtoc/assets/index-eb6c3a15.css">
-  </head>
+  <script id="vite-plugin-pwa:register-sw" src="/giaphaphamtoc/registerSW.js"></script></head>
   <body>
     <div id="root"></div>
     
