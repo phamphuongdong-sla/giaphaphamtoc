@@ -182,6 +182,7 @@ const renderFormattedContent = (content: string) => {
 
 export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab || 'gio');
+  const [selectedItemId, setSelectedItemId] = useState<string>('gio-chinh');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<number>(20);
   const [autoFillDate, setAutoFillDate] = useState<boolean>(true);
@@ -190,6 +191,8 @@ export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
   useEffect(() => {
     if (initialTab) {
       setActiveTab(initialTab);
+      const firstItem = VAN_KHAN_DATA.find((i) => i.category === initialTab);
+      if (firstItem) setSelectedItemId(firstItem.id);
     }
   }, [initialTab]);
 
@@ -203,7 +206,8 @@ export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  const toggleFullscreen = () => {
+  const openItemFullscreen = (itemId: string) => {
+    setSelectedItemId(itemId);
     if (!isFullscreen) {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen().catch(() => {});
@@ -212,12 +216,14 @@ export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
       if ('wakeLock' in navigator) {
         (navigator as any).wakeLock.request('screen').catch(() => {});
       }
-    } else {
-      if (document.exitFullscreen && document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
-      setIsFullscreen(false);
     }
+  };
+
+  const exitFullscreen = () => {
+    if (document.exitFullscreen && document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+    setIsFullscreen(false);
   };
 
   // Tính ngày Âm lịch hôm nay
@@ -295,7 +301,7 @@ export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
   };
 
   const filteredItems = VAN_KHAN_DATA.filter((item) => item.category === activeTab);
-  const activeItem = filteredItems[0] || VAN_KHAN_DATA[0];
+  const activeItem = VAN_KHAN_DATA.find((i) => i.id === selectedItemId) || filteredItems[0] || VAN_KHAN_DATA[0];
 
   return (
     <div 
@@ -355,7 +361,7 @@ export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
                 </button>
 
                 <button
-                  onClick={toggleFullscreen}
+                  onClick={exitFullscreen}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700,
                     background: 'rgba(201,146,58,0.3)', border: '1px solid var(--gold)', color: '#ffffff', cursor: 'pointer', height: 34
@@ -506,7 +512,11 @@ export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
                 ].map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
+                    onClick={() => {
+                      setActiveTab(tab.id as any);
+                      const firstItem = VAN_KHAN_DATA.find((i) => i.category === tab.id);
+                      if (firstItem) setSelectedItemId(firstItem.id);
+                    }}
                     style={{
                       flex: '1 1 auto',
                       minWidth: '85px',
@@ -603,7 +613,7 @@ export const VanKhanModal = ({ onClose, initialTab }: VanKhanModalProps) => {
                           </button>
 
                           <button
-                            onClick={toggleFullscreen}
+                            onClick={() => openItemFullscreen(item.id)}
                             title="Mở toàn màn hình riêng bài văn khấn này"
                             style={{
                               display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 8, fontSize: 12, fontWeight: 700,
