@@ -135,20 +135,48 @@ export const useFamilyData = () => {
     };
 
     const cL = currentLunar;
-    // Rằm tháng này
-    addSpecialDay(15, cL.m, cL.y, 'Ngày Rằm', 'ram');
-    // Mùng 1 tháng này (nếu đang là ngày 1)
-    if (cL.d === 1) addSpecialDay(1, cL.m, cL.y, 'Mùng 1', 'mung1');
-    // Mùng 1 tháng sau
+
+    // --- Tháng hiện tại ---
+    // Mùng 1 tháng này (chỉ thêm nếu hôm nay là ngày 1 – tức đúng ngày hôm nay)
+    if (cL.d === 1) {
+      addSpecialDay(1, cL.m, cL.y, 'Mùng 1', 'mung1');
+    }
+    // Rằm tháng này (thêm nếu chưa qua, tức hôm nay <= 15)
+    if (cL.d <= 15) {
+      addSpecialDay(15, cL.m, cL.y, 'Ngày Rằm', 'ram');
+    }
+
+    // --- Tháng sau ---
     let nextMonth = cL.m + 1;
     let nextYear = cL.y;
     if (nextMonth > 12) { nextMonth = 1; nextYear++; }
-    addSpecialDay(1, nextMonth, nextYear, nextMonth === 1 ? 'Mùng 1 Tết' : 'Mùng 1', nextMonth === 1 ? 'tet' : 'mung1');
-    // Rằm tháng sau (có thể nằm trong 20 ngày nếu hnay là cuối tháng)
+
+    const isTetNextMonth = nextMonth === 1; // Mùng 1 tháng 1 = Tết
+    addSpecialDay(1, nextMonth, nextYear,
+      isTetNextMonth ? '🎉 Mùng 1 Tết' : 'Mùng 1',
+      isTetNextMonth ? 'tet' : 'mung1'
+    );
     addSpecialDay(15, nextMonth, nextYear, 'Ngày Rằm', 'ram');
 
+    // --- Tháng sau nữa (chỉ cần Mùng 1 - trường hợp cuối tháng âm và tháng sau ít ngày) ---
+    let nextNextMonth = nextMonth + 1;
+    let nextNextYear = nextYear;
+    if (nextNextMonth > 12) { nextNextMonth = 1; nextNextYear++; }
+    addSpecialDay(1, nextNextMonth, nextNextYear,
+      nextNextMonth === 1 ? '🎉 Mùng 1 Tết' : 'Mùng 1',
+      nextNextMonth === 1 ? 'tet' : 'mung1'
+    );
+
     // Sắp xếp danh sách: Ngày giỗ nào cận kề nhất (ít ngày nhất) sẽ xếp lên đầu
-    return list.sort((a, b) => a.days - b.days);
+    // Loại bỏ trùng lặp (cùng type cùng date)
+    const seen = new Set<string>();
+    const deduped = list.filter(item => {
+      const key = `${item.specialDayType ?? item.fullName}_${item.solarDay}_${item.solarMonth}_${item.solarYear}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    return deduped.sort((a, b) => a.days - b.days);
   }, [memberEntries]);
 
   const refreshFamilyData = async () => {

@@ -246,13 +246,13 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   // Đúng ngày Rằm (15) hoặc Mùng 1 (1)
   const isMung1Today = ld === 1;
   const isRamToday   = ld === 15;
-  // Đúng dịp Tết: ngày 30 tháng Chạp hoặc Mùng 1 Tết
+  // Đúng dịp Tết: ngày 29/30 tháng Chạp hoặc Mùng 1 Tết
   const isTetToday = (lm === 12 && ld >= 29) || (lm === 1 && ld === 1);
 
   // Nhấp nháy trước 3 ngày
-  const isRamSoon   = ld >= 12 && ld <= 14;   // ngày 12,13,14 → Rằm sắp
-  const isMung1Soon = ld >= 28;               // ngày 28,29,30 → Mùng 1 sắp
-  const isTetSoon   = lm === 12 && ld >= 27;  // 27-30 Chạp → Tết sắp
+  const isRamSoon   = ld >= 12 && ld <= 14;  // ngày 12,13,14 → Rằm sắp đến
+  const isMung1Soon = ld >= 27;              // ngày 27,28,29,30 → Mùng 1 sắp (tháng âm có thể 29 hoặc 30 ngày)
+  const isTetSoon   = lm === 12 && ld >= 26; // 26-30 Chạp → Tết sắp
 
   // Kiểm tra bài khấn có nhấp nháy không
   const shouldBlink = (category: string): boolean => {
