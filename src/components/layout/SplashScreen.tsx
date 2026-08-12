@@ -140,7 +140,7 @@ const SPARKLES = [
 
 
 
-export const SplashScreen = ({ onEnter, currentTheme = 'light', onThemeChange }: SplashScreenProps) => {
+export const SplashScreen = ({ onEnter, onFinish, currentTheme = 'light', onThemeChange }: SplashScreenProps) => {
   const [exiting, setExiting] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark'>(() => {
@@ -158,6 +158,9 @@ export const SplashScreen = ({ onEnter, currentTheme = 'light', onThemeChange }:
     setTimeout(() => {
       if (typeof onEnter === 'function') {
         onEnter();
+      }
+      if (typeof onFinish === 'function') {
+        onFinish();
       }
     }, 700);
   };
