@@ -31,7 +31,6 @@ function App() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [showVanKhanModal, setShowVanKhanModal] = useState(false);
-  const [vanKhanInitialTab, setVanKhanInitialTab] = useState<'gio' | 'taomo' | 'tet' | 'ram' | 'quychinh' | undefined>(undefined);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
@@ -42,7 +41,7 @@ function App() {
 
   // View Transitions API wrapper for smooth SPA transitions
   const handleViewChange = (mode: 'list' | 'tree' | 'lich' | 'stats' | 'manage') => {
-    // @ts-ignore
+    // @ts-ignore - Bypass View Transitions for manage view to prevent DOM screenshot freeze
     if (!document.startViewTransition || mode === 'manage' || viewMode === 'manage') {
       setViewMode(mode);
     } else {
@@ -53,23 +52,41 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'light') {
-      root.classList.add('theme-light');
+  const handleOpenManage = () => {
+    const isAuth = sessionStorage.getItem('manage_authenticated') === 'true';
+    if (isAuth) {
+      handleViewChange('manage');
     } else {
-      root.classList.remove('theme-light');
+      setShowAuthModal(true);
     }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
+  const handleLogoutManage = () => {
+    sessionStorage.removeItem('manage_authenticated');
+    handleViewChange('list');
+  };
+
+  // Global Keyboard Shortcut (Cmd+K / Ctrl+K) for quick search focus
   useEffect(() => {
-    cleanOldHistory();
-  }, [cleanOldHistory]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        handleViewChange('list');
+        setTimeout(() => {
+          const searchInput = document.getElementById('search-input');
+          if (searchInput) searchInput.focus();
+        }, 50);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   // Auto open reminder modal if there are upcoming reminders
   useEffect(() => {
@@ -78,146 +95,123 @@ function App() {
     }
   }, [reminders]);
 
-  // Set App Badge on PWA icon if supported
+  // Handle App Badge separately
   useEffect(() => {
-    const updateAppBadge = async () => {
+    const updateBadge = async () => {
       if ('setAppBadge' in navigator) {
         try {
           if (reminders.length > 0) {
+            // @ts-ignore
             await navigator.setAppBadge(reminders.length);
-          } else if ('clearAppBadge' in navigator) {
+          } else {
+            // @ts-ignore
             await navigator.clearAppBadge();
           }
-        } catch (e) {
-          console.error('Error setting app badge:', e);
+        } catch (error) {
+          console.warn('App Badging API error:', error);
         }
       }
     };
-    updateAppBadge();
+    
+    updateBadge();
   }, [reminders.length, settings.isEnabled]);
 
-  // Handle scheduled Web Push notifications for death anniversaries & upcoming events
+  // Push Notification logic check
   useEffect(() => {
-    if (!settings.isEnabled || reminders.length === 0) return;
+    if (!settings.isEnabled) return;
 
-    const checkPushNotification = () => {
+    const checkAndNotify = () => {
       const now = new Date();
-      const currentHoursStr = String(now.getHours()).padStart(2, '0');
-      const currentMinutesStr = String(now.getMinutes()).padStart(2, '0');
-      const currentTimeStr = `${currentHoursStr}:${currentMinutesStr}`;
-      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-      if (currentTimeStr === settings.time) {
+      const currentHourStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+      
+      // Allow notifications if time has passed the configured time for today
+      if (currentHourStr >= settings.time) {
+        const todayDateStr = now.toISOString().split('T')[0];
+        
         reminders.forEach(reminder => {
-          const notificationKey = `${todayStr}_${reminder.fullName}`;
-
-          if (!hasBeenNotified(notificationKey)) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-              const daysText = reminder.days === 0 ? 'Hôm nay' : `Còn ${reminder.days} ngày`;
-              const solarText = reminder.solarDateStr ? ` (${reminder.solarDateStr})` : '';
-
-              new Notification(`🔔 Giỗ/Nghi Lễ Sắp Tới: ${reminder.fullName}`, {
-                body: `Ngày Âm lịch: ${reminder.date}${solarText} (${daysText}). Bấm vào đây để xem chi tiết gia phả & bài văn khấn.`,
-                icon: '/pwa-192x192.png',
-                badge: '/pwa-192x192.png',
-                tag: notificationKey,
-                renotify: true,
-              });
-
-              markAsNotified(notificationKey);
+          // Only notify for 7, 3, 1, or 0 days away
+          if ([7, 3, 1, 0].includes(reminder.days)) {
+            const notifKey = `${todayDateStr}_${reminder.fullName}_${reminder.days}`;
+            
+            if (!hasBeenNotified(notifKey)) {
+              if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                const daysText = reminder.days === 0 ? 'Hôm nay' : `Còn ${reminder.days} ngày`;
+                const title = `Sắp đến ngày giỗ: ${reminder.fullName}`;
+                const solarText = reminder.solarDateStr ? ` · Dương: ${reminder.solarDateStr}` : '';
+                const options = {
+                  body: `${reminder.date}${solarText} (${daysText})`,
+                  icon: '/giaphaphamtoc/icons/icon-192x192.png',
+                  badge: '/giaphaphamtoc/icons/icon-192x192.png'
+                };
+                
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification(title, options).catch(err => {
+                      console.warn('SW showNotification error:', err);
+                      try { new Notification(title, options); } catch(e) {}
+                    });
+                  });
+                } else {
+                  try { new Notification(title, options); } catch(e) {}
+                }
+                
+                markAsNotified(notifKey);
+              }
             }
           }
         });
+        
+        cleanOldHistory();
       }
     };
 
-    checkPushNotification();
-    const interval = setInterval(checkPushNotification, 30000);
+    // Check immediately on mount/update
+    checkAndNotify();
+
+    // Check every minute
+    const interval = setInterval(checkAndNotify, 60000);
     return () => clearInterval(interval);
   }, [settings.isEnabled, settings.time, reminders, hasBeenNotified, markAsNotified, cleanOldHistory]);
 
-  const handleOpenVanKhan = (tab?: 'gio' | 'taomo' | 'tet' | 'ram' | 'quychinh') => {
-    setVanKhanInitialTab(tab || 'gio');
-    setShowVanKhanModal(true);
+  const enterApp = () => {
+    setSplash(false);
   };
 
+  const handleThemeChange = (newTheme: 'dark' | 'light') => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
+  if (splash) {
+    return <SplashScreen onEnter={enterApp} currentTheme={theme} onThemeChange={handleThemeChange} />;
+  }
+
+
   return (
-    <div className="app-container">
-      {splash && <SplashScreen onFinish={() => setSplash(false)} />}
-      
-      <TopBar 
-        viewMode={viewMode}
-        onViewChange={handleViewChange}
-        lunarLabel={todayLunar}
-        solarLabel={new Date().toLocaleDateString('vi-VN')}
-        theme={theme}
-        onThemeChange={toggleTheme}
-        remindersCount={reminders.length}
-        onOpenReminders={() => setShowReminderModal(true)}
-        onOpenSettings={() => setShowSettingsModal(true)}
-        onOpenManage={() => setShowAuthModal(true)}
-        onOpenRules={() => setShowRulesModal(true)}
-        onOpenVanKhan={() => handleOpenVanKhan('gio')}
-      />
+    <div className="shell">
 
-      <NoticeBar birthdays={birthdays} />
-
-      <main className="main-content">
-        {viewMode === 'list' && (
-          <ListView 
-            data={memberEntries} 
-            onSelectPerson={(person) => setSelectedPerson(person)} 
-          />
-        )}
-        
-        <Suspense fallback={
-          <div style={{ display: 'grid', placeItems: 'center', height: '60vh', color: 'var(--gold-mid)' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div className="spinner" style={{ margin: '0 auto 12px' }}></div>
-              <p>Đang tải dữ liệu gia phả...</p>
-            </div>
-          </div>
-        }>
-          {viewMode === 'tree' && (
-            <TreeView 
-              data={treeData} 
-              onSelectPerson={(person) => setSelectedPerson(person)} 
-            />
-          )}
-
-          {viewMode === 'lich' && (
-            <LichView 
-              data={memberEntries} 
-              onSelectPerson={(person) => setSelectedPerson(person)} 
-            />
-          )}
-
-          {viewMode === 'stats' && (
-            <DashboardView 
-              data={memberEntries} 
-            />
-          )}
-
-          {viewMode === 'manage' && (
-            <ManageView 
-              data={treeData} 
-              onDataChange={refreshFamilyData} 
-            />
-          )}
-        </Suspense>
-      </main>
-
-      {/* Reminder Modal */}
+      {/* Reminder modal */}
       {showReminderModal && (
         <div className="modal-backdrop" onClick={() => setShowReminderModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
-            <div className="modal-head" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-head">
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: 14,
+                  background: 'rgba(139,26,26,0.25)',
+                  border: '1px solid rgba(201,146,58,0.25)',
+                  display: 'grid', placeItems: 'center',
+                }}>
+                  <Icon name="bell-ring" size={26} style={{ color: 'var(--gold-mid)' }} />
+                </div>
+              </div>
               <h2 className="font-display" style={{
                 fontSize: 22, fontWeight: 700,
                 color: 'var(--gold-light)', textAlign: 'center',
                 letterSpacing: '0.02em',
               }}>
-                Ngày Giỗ & Nghi Lễ Sắp Tới
+                Ngày giỗ sắp tới
               </h2>
               <p style={{
                 marginTop: 6, fontSize: 10, fontWeight: 600,
@@ -231,40 +225,29 @@ function App() {
             <div className="modal-list">
               {reminders.map((item, idx) => {
                 const isWeekend = item.weekdayShort === 'CN' || item.weekdayShort === 'T7';
-                const isEvent = item.type === 'event';
                 return (
                   <div
                     className="reminder-row"
                     key={idx}
                     onClick={() => {
-                      if (isEvent) {
-                        setShowReminderModal(false);
-                        handleOpenVanKhan(item.vanKhanTab);
-                      } else if (item.person) {
+                      if (item.person) {
                         setSelectedPerson(item.person);
                         setShowReminderModal(false);
                       }
                     }}
-                    style={{ 
-                      cursor: 'pointer',
-                      borderLeft: isEvent ? '3px solid var(--gold)' : '3px solid transparent',
-                      background: isEvent ? 'rgba(201,146,58,0.08)' : undefined
-                    }}
-                    title={isEvent ? 'Bấm để mở bài văn khấn' : 'Bấm để xem tiểu sử chi tiết'}
+                    style={{ cursor: item.person ? 'pointer' : 'default' }}
+                    title={item.person ? 'Bấm để xem tiểu sử chi tiết' : undefined}
                   >
                     <div>
-                      <p className="reminder-name font-serif" style={{ display: 'flex', alignItems: 'center', gap: 6, color: isEvent ? 'var(--gold-light)' : undefined }}>
-                        <Icon name={isEvent ? "book-open" : "moon"} size={14} style={{ color: 'var(--gold-mid)' }} />
-                        {item.fullName}
-                      </p>
-
+                      <p className="reminder-name font-serif">{item.fullName}</p>
                       <p className="modal-date" style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 3 }}>
                         <span>
-                          Thời gian: <strong>{item.date}</strong>
+                          <Icon name="moon" size={10} style={{ marginRight: 4, verticalAlign: -1, color: 'var(--gold-mid)' }} />
+                          Giỗ âm lịch: <strong>{item.date}</strong>
                         </span>
                         {item.solarDateStr && (
                           <span style={{ fontSize: '11px', color: isWeekend ? 'var(--gold-light)' : 'var(--text-muted)', fontWeight: isWeekend ? 600 : 400 }}>
-                            📅 Dương lịch: <strong>{item.solarDateStr}</strong>
+                            📅 Dương: <strong>{item.solarDateStr}</strong>
                             {isWeekend && (
                               <span style={{ marginLeft: 6, fontSize: '9px', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(201,146,58,0.2)', color: 'var(--gold-mid)' }}>
                                 Cuối tuần
@@ -272,40 +255,8 @@ function App() {
                             )}
                           </span>
                         )}
-                        {item.subtitle && (
-                          <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: 1 }}>
-                            {item.subtitle}
-                          </span>
-                        )}
                       </p>
-
-                      {isEvent && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowReminderModal(false);
-                            handleOpenVanKhan(item.vanKhanTab);
-                          }}
-                          style={{
-                            marginTop: 6,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            padding: '3px 8px',
-                            borderRadius: 6,
-                            fontSize: 11,
-                            fontWeight: 700,
-                            background: 'rgba(201,146,58,0.2)',
-                            border: '1px solid var(--border-gold)',
-                            color: 'var(--gold-light)',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <Icon name="book-open" size={12} /> Xem bài văn khấn
-                        </button>
-                      )}
                     </div>
-
                     <span className={`days-pill${item.days === 0 ? ' today' : ''}`}>
                       {item.days === 0 ? 'Hôm nay' : `Còn ${item.days} ngày`}
                     </span>
@@ -340,7 +291,7 @@ function App() {
       )}
 
       {showVanKhanModal && (
-        <VanKhanModal initialTab={vanKhanInitialTab} onClose={() => setShowVanKhanModal(false)} />
+        <VanKhanModal onClose={() => setShowVanKhanModal(false)} />
       )}
 
       <ManageAuthModal
@@ -352,13 +303,68 @@ function App() {
         }}
       />
 
-      {selectedPerson && (
-        <PersonDetailModal
-          person={selectedPerson}
-          onClose={() => setSelectedPerson(null)}
-        />
-      )}
+      <PersonDetailModal person={selectedPerson} onClose={() => setSelectedPerson(null)} />
 
+      <TopBar
+        viewMode={viewMode}
+        onViewChange={handleViewChange}
+        lunarLabel={todayLunar}
+        theme={theme}
+        onThemeChange={setTheme}
+        remindersCount={reminders.length}
+        onOpenReminders={() => setShowReminderModal(true)}
+        onOpenSettings={() => setShowSettingsModal(true)}
+        onOpenManage={handleOpenManage}
+        onOpenRules={() => setShowRulesModal(true)}
+        onOpenVanKhan={() => setShowVanKhanModal(true)}
+      />
+
+      <NoticeBar birthdays={birthdays} onSelectPerson={setSelectedPerson} />
+
+      <main>
+        <Suspense fallback={
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            height: '100%', color: 'var(--gold-mid)', gap: 8, fontSize: '13px', fontWeight: 600
+          }}>
+            <Icon name="sparkles" size={16} style={{ animation: 'spin 1.5s linear infinite' }} />
+            Đang tải dữ liệu...
+          </div>
+        }>
+          {viewMode === 'list' && (
+            <ListView
+              treeData={treeData}
+              memberEntries={memberEntries}
+              onSelectPerson={setSelectedPerson}
+            />
+          )}
+          {viewMode === 'tree' && (
+            <TreeView
+              treeData={treeData}
+              onSelectPerson={setSelectedPerson}
+            />
+          )}
+          {viewMode === 'lich' && (
+            <LichView
+              treeData={treeData}
+              onSelectPerson={setSelectedPerson}
+            />
+          )}
+          {viewMode === 'stats' && (
+            <DashboardView
+              memberEntries={memberEntries}
+              onSelectPerson={setSelectedPerson}
+            />
+          )}
+          {viewMode === 'manage' && (
+            <ManageView
+              onRefreshData={refreshFamilyData}
+              onLogout={handleLogoutManage}
+            />
+          )}
+        </Suspense>
+      </main>
+      
       <InstallPrompt />
     </div>
   );
