@@ -24,7 +24,7 @@ const ManageView = lazy(() => import('./components/views/ManageView').then(m => 
 const CURRENT_SOLAR_MONTH = new Date().getMonth() + 1;
 
 function App() {
-  const [splash, setSplash] = useState(true);
+  const [splash, setSplash] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'tree' | 'lich' | 'stats' | 'manage'>('list');
   const [selectedPerson, setSelectedPerson] = useState<MemberEntry | null>(null);
   const [showReminderModal, setShowReminderModal] = useState(false);
