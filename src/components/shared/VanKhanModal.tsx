@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Icon } from '@/components/ui/Icon';
+import { getLunarToday, getCanChiYear } from '@/utils/dateUtils';
 
 interface VanKhanModalProps {
   onClose: () => void;
@@ -146,24 +147,26 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
 
 // Định dạng trực quan các vị trí điền thông tin cá nhân/ngày tháng
 const renderFormattedContent = (content: string) => {
-  const parts = content.split(/(\.{3,})/g);
+  const parts = content.split(/(\.{3,}|ngày \d+ tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?)/g);
   return (
     <>
       {parts.map((part, idx) => {
-        if (/^\.{3,}$/.test(part)) {
+        if (/^\.{3,}$/.test(part) || /^ngày \d+ tháng \d+/.test(part)) {
+          const isFilledDate = /^ngày \d+ tháng \d+/.test(part);
           return (
             <span
               key={idx}
               style={{
-                color: 'var(--gold-light)',
-                borderBottom: '1.5px dashed var(--gold)',
+                color: isFilledDate ? '#fef08a' : 'var(--gold-light)',
+                borderBottom: isFilledDate ? '2px solid var(--gold)' : '1.5px dashed var(--gold)',
                 fontWeight: 700,
-                padding: '1px 6px',
-                margin: '0 2px',
-                background: 'rgba(201, 146, 58, 0.18)',
-                borderRadius: '4px',
+                padding: '2px 8px',
+                margin: '0 3px',
+                background: isFilledDate ? 'rgba(201, 146, 58, 0.28)' : 'rgba(201, 146, 58, 0.18)',
+                borderRadius: '6px',
                 display: 'inline-block',
-                lineHeight: 1.3
+                lineHeight: 1.35,
+                boxShadow: isFilledDate ? '0 0 8px rgba(201,146,58,0.25)' : 'none'
               }}
             >
               {part}
@@ -179,10 +182,19 @@ const renderFormattedContent = (content: string) => {
 export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const [activeTab, setActiveTab] = useState<string>('gio');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [fontSize, setFontSize] = useState<number>(20); // Mặc định 20px dễ đọc trên điện thoại
+  const [fontSize, setFontSize] = useState<number>(20);
+  const [autoFillDate, setAutoFillDate] = useState<boolean>(true); // Mặc định tự động điền ngày Âm lịch hôm nay
 
-  const handleCopy = (id: string, content: string) => {
-    navigator.clipboard.writeText(content).then(() => {
+  // Tính ngày Âm lịch hôm nay
+  const todayLunarObj = getLunarToday();
+  const canChiYear = getCanChiYear(todayLunarObj.y);
+  const lunarMonthStr = String(todayLunarObj.m).padStart(2, '0');
+  const lunarDayStr = String(todayLunarObj.d).padStart(2, '0');
+  const formattedTodayLunarText = `ngày ${lunarDayStr} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
+
+  const handleCopy = (id: string, rawContent: string) => {
+    const finalContent = getProcessedContent(rawContent);
+    navigator.clipboard.writeText(finalContent).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2500);
     });
@@ -194,6 +206,14 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
   const decreaseFontSize = () => {
     setFontSize((prev) => Math.max(prev - 2, 16));
+  };
+
+  const getProcessedContent = (content: string) => {
+    if (!autoFillDate) return content;
+    return content.replace(
+      /ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
+      formattedTodayLunarText
+    );
   };
 
   const filteredItems = VAN_KHAN_DATA.filter((item) => item.category === activeTab);
@@ -216,7 +236,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           border: '1px solid var(--border-gold-md)'
         }}
       >
-        {/* Header - Góc trên chỉ giữ lại nút Đóng X riêng biệt, không bị trùng nút A+ */}
+        {/* Header */}
         <div 
           className="modal-head" 
           style={{ 
@@ -226,7 +246,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             flexShrink: 0
           }}
         >
-          {/* Hàng 1: Tiêu đề & Nút Đóng X lớn riêng biệt trên góc phải */}
+          {/* Hàng 1: Tiêu đề & Nút Đóng X */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{
@@ -267,7 +287,32 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             </button>
           </div>
 
-          {/* Hàng 2: Danh mục văn khấn tự động sắp xếp gọn gàng không bị tràn màn hình */}
+          {/* Hàng 2: Tự động gán ngày Âm lịch hôm nay */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justify: 'space-between',
+            background: 'rgba(201, 146, 58, 0.12)',
+            border: '1px solid rgba(201, 146, 58, 0.3)',
+            borderRadius: 8,
+            padding: '6px 10px',
+            marginBottom: 8,
+            fontSize: 12
+          }}>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--gold-light)', width: '100%' }}>
+              <input
+                type="checkbox"
+                checked={autoFillDate}
+                onChange={(e) => setAutoFillDate(e.target.checked)}
+                style={{ accentColor: 'var(--gold)', width: 15, height: 15, cursor: 'pointer' }}
+              />
+              <span>
+                Tự động điền ngày Âm lịch hôm nay: <strong style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong>
+              </span>
+            </label>
+          </div>
+
+          {/* Hàng 3: Danh mục văn khấn */}
           <div style={{ 
             display: 'flex', 
             flexWrap: 'wrap',
@@ -321,6 +366,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
         }}>
           {filteredItems.map((item) => {
             const isCopied = copiedId === item.id;
+            const processedContent = getProcessedContent(item.content);
             return (
               <div
                 key={item.id}
@@ -414,14 +460,14 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                     boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)'
                   }}
                 >
-                  {renderFormattedContent(item.content)}
+                  {renderFormattedContent(processedContent)}
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Footer: Đặt BỘ NÚT TĂNG GIẢM CỠ CHỮ LỚN Ở ĐÂY - Cách xa nút Đóng ở trên */}
+        {/* Footer */}
         <div 
           style={{ 
             padding: '10px 14px 12px', 
@@ -433,7 +479,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             gap: 8
           }}
         >
-          {/* Thanh công cụ chỉnh cỡ chữ cực kỳ rộng rãi & dễ bấm trên điện thoại */}
+          {/* Thanh chỉnh cỡ chữ */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -461,7 +507,6 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
               </span>
             </div>
 
-            {/* Các nút bấm A- / Mặc định / A+ LỚN - DỄ BẤM - CÁCH XA NÚT ĐÓNG X */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <button
                 onClick={decreaseFontSize}
