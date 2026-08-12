@@ -145,8 +145,7 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
 ];
 
 export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
-  const [activeTab, setActiveTab] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>('gio');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopy = (id: string, content: string) => {
@@ -156,42 +155,39 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     });
   };
 
-  const filteredItems = VAN_KHAN_DATA.filter((item) => {
-    const matchesTab = activeTab === 'all' || item.category === activeTab;
-    const matchesQuery = !searchQuery.trim() || 
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.content.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesTab && matchesQuery;
-  });
+  const filteredItems = VAN_KHAN_DATA.filter((item) => item.category === activeTab);
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div 
         className="modal" 
         onClick={(e) => e.stopPropagation()} 
-        style={{ maxWidth: '680px', width: '92vw', maxHeight: '88vh', display: 'flex', flexDirection: 'column' }}
+        style={{ 
+          maxWidth: '780px', 
+          width: '96vw', 
+          height: '92vh', 
+          maxHeight: '92vh', 
+          display: 'flex', 
+          flexDirection: 'column',
+          borderRadius: '16px',
+          overflow: 'hidden'
+        }}
       >
-        {/* Header */}
-        <div className="modal-head" style={{ padding: '16px 20px 12px', borderBottom: '1px solid var(--border-gold-md)' }}>
+        {/* Header - Tối ưu diện tích gọn gàng */}
+        <div className="modal-head" style={{ padding: '12px 16px 10px', borderBottom: '1px solid var(--border-gold-md)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{
-                width: 38, height: 38, borderRadius: 10,
+                width: 32, height: 32, borderRadius: 8,
                 background: 'rgba(201,146,58,0.15)',
                 border: '1px solid var(--border-gold)',
                 display: 'grid', placeItems: 'center', flexShrink: 0
               }}>
-                <Icon name="book-open" size={20} style={{ color: 'var(--gold-light)' }} />
+                <Icon name="book-open" size={17} style={{ color: 'var(--gold-light)' }} />
               </div>
-              <div>
-                <h2 className="font-display" style={{ fontSize: 19, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
-                  Tủ Sách Văn Khấn Cổ Truyền
-                </h2>
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                  Văn khấn chuẩn phong tục cho ngày Giỗ, Tảo mộ, Tết & Lễ thường nhật
-                </p>
-              </div>
+              <h2 className="font-display" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
+                Tủ Sách Văn Khấn Cổ Truyền
+              </h2>
             </div>
             <button 
               className="detail-close" 
@@ -202,39 +198,9 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             </button>
           </div>
 
-          {/* Search bar */}
-          <div style={{ marginTop: 12, position: 'relative' }}>
-            <input
-              type="text"
-              placeholder="Tìm bài văn khấn (vd: Cúng giỗ, Tảo mộ, Tất niên...)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '7px 12px 7px 32px',
-                borderRadius: 8,
-                border: '1px solid var(--border-gold)',
-                background: 'var(--bg-elevated)',
-                color: 'var(--text-primary)',
-                fontSize: 12,
-                outline: 'none'
-              }}
-            />
-            <Icon name="search" size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
-              >
-                <Icon name="x" size={12} />
-              </button>
-            )}
-          </div>
-
-          {/* Tabs */}
+          {/* Các tab danh mục văn khấn (Bỏ nút Tất cả) */}
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingTop: 10, scrollbarWidth: 'none' }}>
             {[
-              { id: 'all', label: 'Tất cả' },
               { id: 'gio', label: 'Cúng Giỗ' },
               { id: 'taomo', label: 'Tảo Mộ' },
               { id: 'tet', label: 'Lễ Tết' },
@@ -245,14 +211,14 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  padding: '4px 10px',
-                  borderRadius: 6,
-                  fontSize: 11,
+                  padding: '6px 14px',
+                  borderRadius: 7,
+                  fontSize: 12.5,
                   fontWeight: activeTab === tab.id ? 700 : 500,
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
                   border: activeTab === tab.id ? '1px solid var(--gold)' : '1px solid transparent',
-                  background: activeTab === tab.id ? 'rgba(201,146,58,0.2)' : 'rgba(255,255,255,0.04)',
+                  background: activeTab === tab.id ? 'rgba(201,146,58,0.22)' : 'rgba(255,255,255,0.04)',
                   color: activeTab === tab.id ? 'var(--gold-light)' : 'var(--text-muted)',
                   transition: 'all 0.15s ease'
                 }}
@@ -263,103 +229,89 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           </div>
         </div>
 
-        {/* Content Body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {filteredItems.length === 0 ? (
-            <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-              Không tìm thấy bài văn khấn phù hợp với từ khóa "{searchQuery}"
-            </div>
-          ) : (
-            filteredItems.map((item) => {
-              const isCopied = copiedId === item.id;
-              return (
-                <div
-                  key={item.id}
-                  style={{
-                    background: 'var(--bg-elevated)',
-                    border: '1px solid var(--border-gold)',
-                    borderRadius: 10,
-                    padding: 16,
-                    boxShadow: 'var(--shadow-sm)'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                        <span style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          padding: '2px 7px',
-                          borderRadius: 4,
-                          background: 'rgba(201,146,58,0.18)',
-                          color: 'var(--gold-mid)',
-                          border: '1px solid rgba(201,146,58,0.3)'
-                        }}>
-                          {item.badge}
-                        </span>
-                        <h3 className="font-serif" style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--gold-light)' }}>
-                          {item.title}
-                        </h3>
-                      </div>
-                      <p style={{ margin: '4px 0 0', fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                        {item.subtitle}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => handleCopy(item.id, item.content)}
-                      title="Sao chép toàn bộ bài văn khấn này"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 5,
-                        padding: '4px 10px',
-                        borderRadius: 6,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        background: isCopied ? 'rgba(61,168,112,0.25)' : 'var(--bg-glass-md)',
-                        border: '1px solid ' + (isCopied ? '#3da870' : 'var(--border-gold)'),
-                        color: isCopied ? '#3da870' : 'var(--gold-mid)',
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <Icon name={isCopied ? 'check' : 'copy'} size={12} />
-                      {isCopied ? 'Đã chép' : 'Sao chép'}
-                    </button>
+        {/* Khung đọc văn khấn - Tối đa hóa diện tích & chữ to rõ nét */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {filteredItems.map((item) => {
+            const isCopied = copiedId === item.id;
+            return (
+              <div
+                key={item.id}
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-gold)',
+                  borderRadius: 12,
+                  padding: '14px 16px',
+                  boxShadow: 'var(--shadow-sm)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 8, borderBottom: '1px solid rgba(201,146,58,0.2)', paddingBottom: 8 }}>
+                  <div>
+                    <h3 className="font-serif" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--gold-light)' }}>
+                      {item.title}
+                    </h3>
+                    <p style={{ margin: '2px 0 0', fontSize: 11.5, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                      {item.subtitle}
+                    </p>
                   </div>
 
-                  {/* Prayer content box */}
-                  <pre
-                    className="font-serif"
+                  <button
+                    onClick={() => handleCopy(item.id, item.content)}
+                    title="Sao chép toàn bộ bài văn khấn này"
                     style={{
-                      margin: '10px 0 0',
-                      padding: 14,
-                      borderRadius: 8,
-                      background: 'rgba(0,0,0,0.25)',
-                      border: '1px solid rgba(201,146,58,0.15)',
-                      color: 'var(--text-primary)',
-                      fontSize: 12.5,
-                      lineHeight: 1.65,
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                      fontFamily: 'serif'
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: '5px 12px',
+                      borderRadius: 6,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      background: isCopied ? 'rgba(61,168,112,0.25)' : 'rgba(201,146,58,0.15)',
+                      border: '1px solid ' + (isCopied ? '#3da870' : 'var(--border-gold)'),
+                      color: isCopied ? '#3da870' : 'var(--gold-mid)',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                      transition: 'all 0.2s ease'
                     }}
                   >
-                    {item.content}
-                  </pre>
+                    <Icon name={isCopied ? 'check' : 'copy'} size={13} />
+                    {isCopied ? 'Đã sao chép' : 'Sao chép'}
+                  </button>
                 </div>
-              );
-            })
-          )}
+
+                {/* Khung đọc văn khấn với chữ lớn, dễ đọc trên di động & máy tính */}
+                <pre
+                  className="font-serif"
+                  style={{
+                    margin: '6px 0 0',
+                    padding: '16px 18px',
+                    borderRadius: 10,
+                    background: 'rgba(0,0,0,0.32)',
+                    border: '1px solid rgba(201,146,58,0.2)',
+                    color: '#f7f4ec',
+                    fontSize: 'clamp(14px, 2vw, 16px)',
+                    lineHeight: 1.75,
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    letterSpacing: '0.01em',
+                    flex: 1
+                  }}
+                >
+                  {item.content}
+                </pre>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Footer */}
-        <div style={{ padding: '10px 20px', borderTop: '1px solid var(--border-gold-md)', textAlign: 'center' }}>
+        {/* Footer gọn gàng */}
+        <div style={{ padding: '8px 16px 12px', borderTop: '1px solid var(--border-gold-md)', textAlign: 'center' }}>
           <button
             className="action-button modal-close"
-            style={{ width: '100%', justifyContent: 'center' }}
+            style={{ width: '100%', justifyContent: 'center', padding: '8px 16px' }}
             onClick={onClose}
           >
             Đóng Tủ Sách
