@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Icon } from '@/components/ui/Icon';
 import { getLunarToday, getCanChiYear } from '@/utils/dateUtils';
 
@@ -183,7 +183,37 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const [activeTab, setActiveTab] = useState<string>('gio');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<number>(20);
-  const [autoFillDate, setAutoFillDate] = useState<boolean>(true); // Mặc định tự động điền ngày Âm lịch hôm nay cho tất cả bài khấn
+  const [autoFillDate, setAutoFillDate] = useState<boolean>(true);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  // Lắng nghe sự kiện thoát Toàn màn hình từ phím ESC hoặc thao tác thiết bị
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!isFullscreen) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+      setIsFullscreen(true);
+      // Wake Lock API: Giữ điện thoại luôn sáng màn hình khi khấn
+      if ('wakeLock' in navigator) {
+        (navigator as any).wakeLock.request('screen').catch(() => {});
+      }
+    } else {
+      if (document.exitFullscreen && document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      setIsFullscreen(false);
+    }
+  };
 
   // Tính ngày Âm lịch hôm nay
   const todayLunarObj = getLunarToday();
@@ -200,7 +230,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   };
 
   const increaseFontSize = () => {
-    setFontSize((prev) => Math.min(prev + 2, 28));
+    setFontSize((prev) => Math.min(prev + 2, 32));
   };
 
   const decreaseFontSize = () => {
@@ -211,11 +241,6 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const getProcessedContent = (content: string) => {
     if (!autoFillDate) return content;
     
-    // Tự động xác định xưng hô phong tục:
-    // Nếu d = 1 -> "ngày Mùng 1"
-    // Nếu d = 15 -> "ngày Rằm (15)"
-    // Nếu d <= 10 -> "ngày mùng 02", "ngày mùng 03"...
-    // Ngược lại -> "ngày 29"...
     const getLunarDayPhrase = (d: number) => {
       if (d === 1) return 'ngày Mùng 1';
       if (d === 15) return 'ngày Rằm (15)';
@@ -225,19 +250,19 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
     const currentDayPhrase = getLunarDayPhrase(todayLunarObj.d);
 
-    // 1. Dạng Cúng Giỗ & Tảo Mộ: "Hôm nay là ngày ...... tháng ...... năm ......"
+    // 1. Dạng Cúng Giỗ & Tảo Mộ
     let result = content.replace(
       /Hôm nay là ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
       `Hôm nay là ${currentDayPhrase} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
     );
 
-    // 2. Dạng Đêm Giao Thừa & Tất Niên: "Hôm nay là ngày 30 tháng Chạp năm ......"
+    // 2. Dạng Đêm Giao Thừa & Tất Niên
     result = result.replace(
       /Hôm nay là ngày 30 tháng Chạp năm \.{3,}/g,
       `Hôm nay là ngày 30 tháng Chạp năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
     );
 
-    // 3. Dạng Mùng 1 & Rằm: "Hôm nay là ngày mùng 1 \/ ngày Rằm tháng ...... năm ......"
+    // 3. Dạng Mùng 1 & Rằm
     result = result.replace(
       /Hôm nay là ngày mùng 1 \/ ngày Rằm tháng \.{3,} năm \.{3,}/g,
       `Hôm nay là ${currentDayPhrase} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
@@ -249,34 +274,45 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const filteredItems = VAN_KHAN_DATA.filter((item) => item.category === activeTab);
 
   return (
-    <div className="modal-backdrop" onClick={onClose} style={{ padding: '8px 4px' }}>
+    <div 
+      className="modal-backdrop" 
+      onClick={onClose} 
+      style={{ 
+        padding: isFullscreen ? 0 : '8px 4px',
+        zIndex: isFullscreen ? 999999 : undefined
+      }}
+    >
       <div 
         className="modal" 
         onClick={(e) => e.stopPropagation()} 
         style={{ 
-          maxWidth: '840px', 
+          maxWidth: isFullscreen ? '100vw' : '840px', 
           width: '100%', 
-          height: '94vh', 
-          maxHeight: '94vh', 
+          height: isFullscreen ? '100vh' : '94vh', 
+          maxHeight: isFullscreen ? '100vh' : '94vh', 
           display: 'flex', 
           flexDirection: 'column',
-          borderRadius: '16px',
+          borderRadius: isFullscreen ? 0 : '16px',
           overflow: 'hidden',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
-          border: '1px solid var(--border-gold-md)'
+          boxShadow: isFullscreen ? 'none' : '0 12px 40px rgba(0,0,0,0.7)',
+          border: isFullscreen ? 'none' : '1px solid var(--border-gold-md)',
+          position: isFullscreen ? 'fixed' : 'relative',
+          top: isFullscreen ? 0 : undefined,
+          left: isFullscreen ? 0 : undefined,
+          background: '#0a0806'
         }}
       >
         {/* Header */}
         <div 
           className="modal-head" 
           style={{ 
-            padding: '12px 14px 10px', 
+            padding: isFullscreen ? '10px 14px 8px' : '12px 14px 10px', 
             borderBottom: '1px solid var(--border-gold-md)',
             background: 'var(--bg-card)',
             flexShrink: 0
           }}
         >
-          {/* Hàng 1: Tiêu đề & Nút Đóng X */}
+          {/* Hàng 1: Tiêu đề & Nút Toàn màn hình + Nút Đóng */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{
@@ -291,33 +327,62 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 <h2 className="font-display" style={{ fontSize: 16.5, fontWeight: 700, color: 'var(--gold-light)', margin: 0, lineHeight: 1.2 }}>
                   Tủ Sách Văn Khấn Cổ Truyền
                 </h2>
-                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Gia Phả Phạm Tộc</span>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  {isFullscreen ? '📺 Đang mở Toàn màn hình · Giữ sáng điện thoại' : 'Gia Phả Phạm Tộc'}
+                </span>
               </div>
             </div>
 
-            <button 
-              className="detail-close" 
-              onClick={onClose}
-              aria-label="Đóng tủ sách"
-              title="Đóng cửa sổ"
-              style={{ 
-                background: 'rgba(255,255,255,0.08)', 
-                border: '1px solid rgba(255,255,255,0.15)', 
-                color: 'var(--gold-light)', 
-                cursor: 'pointer', 
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                display: 'grid',
-                placeItems: 'center',
-                flexShrink: 0
-              }}
-            >
-              <Icon name="x" size={20} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {/* Nút Toàn Màn Hình Youtube-style */}
+              <button
+                onClick={toggleFullscreen}
+                title={isFullscreen ? "Thoát toàn màn hình" : "Mở toàn màn hình như xem Youtube"}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 12px',
+                  borderRadius: 8,
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  background: isFullscreen ? 'rgba(201,146,58,0.35)' : 'rgba(201,146,58,0.18)',
+                  border: '1px solid var(--border-gold)',
+                  color: 'var(--gold-light)',
+                  cursor: 'pointer',
+                  height: 36,
+                  transition: 'all 0.15s ease',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+                }}
+              >
+                <Icon name={isFullscreen ? "minimize" : "maximize"} size={16} />
+                <span>{isFullscreen ? "Thu nhỏ" : "Toàn màn hình"}</span>
+              </button>
+
+              <button 
+                className="detail-close" 
+                onClick={onClose}
+                aria-label="Đóng tủ sách"
+                title="Đóng cửa sổ"
+                style={{ 
+                  background: 'rgba(255,255,255,0.08)', 
+                  border: '1px solid rgba(255,255,255,0.15)', 
+                  color: 'var(--gold-light)', 
+                  cursor: 'pointer', 
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  display: 'grid',
+                  placeItems: 'center',
+                  flexShrink: 0
+                }}
+              >
+                <Icon name="x" size={20} />
+              </button>
+            </div>
           </div>
 
-          {/* Hàng 2: Tự động gán ngày Âm lịch hôm nay vào TẤT CẢ các bài khấn */}
+          {/* Hàng 2: Tự động gán ngày Âm lịch */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -384,11 +449,11 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           </div>
         </div>
 
-        {/* Khung đọc văn khấn */}
+        {/* Khung đọc văn khấn toàn màn hình cực rộng */}
         <div style={{ 
           flex: 1, 
           overflowY: 'auto', 
-          padding: '12px 14px', 
+          padding: isFullscreen ? '14px 16px' : '12px 14px', 
           display: 'flex', 
           flexDirection: 'column', 
           gap: 12,
@@ -408,10 +473,11 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                   boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 10
+                  gap: 10,
+                  height: isFullscreen ? '100%' : undefined
                 }}
               >
-                {/* Header bài khấn: Tiêu đề + Nút sao chép */}
+                {/* Header bài khấn */}
                 <div style={{ 
                   display: 'flex', 
                   flexDirection: 'column',
@@ -436,7 +502,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                       }}>
                         {item.badge}
                       </span>
-                      <h3 className="font-serif" style={{ margin: 0, fontSize: 16.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.3 }}>
+                      <h3 className="font-serif" style={{ margin: 0, fontSize: isFullscreen ? 18 : 16.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.3 }}>
                         {item.title}
                       </h3>
                     </div>
@@ -476,7 +542,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                   className="font-serif"
                   style={{
                     margin: 0,
-                    padding: '16px 16px',
+                    padding: isFullscreen ? '20px 22px' : '16px 16px',
                     borderRadius: 12,
                     background: 'rgba(8, 7, 5, 0.75)',
                     border: '1px solid rgba(201,146,58,0.25)',
@@ -487,7 +553,8 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                     wordBreak: 'break-word',
                     fontFamily: 'Georgia, "Times New Roman", serif',
                     letterSpacing: '0.015em',
-                    boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)'
+                    boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)',
+                    flex: isFullscreen ? 1 : undefined
                   }}
                 >
                   {renderFormattedContent(processedContent)}
@@ -579,21 +646,21 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
               <button
                 onClick={increaseFontSize}
-                disabled={fontSize >= 28}
+                disabled={fontSize >= 32}
                 style={{
-                  background: fontSize >= 28 ? 'rgba(255,255,255,0.02)' : 'rgba(201,146,58,0.3)',
-                  border: '1px solid ' + (fontSize >= 28 ? 'rgba(255,255,255,0.08)' : 'var(--gold)'),
+                  background: fontSize >= 32 ? 'rgba(255,255,255,0.02)' : 'rgba(201,146,58,0.3)',
+                  border: '1px solid ' + (fontSize >= 32 ? 'rgba(255,255,255,0.08)' : 'var(--gold)'),
                   borderRadius: 8,
-                  color: fontSize >= 28 ? 'var(--text-muted)' : '#ffffff',
+                  color: fontSize >= 32 ? 'var(--text-muted)' : '#ffffff',
                   fontSize: 15,
                   fontWeight: 800,
-                  cursor: fontSize >= 28 ? 'default' : 'pointer',
+                  cursor: fontSize >= 32 ? 'default' : 'pointer',
                   padding: '6px 16px',
                   height: 36,
                   display: 'flex',
                   alignItems: 'center',
                   gap: 4,
-                  boxShadow: fontSize < 28 ? '0 2px 8px rgba(201,146,58,0.3)' : 'none',
+                  boxShadow: fontSize < 32 ? '0 2px 8px rgba(201,146,58,0.3)' : 'none',
                   transition: 'all 0.15s ease'
                 }}
               >
@@ -617,7 +684,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             }}
             onClick={onClose}
           >
-            Đóng Tủ Sách
+            Thoát Tủ Sách
           </button>
         </div>
       </div>
