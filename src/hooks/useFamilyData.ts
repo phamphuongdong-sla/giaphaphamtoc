@@ -38,7 +38,7 @@ export const useFamilyData = () => {
 
   // LOGIC TÍNH NGÀY GIỖ SẮP TỚI THEO ĐÚNG NGÀY/THÁNG ÂM LỊCH TỪ CHUỖI "DEATH"
   const reminders = useMemo(() => {
-    const list: { fullName: string; date: string; days: number; person: MemberEntry }[] = [];
+    const list: { fullName: string; date: string; days: number; person?: MemberEntry; solarDateStr?: string; weekdayFull?: string; weekdayShort?: string; solarDay?: number; solarMonth?: number; solarYear?: number; isSpecialDay?: boolean; specialDayType?: string; }[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -101,6 +101,51 @@ export const useFamilyData = () => {
         }
       }
     });
+
+    // Thêm các sự kiện ngày Rằm, Mùng 1, Lễ Tết
+    const addSpecialDay = (targetLunarD: number, targetLunarM: number, targetLunarY: number, name: string, type: string) => {
+      const solarTarget = lunarToSolar(targetLunarD, targetLunarM, targetLunarY);
+      if (!solarTarget) return;
+      const targetDate = new Date(solarTarget.y, solarTarget.m - 1, solarTarget.d);
+      const diffTime = targetDate.getTime() - today.getTime();
+      const daysLeft = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (daysLeft >= 0 && daysLeft <= 20) {
+        const WEEKDAYS_FULL = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+        const WEEKDAYS_SHORT = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        const dayOfWeek = targetDate.getDay();
+        const weekdayFull = WEEKDAYS_FULL[dayOfWeek];
+        const weekdayShort = WEEKDAYS_SHORT[dayOfWeek];
+        const solarDateStr = `${weekdayFull}, ${String(solarTarget.d).padStart(2, '0')}/${String(solarTarget.m).padStart(2, '0')}/${solarTarget.y}`;
+
+        list.push({
+          fullName: name,
+          date: `${String(targetLunarD).padStart(2, '0')}/${String(targetLunarM).padStart(2, '0')} Âm lịch`,
+          days: daysLeft,
+          solarDateStr,
+          weekdayFull,
+          weekdayShort,
+          solarDay: solarTarget.d,
+          solarMonth: solarTarget.m,
+          solarYear: solarTarget.y,
+          isSpecialDay: true,
+          specialDayType: type
+        });
+      }
+    };
+
+    const cL = currentLunar;
+    // Rằm tháng này
+    addSpecialDay(15, cL.m, cL.y, 'Ngày Rằm', 'ram');
+    // Mùng 1 tháng này (nếu đang là ngày 1)
+    if (cL.d === 1) addSpecialDay(1, cL.m, cL.y, 'Mùng 1', 'mung1');
+    // Mùng 1 tháng sau
+    let nextMonth = cL.m + 1;
+    let nextYear = cL.y;
+    if (nextMonth > 12) { nextMonth = 1; nextYear++; }
+    addSpecialDay(1, nextMonth, nextYear, nextMonth === 1 ? 'Mùng 1 Tết' : 'Mùng 1', nextMonth === 1 ? 'tet' : 'mung1');
+    // Rằm tháng sau (có thể nằm trong 20 ngày nếu hnay là cuối tháng)
+    addSpecialDay(15, nextMonth, nextYear, 'Ngày Rằm', 'ram');
 
     // Sắp xếp danh sách: Ngày giỗ nào cận kề nhất (ít ngày nhất) sẽ xếp lên đầu
     return list.sort((a, b) => a.days - b.days);

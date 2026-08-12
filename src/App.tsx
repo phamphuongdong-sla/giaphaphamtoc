@@ -211,7 +211,7 @@ function App() {
                 color: 'var(--gold-light)', textAlign: 'center',
                 letterSpacing: '0.02em',
               }}>
-                Ngày giỗ sắp tới
+                Giỗ & Lễ sắp tới
               </h2>
               <p style={{
                 marginTop: 6, fontSize: 10, fontWeight: 600,
@@ -239,11 +239,14 @@ function App() {
                     title={item.person ? 'Bấm để xem tiểu sử chi tiết' : undefined}
                   >
                     <div>
-                      <p className="reminder-name font-serif">{item.fullName}</p>
+                      <p className="reminder-name font-serif" style={{ color: item.isSpecialDay ? 'var(--gold-light)' : undefined, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {item.isSpecialDay && <Icon name="bell-ring" size={14} style={{ color: 'var(--gold-mid)' }} />}
+                        {item.fullName}
+                      </p>
                       <p className="modal-date" style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 3 }}>
                         <span>
                           <Icon name="moon" size={10} style={{ marginRight: 4, verticalAlign: -1, color: 'var(--gold-mid)' }} />
-                          Giỗ âm lịch: <strong>{item.date}</strong>
+                          {item.isSpecialDay ? 'Ngày âm lịch' : 'Giỗ âm lịch'}: <strong>{item.date}</strong>
                         </span>
                         {item.solarDateStr && (
                           <span style={{ fontSize: '11px', color: isWeekend ? 'var(--gold-light)' : 'var(--text-muted)', fontWeight: isWeekend ? 600 : 400 }}>
