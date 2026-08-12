@@ -1,9 +1,9 @@
-import { DateInfo } from '@/types';
 
-export const CAN = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
-export const CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
 
-export const getCanChiYear = (year: number): string => {
+const CAN = ["Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ", "Canh", "Tân", "Nhâm", "Quý"];
+const CHI = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi", "Thân", "Dậu", "Tuất", "Hợi"];
+
+const getCanChiYear = (year: number): string => {
   const can = CAN[(year + 6) % 10];
   const chi = CHI[(year + 8) % 12];
   return `${can} ${chi}`;
@@ -13,7 +13,7 @@ const INT = Math.floor;
 const PI = Math.PI;
 
 // ===== JULIAN DATE FUNCTIONS =====
-export const jdFromDate = (dd: number, mm: number, yy: number): number => {
+const jdFromDate = (dd: number, mm: number, yy: number): number => {
   const a = INT((14 - mm) / 12);
   const y = yy + 4800 - a;
   const m = mm + 12 * a - 3;
@@ -24,7 +24,7 @@ export const jdFromDate = (dd: number, mm: number, yy: number): number => {
   return jd;
 };
 
-export const jdToDate = (jd: number): { d: number; m: number; y: number } => {
+const jdToDate = (jd: number): { d: number; m: number; y: number } => {
   let a, b, c;
   if (jd > 2299160) {
     a = jd + 32044;
@@ -44,7 +44,7 @@ export const jdToDate = (jd: number): { d: number; m: number; y: number } => {
 };
 
 // ===== LUNAR CALCULATION FUNCTIONS =====
-export const newMoon = (k: number): number => {
+const newMoon = (k: number): number => {
   const t = k / 1236.85;
   const t2 = t * t;
   const t3 = t2 * t;
@@ -67,7 +67,7 @@ export const newMoon = (k: number): number => {
   return jd1 + c1 - deltaT;
 };
 
-export const getNewMoonDay = (k: number, timeZone: number): number => {
+const getNewMoonDay = (k: number, timeZone: number): number => {
   return INT(newMoon(k) + 0.5 + timeZone / 24);
 };
 
@@ -84,7 +84,7 @@ const getSunLongitude = (jdn: number, timeZone: number): number => {
   return INT(l / PI * 6);
 };
 
-export const getLunarMonth11 = (yy: number, timeZone: number): number => {
+const getLunarMonth11 = (yy: number, timeZone: number): number => {
   const off = jdFromDate(31, 12, yy) - 2415021;
   const k = INT(off / 29.530588853);
   let nm = getNewMoonDay(k, timeZone);
@@ -93,7 +93,7 @@ export const getLunarMonth11 = (yy: number, timeZone: number): number => {
   return nm;
 };
 
-export const getLeapMonthOffset = (a11: number, timeZone: number): number => {
+const getLeapMonthOffset = (a11: number, timeZone: number): number => {
   const k = INT((a11 - 2415021.076998695) / 29.530588853 + 0.5);
   let last = 0;
   let i = 1;
@@ -107,7 +107,7 @@ export const getLeapMonthOffset = (a11: number, timeZone: number): number => {
 };
 
 // ===== PUBLIC LUNAR FUNCTIONS =====
-export const solarToLunar = (dd: number, mm: number, yy: number, timeZone: number = VN_TIMEZONE): {
+const solarToLunar = (dd: number, mm: number, yy: number, timeZone: number = VN_TIMEZONE): {
   d: number;
   m: number;
   y: number;
@@ -143,7 +143,7 @@ export const solarToLunar = (dd: number, mm: number, yy: number, timeZone: numbe
   return { d: lunarDay, m: lunarMonth, y: lunarYear || 0, leap: lunarLeap };
 };
 
-export const lunarToSolar = (
+const lunarToSolar = (
   lunarDay: number,
   lunarMonth: number,
   lunarYear: number,
@@ -164,7 +164,7 @@ export const lunarToSolar = (
   if (b11 - a11 > 365) {
     const leapOff = getLeapMonthOffset(a11, timeZone);
     let leapMonth = leapOff - 2;
-    if (leapMonth <= 0) leapMonth += 12;
+    if (leapMonth < 0) leapMonth += 12;
     if (lunarLeap && lunarMonth !== leapMonth) return null;
     if (lunarLeap || off >= leapOff) off += 1;
   }
@@ -172,7 +172,7 @@ export const lunarToSolar = (
 };
 
 // ===== GET TODAY LUNAR =====
-export const getLunarToday = (): { d: number; m: number; y: number; leap: boolean; label: string } => {
+const getLunarToday = (): { d: number; m: number; y: number; leap: boolean; label: string } => {
   const current = new Date();
   const lunar = solarToLunar(current.getDate(), current.getMonth() + 1, current.getFullYear(), VN_TIMEZONE);
   return {
@@ -182,7 +182,7 @@ export const getLunarToday = (): { d: number; m: number; y: number; leap: boolea
 };
 
 // ===== FORMAT FUNCTIONS =====
-export const parseBirthText = (text: string): { solar: DateInfo | null; note: string } => {
+const parseBirthText = (text: string): { solar: DateInfo | null; note: string } => {
   if (!text) return { solar: null, note: '' };
   const dateMatch = text.match(/(\d{1,2})[-/](\d{1,2})(?:[-/](\d{2,4}))?/);
   if (dateMatch) {
@@ -198,7 +198,7 @@ export const parseBirthText = (text: string): { solar: DateInfo | null; note: st
   return { solar: null, note: text };
 };
 
-export const parseDeathText = (text: string): { solar: DateInfo | null; note: string } => {
+const parseDeathText = (text: string): { solar: DateInfo | null; note: string } => {
   if (!text) return { solar: null, note: '' };
   const str = text.trim();
   // 1. Try YYYY-MM-DD or YYYY/MM/DD
@@ -225,7 +225,7 @@ export const parseDeathText = (text: string): { solar: DateInfo | null; note: st
   return { solar: null, note: str };
 };
 
-export const formatBirthDisplay = (data: { birthSolar?: DateInfo | null; birthNote?: string }): string => {
+const formatBirthDisplay = (data: { birthSolar?: DateInfo | null; birthNote?: string }): string => {
   const parts: string[] = [];
   if (data.birthSolar) {
     const { d, m, y } = data.birthSolar;
@@ -237,7 +237,7 @@ export const formatBirthDisplay = (data: { birthSolar?: DateInfo | null; birthNo
   return parts.length ? parts.join(' · ') : 'Chưa rõ';
 };
 
-export const formatDeathDisplay = (data: { deathSolar?: DateInfo | null; deathNote?: string }): string => {
+const formatDeathDisplay = (data: { deathSolar?: DateInfo | null; deathNote?: string }): string => {
   const parts: string[] = [];
   if (data.deathSolar) {
     const { d, m, y } = data.deathSolar;
@@ -249,12 +249,12 @@ export const formatDeathDisplay = (data: { deathSolar?: DateInfo | null; deathNo
   return parts.length ? parts.join(' · ') : 'Chưa rõ';
 };
 
-export const getTodayLunar = (): string => {
+const getTodayLunar = (): string => {
   const today = getLunarToday();
   return today.label;
 };
 
-export const getDaysUntil = (targetDate: Date): number => {
+const getDaysUntil = (targetDate: Date): number => {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   targetDate.setHours(0, 0, 0, 0);
@@ -263,7 +263,7 @@ export const getDaysUntil = (targetDate: Date): number => {
 };
 
 // ===== HÀM MỚI: TÍNH CHÍNH XÁC SỐ NGÀY ĐẾN NGÀY GIỖ ÂM LỊCH =====
-export const getDaysUntilLunarAnniversary = (lunarDay: number, lunarMonth: number): number => {
+const getDaysUntilLunarAnniversary = (lunarDay: number, lunarMonth: number): number => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -292,3 +292,5 @@ export const getDaysUntilLunarAnniversary = (lunarDay: number, lunarMonth: numbe
   const diffTime = targetSolarDate.getTime() - today.getTime();
   return Math.round(diffTime / (1000 * 60 * 60 * 24)); 
 };
+console.log(solarToLunar(12, 8, 2026));
+console.log(solarToLunar(13, 8, 2026));

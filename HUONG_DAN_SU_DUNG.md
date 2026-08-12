@@ -101,6 +101,7 @@ Hệ thống cho phép bạn đồng bộ trực tiếp các ngày giỗ, sinh n
 ### 📅 2.5. Lịch Giỗ & Sinh Nhật (Tab "Lịch giỗ")
 
 * Tự động tính toán ngày giỗ Âm lịch quy đổi sang ngày Dương lịch tương ứng của năm hiện tại.
+* **Quy tắc tính ngày giỗ:** Hệ thống mặc định cộng thêm 1 ngày vào ngày mất Âm lịch để tính thành ngày giỗ (theo phong tục truyền thống).
 * **Thao tác:**
   * Bấm mũi tên **<** hoặc **>** để xem lịch của các năm khác nhau.
   * Bấm chọn từng **Tháng (Th.1 ➔ Th.12)** để tra cứu ngày giỗ và sinh nhật trong tháng đó.

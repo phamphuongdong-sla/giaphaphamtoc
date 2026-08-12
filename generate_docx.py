@@ -369,6 +369,7 @@ def main():
 
     cal_feats = [
         ("Tự động quy đổi: ", "Hiển thị ngày giỗ Âm lịch được chuyển sang ngày Dương lịch tương ứng của năm hiện tại."),
+        ("Quy tắc tính ngày giỗ: ", "Hệ thống mặc định cộng thêm 1 ngày vào ngày mất Âm lịch để tính thành ngày giỗ (theo phong tục truyền thống)."),
         ("Chuyển đổi năm/tháng: ", "Bấm mũi tên < hoặc > để xem lịch các năm, chọn từng Tháng (Th.1 -> Th.12) để xem chi tiết các sự kiện."),
         ("Xem chi tiết: ", "Bấm trực tiếp vào tên thành viên trong Lịch để xem ngay thông tin tiểu sử đầy đủ.")
     ]
