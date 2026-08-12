@@ -4,40 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
+    <!-- Anti-Cache Headers: Đảm bảo trình duyệt luôn tải index.html mới nhất từ GitHub Pages -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <!-- SEO & App Meta -->
     <title>Gia Phả Phạm Tộc</title>
     <meta name="description" content="Ứng dụng lưu trữ và tra cứu gia phả dòng họ Phạm. Xem sơ đồ phả hệ, lịch giỗ âm lịch, sinh nhật thành viên." />
     <meta name="theme-color" content="#0c0c0c" />
 
-    <!-- Service Worker Cache Auto-Recovery Guard (Khắc phục triệt để màn hình đen do Service Worker đè cache cũ) -->
+    <!-- Service Worker Self-Destruct & Auto-Recovery Guard -->
     <script>
       (function() {
+        // Tự động gỡ bỏ mọi Service Worker cũ lưu trên thiết bị
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function(registrations) {
             for (var r of registrations) {
-              r.update();
+              r.unregister();
             }
           });
         }
+        // Xóa sạch bộ nhớ đệm CacheStorage cũ
+        if ('caches' in window) {
+          caches.keys().then(function(keys) {
+            keys.forEach(function(key) {
+              caches.delete(key);
+            });
+          });
+        }
+        // Tự động reload nếu gặp lỗi 404 từ file đệm cũ
         window.addEventListener('error', function(e) {
           if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
             var url = e.target.src || e.target.href || '';
             if (url.includes('/assets/')) {
-              console.warn('Asset load failed, clearing stale SW cache...', url);
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                  for (var r of registrations) r.unregister();
-                  if ('caches' in window) {
-                    caches.keys().then(function(keys) {
-                      return Promise.all(keys.map(function(k) { return caches.delete(k); }));
-                    }).then(function() {
-                      window.location.reload(true);
-                    });
-                  } else {
-                    window.location.reload(true);
-                  }
-                });
-              }
+              console.warn('Stale asset detected, reloading page...', url);
+              window.location.reload(true);
             }
           }
         }, true);
