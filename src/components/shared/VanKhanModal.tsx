@@ -147,12 +147,12 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
 
 // Định dạng trực quan các vị trí điền thông tin cá nhân/ngày tháng
 const renderFormattedContent = (content: string) => {
-  const parts = content.split(/(\.{3,}|ngày \d+ tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?)/g);
+  const parts = content.split(/(\.{3,}|ngày \d+ tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày 30 tháng Chạp năm [^\n(]+(?:\([^\n)]+\))?|ngày mùng \d+ tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày Rằm \(\d+\) tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?)/g);
   return (
     <>
       {parts.map((part, idx) => {
-        if (/^\.{3,}$/.test(part) || /^ngày \d+ tháng \d+/.test(part)) {
-          const isFilledDate = /^ngày \d+ tháng \d+/.test(part);
+        if (/^\.{3,}$/.test(part) || /^ngày (?:mùng |\d+|Rằm|30)/.test(part)) {
+          const isFilledDate = /^ngày (?:mùng |\d+|Rằm|30)/.test(part);
           return (
             <span
               key={idx}
@@ -183,14 +183,13 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const [activeTab, setActiveTab] = useState<string>('gio');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<number>(20);
-  const [autoFillDate, setAutoFillDate] = useState<boolean>(true); // Mặc định tự động điền ngày Âm lịch hôm nay
+  const [autoFillDate, setAutoFillDate] = useState<boolean>(true); // Mặc định tự động điền ngày Âm lịch hôm nay cho tất cả bài khấn
 
   // Tính ngày Âm lịch hôm nay
   const todayLunarObj = getLunarToday();
   const canChiYear = getCanChiYear(todayLunarObj.y);
   const lunarMonthStr = String(todayLunarObj.m).padStart(2, '0');
   const lunarDayStr = String(todayLunarObj.d).padStart(2, '0');
-  const formattedTodayLunarText = `ngày ${lunarDayStr} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
 
   const handleCopy = (id: string, rawContent: string) => {
     const finalContent = getProcessedContent(rawContent);
@@ -208,12 +207,32 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     setFontSize((prev) => Math.max(prev - 2, 16));
   };
 
+  // Tự động gán ngày Âm lịch vào TẤT CẢ các bài văn khấn theo cú pháp tương ứng
   const getProcessedContent = (content: string) => {
     if (!autoFillDate) return content;
-    return content.replace(
-      /ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
-      formattedTodayLunarText
+    
+    // 1. Dạng Cúng Giỗ & Tảo Mộ: "Hôm nay là ngày ...... tháng ...... năm ......"
+    let result = content.replace(
+      /Hôm nay là ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
+      `Hôm nay là ngày ${lunarDayStr} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
     );
+
+    // 2. Dạng Đêm Giao Thừa & Tất Niên: "Hôm nay là ngày 30 tháng Chạp năm ......"
+    result = result.replace(
+      /Hôm nay là ngày 30 tháng Chạp năm \.{3,}/g,
+      `Hôm nay là ngày 30 tháng Chạp năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+    );
+
+    // 3. Dạng Mùng 1 & Rằm: "Hôm nay là ngày mùng 1 / ngày Rằm tháng ...... năm ......"
+    const ramOrMungText = todayLunarObj.d === 1 
+      ? 'ngày mùng 1' 
+      : (todayLunarObj.d === 15 ? 'ngày Rằm (15)' : `ngày ${lunarDayStr}`);
+    result = result.replace(
+      /Hôm nay là ngày mùng 1 \/ ngày Rằm tháng \.{3,} năm \.{3,}/g,
+      `Hôm nay là ${ramOrMungText} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+    );
+
+    return result;
   };
 
   const filteredItems = VAN_KHAN_DATA.filter((item) => item.category === activeTab);
@@ -287,7 +306,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             </button>
           </div>
 
-          {/* Hàng 2: Tự động gán ngày Âm lịch hôm nay */}
+          {/* Hàng 2: Tự động gán ngày Âm lịch hôm nay vào TẤT CẢ các bài khấn */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -307,7 +326,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 style={{ accentColor: 'var(--gold)', width: 15, height: 15, cursor: 'pointer' }}
               />
               <span>
-                Tự động điền ngày Âm lịch hôm nay: <strong style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong>
+                Tự động điền ngày Âm lịch hôm nay cho <strong>TẤT CẢ</strong> bài khấn: <strong style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong>
               </span>
             </label>
           </div>
