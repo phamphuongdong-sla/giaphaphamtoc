@@ -143,8 +143,7 @@ function App() {
 
   return (
     <div className="app-container">
-      {splash && <SplashScreen onEnter={() => setSplash(false)} onFinish={() => setSplash(false)} currentTheme={theme} onThemeChange={setTheme} />}
-      
+
       <TopBar 
         viewMode={viewMode}
         onViewChange={handleViewChange}
