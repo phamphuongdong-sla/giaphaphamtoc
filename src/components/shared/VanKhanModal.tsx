@@ -541,31 +541,27 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 <div style={{ 
                   display: 'flex', 
                   flexDirection: 'column',
-                  gap: 8, 
+                  gap: 6, 
                   borderBottom: '1px solid rgba(201,146,58,0.2)', 
-                  paddingBottom: 8 
+                  paddingBottom: 10 
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                    <div style={{ flex: 1 }}>
-                      <span style={{
-                        display: 'inline-block',
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        color: 'var(--gold-mid)',
-                        background: 'rgba(201,146,58,0.12)',
-                        padding: '2px 8px',
-                        borderRadius: 4,
-                        marginBottom: 4,
-                        border: '1px solid rgba(201,146,58,0.2)'
-                      }}>
-                        {item.badge}
-                      </span>
-                      <h3 className="font-serif" style={{ margin: 0, fontSize: isFullscreen ? 18 : 16.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.3 }}>
-                        {item.title}
-                      </h3>
-                    </div>
+                  {/* Hàng 1: Badge trái + Nút phải */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <span style={{
+                      display: 'inline-block',
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      color: 'var(--gold-mid)',
+                      background: 'rgba(201,146,58,0.12)',
+                      padding: '2px 8px',
+                      borderRadius: 4,
+                      border: '1px solid rgba(201,146,58,0.2)',
+                      flexShrink: 0
+                    }}>
+                      {item.badge}
+                    </span>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                       {/* Nút Toàn màn hình từng bài */}
@@ -605,7 +601,13 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                     </div>
                   </div>
 
-                  <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.35 }}>
+                  {/* Hàng 2: Tên bài đầy đủ — rộng toàn dòng */}
+                  <h3 className="font-serif" style={{ margin: 0, fontSize: 16.5, fontWeight: 700, color: 'var(--gold-light)', lineHeight: 1.35 }}>
+                    {item.title}
+                  </h3>
+
+                  {/* Hàng 3: Mô tả */}
+                  <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.4 }}>
                     {item.subtitle}
                   </p>
                 </div>
