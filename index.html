@@ -4,38 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <!-- Anti-Cache Headers -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-
     <!-- SEO & App Meta -->
     <title>Gia Phả Phạm Tộc</title>
     <meta name="description" content="Ứng dụng lưu trữ và tra cứu gia phả dòng họ Phạm. Xem sơ đồ phả hệ, lịch giỗ âm lịch, sinh nhật thành viên." />
     <meta name="theme-color" content="#0c0c0c" />
 
-    <!-- Tự động dọn dẹp các Service Worker cũ nếu có (không reload vô hạn) -->
-    <script>
-      (function() {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for (var r of registrations) {
-              r.unregister();
-            }
-          });
-        }
-        if ('caches' in window) {
-          caches.keys().then(function(keys) {
-            keys.forEach(function(k) { caches.delete(k); });
-          });
-        }
-      })();
-    </script>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
 
-    <!-- PWA Manifest & Icons -->
-    <link rel="manifest" href="manifest.json" />
-    <link rel="icon" type="image/png" href="icons/icon-192.png" />
-    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 
     <!-- iOS PWA Support -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
