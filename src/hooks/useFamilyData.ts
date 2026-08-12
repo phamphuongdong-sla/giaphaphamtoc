@@ -75,8 +75,8 @@ export const useFamilyData = () => {
             const diffTime = targetDate.getTime() - today.getTime();
             const daysLeft = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-            // Chỉ lấy các ngày giỗ sắp diễn ra trong vòng 20 ngày tới (daysLeft = 0 là đúng ngày hôm nay)
-            if (daysLeft >= 0 && daysLeft <= 20) {
+            // Chỉ lấy các ngày giỗ sắp diễn ra trong vòng 7 ngày tới (daysLeft = 0 là đúng ngày hôm nay)
+            if (daysLeft >= 0 && daysLeft <= 7) {
               const WEEKDAYS_FULL = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
               const WEEKDAYS_SHORT = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
               const dayOfWeek = targetDate.getDay();
@@ -110,7 +110,7 @@ export const useFamilyData = () => {
       const diffTime = targetDate.getTime() - today.getTime();
       const daysLeft = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-      if (daysLeft >= 0 && daysLeft <= 20) {
+      if (daysLeft >= 0 && daysLeft <= 7) {
         const WEEKDAYS_FULL = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
         const WEEKDAYS_SHORT = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
         const dayOfWeek = targetDate.getDay();
