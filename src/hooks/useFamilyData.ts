@@ -71,17 +71,30 @@ export const useFamilyData = () => {
           }
 
           // Tính khoảng cách số ngày thực tế từ hôm nay đến ngày giỗ đó
-          if (targetDate) {
+          if (targetDate && solarTarget) {
             const diffTime = targetDate.getTime() - today.getTime();
             const daysLeft = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
             // Chỉ lấy các ngày giỗ sắp diễn ra trong vòng 20 ngày tới (daysLeft = 0 là đúng ngày hôm nay)
             if (daysLeft >= 0 && daysLeft <= 20) {
+              const WEEKDAYS_FULL = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+              const WEEKDAYS_SHORT = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+              const dayOfWeek = targetDate.getDay();
+              const weekdayFull = WEEKDAYS_FULL[dayOfWeek];
+              const weekdayShort = WEEKDAYS_SHORT[dayOfWeek];
+              const solarDateStr = `${weekdayFull}, ${String(solarTarget.d).padStart(2, '0')}/${String(solarTarget.m).padStart(2, '0')}/${solarTarget.y}`;
+
               list.push({
                 fullName: node.name,
                 date: `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')} Âm lịch`,
                 days: daysLeft,
-                person: member
+                person: member,
+                solarDateStr,
+                weekdayFull,
+                weekdayShort,
+                solarDay: solarTarget.d,
+                solarMonth: solarTarget.m,
+                solarYear: solarTarget.y
               });
             }
           }

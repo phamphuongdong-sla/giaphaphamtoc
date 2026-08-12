@@ -135,8 +135,9 @@ function App() {
               if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                 const daysText = reminder.days === 0 ? 'Hôm nay' : `Còn ${reminder.days} ngày`;
                 const title = `Sắp đến ngày giỗ: ${reminder.fullName}`;
+                const solarText = reminder.solarDateStr ? ` · Dương: ${reminder.solarDateStr}` : '';
                 const options = {
-                  body: `${reminder.date} (${daysText})`,
+                  body: `${reminder.date}${solarText} (${daysText})`,
                   icon: '/giaphaphamtoc/icons/icon-192x192.png',
                   badge: '/giaphaphamtoc/icons/icon-192x192.png'
                 };
@@ -220,31 +221,46 @@ function App() {
             </div>
 
             <div className="modal-list">
-              {reminders.map((item, idx) => (
-                <div
-                  className="reminder-row"
-                  key={idx}
-                  onClick={() => {
-                    if (item.person) {
-                      setSelectedPerson(item.person);
-                      setShowReminderModal(false);
-                    }
-                  }}
-                  style={{ cursor: item.person ? 'pointer' : 'default' }}
-                  title={item.person ? 'Bấm để xem tiểu sử chi tiết' : undefined}
-                >
-                  <div>
-                    <p className="reminder-name font-serif">{item.fullName}</p>
-                    <p className="modal-date">
-                      <Icon name="moon" size={9} style={{ marginRight: 4, verticalAlign: -1 }} />
-                      {item.date}
-                    </p>
+              {reminders.map((item, idx) => {
+                const isWeekend = item.weekdayShort === 'CN' || item.weekdayShort === 'T7';
+                return (
+                  <div
+                    className="reminder-row"
+                    key={idx}
+                    onClick={() => {
+                      if (item.person) {
+                        setSelectedPerson(item.person);
+                        setShowReminderModal(false);
+                      }
+                    }}
+                    style={{ cursor: item.person ? 'pointer' : 'default' }}
+                    title={item.person ? 'Bấm để xem tiểu sử chi tiết' : undefined}
+                  >
+                    <div>
+                      <p className="reminder-name font-serif">{item.fullName}</p>
+                      <p className="modal-date" style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 3 }}>
+                        <span>
+                          <Icon name="moon" size={10} style={{ marginRight: 4, verticalAlign: -1, color: 'var(--gold-mid)' }} />
+                          Giỗ âm lịch: <strong>{item.date}</strong>
+                        </span>
+                        {item.solarDateStr && (
+                          <span style={{ fontSize: '11px', color: isWeekend ? 'var(--gold-light)' : 'var(--text-muted)', fontWeight: isWeekend ? 600 : 400 }}>
+                            📅 Dương: <strong>{item.solarDateStr}</strong>
+                            {isWeekend && (
+                              <span style={{ marginLeft: 6, fontSize: '9px', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(201,146,58,0.2)', color: 'var(--gold-mid)' }}>
+                                Cuối tuần
+                              </span>
+                            )}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <span className={`days-pill${item.days === 0 ? ' today' : ''}`}>
+                      {item.days === 0 ? 'Hôm nay' : `Còn ${item.days} ngày`}
+                    </span>
                   </div>
-                  <span className={`days-pill${item.days === 0 ? ' today' : ''}`}>
-                    {item.days === 0 ? 'Hôm nay' : `Còn ${item.days} ngày`}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div style={{ padding: '10px 12px 14px' }}>
