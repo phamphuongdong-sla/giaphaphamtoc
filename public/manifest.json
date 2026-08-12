@@ -1,0 +1,40 @@
+{
+  "name": "Gia Phả Phạm Tộc",
+  "short_name": "Gia Phả",
+  "description": "Ứng dụng lưu trữ và tra cứu gia phả dòng họ Phạm",
+  "start_url": "/giaphaphamtoc/",
+  "scope": "/giaphaphamtoc/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c0c0c",
+  "theme_color": "#0c0c0c",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["lifestyle", "social"],
+  "lang": "vi",
+  "dir": "ltr"
+}
