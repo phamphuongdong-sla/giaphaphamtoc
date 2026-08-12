@@ -147,12 +147,21 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
 export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const [activeTab, setActiveTab] = useState<string>('gio');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [fontSize, setFontSize] = useState<number>(18); // Default font size set to 18px for great readability on mobile
 
   const handleCopy = (id: string, content: string) => {
     navigator.clipboard.writeText(content).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2500);
     });
+  };
+
+  const increaseFontSize = () => {
+    setFontSize((prev) => Math.min(prev + 2, 24));
+  };
+
+  const decreaseFontSize = () => {
+    setFontSize((prev) => Math.max(prev - 2, 14));
   };
 
   const filteredItems = VAN_KHAN_DATA.filter((item) => item.category === activeTab);
@@ -163,19 +172,19 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
         className="modal" 
         onClick={(e) => e.stopPropagation()} 
         style={{ 
-          maxWidth: '780px', 
-          width: '96vw', 
-          height: '92vh', 
-          maxHeight: '92vh', 
+          maxWidth: '820px', 
+          width: '98vw', 
+          height: '94vh', 
+          maxHeight: '94vh', 
           display: 'flex', 
           flexDirection: 'column',
           borderRadius: '16px',
           overflow: 'hidden'
         }}
       >
-        {/* Header - Tối ưu diện tích gọn gàng */}
-        <div className="modal-head" style={{ padding: '12px 16px 10px', borderBottom: '1px solid var(--border-gold-md)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Header - Tối ưu diện tích & Nút chỉnh cỡ chữ A- / A+ */}
+        <div className="modal-head" style={{ padding: '12px 14px 10px', borderBottom: '1px solid var(--border-gold-md)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{
                 width: 32, height: 32, borderRadius: 8,
@@ -185,20 +194,70 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
               }}>
                 <Icon name="book-open" size={17} style={{ color: 'var(--gold-light)' }} />
               </div>
-              <h2 className="font-display" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
+              <h2 className="font-display" style={{ fontSize: 17, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
                 Tủ Sách Văn Khấn Cổ Truyền
               </h2>
             </div>
-            <button 
-              className="detail-close" 
-              onClick={onClose}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
-            >
-              <Icon name="x" size={18} />
-            </button>
+
+            {/* Bộ điều chỉnh cỡ chữ (A- / 18px / A+) & Nút Đóng */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: 'rgba(0,0,0,0.3)',
+                border: '1px solid var(--border-gold)',
+                borderRadius: 8,
+                padding: '2px 4px',
+                gap: 4
+              }}>
+                <button
+                  onClick={decreaseFontSize}
+                  title="Giảm cỡ chữ"
+                  disabled={fontSize <= 14}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: fontSize <= 14 ? 'var(--text-muted)' : 'var(--gold-light)',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: fontSize <= 14 ? 'default' : 'pointer',
+                    padding: '2px 6px'
+                  }}
+                >
+                  A-
+                </button>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--gold-mid)', minWidth: 32, textAlign: 'center' }}>
+                  {fontSize}px
+                </span>
+                <button
+                  onClick={increaseFontSize}
+                  title="Tăng cỡ chữ"
+                  disabled={fontSize >= 24}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: fontSize >= 24 ? 'var(--text-muted)' : 'var(--gold-light)',
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: fontSize >= 24 ? 'default' : 'pointer',
+                    padding: '2px 6px'
+                  }}
+                >
+                  A+
+                </button>
+              </div>
+
+              <button 
+                className="detail-close" 
+                onClick={onClose}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
+              >
+                <Icon name="x" size={18} />
+              </button>
+            </div>
           </div>
 
-          {/* Các tab danh mục văn khấn (Bỏ nút Tất cả) */}
+          {/* Các tab danh mục văn khấn */}
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingTop: 10, scrollbarWidth: 'none' }}>
             {[
               { id: 'gio', label: 'Cúng Giỗ' },
@@ -213,7 +272,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 style={{
                   padding: '6px 14px',
                   borderRadius: 7,
-                  fontSize: 12.5,
+                  fontSize: 13,
                   fontWeight: activeTab === tab.id ? 700 : 500,
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
@@ -229,8 +288,8 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           </div>
         </div>
 
-        {/* Khung đọc văn khấn - Tối đa hóa diện tích & chữ to rõ nét */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {/* Khung đọc văn khấn - Phóng to chữ mặc định 18px & cho phép chỉnh đến 24px */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {filteredItems.map((item) => {
             const isCopied = copiedId === item.id;
             return (
@@ -240,14 +299,14 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                   background: 'var(--bg-elevated)',
                   border: '1px solid var(--border-gold)',
                   borderRadius: 12,
-                  padding: '14px 16px',
+                  padding: '12px 14px',
                   boxShadow: 'var(--shadow-sm)',
                   display: 'flex',
                   flexDirection: 'column',
                   height: '100%'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 8, borderBottom: '1px solid rgba(201,146,58,0.2)', paddingBottom: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 8, borderBottom: '1px solid rgba(201,146,58,0.2)', paddingBottom: 6 }}>
                   <div>
                     <h3 className="font-serif" style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--gold-light)' }}>
                       {item.title}
@@ -281,18 +340,18 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                   </button>
                 </div>
 
-                {/* Khung đọc văn khấn với chữ lớn, dễ đọc trên di động & máy tính */}
+                {/* Khung văn khấn hiển thị cực lớn & dễ đọc */}
                 <pre
                   className="font-serif"
                   style={{
-                    margin: '6px 0 0',
+                    margin: '4px 0 0',
                     padding: '16px 18px',
                     borderRadius: 10,
-                    background: 'rgba(0,0,0,0.32)',
-                    border: '1px solid rgba(201,146,58,0.2)',
-                    color: '#f7f4ec',
-                    fontSize: 'clamp(14px, 2vw, 16px)',
-                    lineHeight: 1.75,
+                    background: 'rgba(5, 5, 5, 0.55)',
+                    border: '1px solid rgba(201,146,58,0.25)',
+                    color: '#ffffff',
+                    fontSize: `${fontSize}px`,
+                    lineHeight: 1.8,
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
                     fontFamily: 'Georgia, "Times New Roman", serif',
@@ -308,7 +367,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
         </div>
 
         {/* Footer gọn gàng */}
-        <div style={{ padding: '8px 16px 12px', borderTop: '1px solid var(--border-gold-md)', textAlign: 'center' }}>
+        <div style={{ padding: '8px 14px 10px', borderTop: '1px solid var(--border-gold-md)', textAlign: 'center' }}>
           <button
             className="action-button modal-close"
             style={{ width: '100%', justifyContent: 'center', padding: '8px 16px' }}
