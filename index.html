@@ -9,12 +9,45 @@
     <meta name="description" content="Ứng dụng lưu trữ và tra cứu gia phả dòng họ Phạm. Xem sơ đồ phả hệ, lịch giỗ âm lịch, sinh nhật thành viên." />
     <meta name="theme-color" content="#0c0c0c" />
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/giaphaphamtoc/manifest.json" />
+    <!-- Service Worker Cache Auto-Recovery Guard (Khắc phục triệt để màn hình đen do Service Worker đè cache cũ) -->
+    <script>
+      (function() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (var r of registrations) {
+              r.update();
+            }
+          });
+        }
+        window.addEventListener('error', function(e) {
+          if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+            var url = e.target.src || e.target.href || '';
+            if (url.includes('/assets/')) {
+              console.warn('Asset load failed, clearing stale SW cache...', url);
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for (var r of registrations) r.unregister();
+                  if ('caches' in window) {
+                    caches.keys().then(function(keys) {
+                      return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+                    }).then(function() {
+                      window.location.reload(true);
+                    });
+                  } else {
+                    window.location.reload(true);
+                  }
+                });
+              }
+            }
+          }
+        }, true);
+      })();
+    </script>
 
-    <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" href="/giaphaphamtoc/icons/icon-192.png" />
-    <link rel="apple-touch-icon" href="/giaphaphamtoc/icons/icon-192.png" />
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
     <!-- iOS PWA Support -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
