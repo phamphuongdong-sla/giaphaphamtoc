@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <!-- Anti-Cache Headers: Đảm bảo trình duyệt luôn tải index.html mới nhất từ GitHub Pages -->
+    <!-- Anti-Cache Headers -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -14,10 +14,9 @@
     <meta name="description" content="Ứng dụng lưu trữ và tra cứu gia phả dòng họ Phạm. Xem sơ đồ phả hệ, lịch giỗ âm lịch, sinh nhật thành viên." />
     <meta name="theme-color" content="#0c0c0c" />
 
-    <!-- Service Worker Self-Destruct & Auto-Recovery Guard -->
+    <!-- Tự động dọn dẹp các Service Worker cũ nếu có (không reload vô hạn) -->
     <script>
       (function() {
-        // Tự động gỡ bỏ mọi Service Worker cũ lưu trên thiết bị
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function(registrations) {
             for (var r of registrations) {
@@ -25,24 +24,11 @@
             }
           });
         }
-        // Xóa sạch bộ nhớ đệm CacheStorage cũ
         if ('caches' in window) {
           caches.keys().then(function(keys) {
-            keys.forEach(function(key) {
-              caches.delete(key);
-            });
+            keys.forEach(function(k) { caches.delete(k); });
           });
         }
-        // Tự động reload nếu gặp lỗi 404 từ file đệm cũ
-        window.addEventListener('error', function(e) {
-          if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
-            var url = e.target.src || e.target.href || '';
-            if (url.includes('/assets/')) {
-              console.warn('Stale asset detected, reloading page...', url);
-              window.location.reload(true);
-            }
-          }
-        }, true);
       })();
     </script>
 
@@ -67,7 +53,7 @@
     <link rel="modulepreload" crossorigin href="/giaphaphamtoc/assets/vendor-core-fdd35676.js">
     <link rel="modulepreload" crossorigin href="/giaphaphamtoc/assets/vendor-tree-a8166c4f.js">
     <link rel="stylesheet" href="/giaphaphamtoc/assets/index-eb6c3a15.css">
-  <script id="vite-plugin-pwa:register-sw" src="/giaphaphamtoc/registerSW.js"></script></head>
+  </head>
   <body>
     <div id="root"></div>
     
