@@ -239,7 +239,13 @@ function App() {
                     title={item.person ? 'Bấm để xem tiểu sử chi tiết' : undefined}
                   >
                     <div>
-                      <p className="reminder-name font-serif" style={{ color: item.isSpecialDay ? 'var(--gold-light)' : undefined, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <p className="reminder-name font-serif" style={{ 
+                        color: item.isSpecialDay ? '#fef08a' : undefined, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 6,
+                        animation: item.isSpecialDay ? 'vanKhanBlink 1.4s ease-in-out infinite' : 'none'
+                      }}>
                         {item.isSpecialDay && <Icon name="bell-ring" size={14} style={{ color: 'var(--gold-mid)' }} />}
                         {item.fullName}
                       </p>
