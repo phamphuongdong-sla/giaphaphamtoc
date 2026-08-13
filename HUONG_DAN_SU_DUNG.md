@@ -88,10 +88,9 @@ Hệ thống cho phép bạn đồng bộ trực tiếp các ngày giỗ, sinh n
 
 ### 🌿 2.4. Xem Sơ Đồ Cây Phả Hệ (Tab "Sơ đồ")
 
-* Hiển thị cấu trúc dòng họ theo từng nhánh, từng đời trực quan.
+* Hiển thị cấu trúc dòng họ theo từng nhánh, từng đời trực quan. Toàn bộ cây phả hệ sẽ được hiển thị đầy đủ ngay từ ban đầu.
 * **Chuẩn truyền thống:** Sơ đồ đã được tối ưu hiển thị theo nguyên tắc truyền thống (từ Phải qua Trái): Vợ cả ➔ Vợ 2, Con trưởng ➔ Con út.
 * **Thao tác:**
-  * **Đóng / Mở nhánh:** Sơ đồ ban đầu hiển thị rút gọn để dễ nhìn. Bạn có thể bấm nút mũi tên Lên/Xuống ở dưới mỗi người để Mở rộng hoặc Thu gọn các thế hệ con cháu của người đó.
   * **Kéo rê:** Dùng tay vuốt (trên điện thoại) hoặc giữ chuột kéo (trên PC) để di chuyển sơ đồ.
   * **Thu phóng:** Dùng 2 ngón tay chụm/xòe hoặc con trỏ chuột để phóng to/thu nhỏ.
   * **Xem chi tiết:** Bấm vào tên thành viên trên sơ đồ để xem bảng thông tin tiểu sử.

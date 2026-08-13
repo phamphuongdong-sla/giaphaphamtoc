@@ -339,9 +339,8 @@ def main():
     r.font.color.rgb = RGBColor(180, 100, 20)
 
     tree_feats = [
-        ("Hiển thị trực quan: ", "Cho phép hình dung rõ ràng cấu trúc gia tộc theo từng nhánh, từng đời."),
+        ("Hiển thị trực quan: ", "Cho phép hình dung rõ ràng cấu trúc gia tộc theo từng nhánh, từng đời. Toàn bộ cây phả hệ sẽ được hiển thị đầy đủ ngay từ ban đầu."),
         ("Chuẩn truyền thống: ", "Sơ đồ đã được tối ưu hiển thị theo nguyên tắc truyền thống (từ Phải qua Trái): Vợ cả ➔ Vợ 2, Con trưởng ➔ Con út."),
-        ("Đóng / Mở nhánh: ", "Sơ đồ ban đầu hiển thị rút gọn để dễ nhìn. Bạn có thể bấm nút mũi tên Lên/Xuống ở dưới mỗi người để Mở rộng hoặc Thu gọn các thế hệ con cháu của người đó."),
         ("Kéo rê: ", "Dùng tay vuốt (trên điện thoại) hoặc giữ chuột kéo (trên PC) để di chuyển sơ đồ."),
         ("Phóng to / Thu nhỏ: ", "Dùng 2 ngón tay chụm/xòe hoặc lăn con trỏ chuột để thu phóng."),
         ("Xem thông tin chi tiết: ", "Bấm trực tiếp vào từng ô thành viên trên cây để xem bảng tiểu sử chi tiết.")
@@ -352,7 +351,7 @@ def main():
         r_b = p.add_run(b)
         r_b.bold = True
         r_b.font.name = 'Arial'
-        if b in ["Chuẩn truyền thống: ", "Đóng / Mở nhánh: "]:
+        if b in ["Chuẩn truyền thống: "]:
             r_b.font.color.rgb = RGBColor(0, 100, 0)
         r_t = p.add_run(text)
         r_t.font.name = 'Arial'
