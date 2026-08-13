@@ -977,71 +977,318 @@ main {
 }
 
 /* ============================================================
-   TREE VIEW (ReactFlow)
+   TREE VIEW (ReactFlow) - UI/UX PRO MAX REDESIGN
    ============================================================ */
-.tree-card {
+.tree-container-wrapper {
+  width: 100%;
+  height: calc(100vh - 80px);
+  background: radial-gradient(ellipse at 50% 10%, rgba(212, 175, 55, 0.12) 0%, rgba(15, 23, 42, 0.98) 70%), #0f172a;
   position: relative;
-  width: 290px;
-  min-height: 200px;
-  border-radius: var(--r-lg);
-  border: 1px solid var(--border-gold);
-  background: var(--bg-card);
-  box-shadow: var(--shadow-md);
-  cursor: pointer;
-  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
   overflow: hidden;
 }
 
-.tree-card::before {
-  content: '';
+[data-theme="light"] .tree-container-wrapper {
+  background: radial-gradient(ellipse at 50% 10%, rgba(212, 175, 55, 0.15) 0%, #faf8f5 75%), #f7f4ef;
+}
+
+:root {
+  --tree-edge-color: #b8893c;
+  --tree-dot-color: rgba(212, 175, 55, 0.25);
+}
+
+[data-theme="light"] {
+  --tree-edge-color: #b8860b;
+  --tree-dot-color: rgba(184, 137, 60, 0.2);
+}
+
+/* ── Custom Node Handle ── */
+.tree-node-handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: #d4af37 !important;
+  border: 2px solid #1e293b !important;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+  z-index: 10 !important;
+}
+
+[data-theme="light"] .tree-node-handle {
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 6px rgba(184, 137, 60, 0.4);
+}
+
+/* ── Tree Card Base ── */
+.tree-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background: rgba(30, 41, 59, 0.85);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-card-accent-line {
   position: absolute;
-  inset: 0 0 auto;
+  top: 0;
+  left: 12px;
+  right: 12px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold-mid) 40%, var(--gold) 50%, var(--gold-mid) 60%, transparent);
-  z-index: 3;
+  background: linear-gradient(90deg, transparent, #eab308 50%, transparent);
+  border-radius: 2px;
+  opacity: 0.8;
   pointer-events: none;
 }
 
 .tree-card:hover {
-  border-color: var(--border-gold-md);
-  box-shadow: var(--shadow-gold);
-  transform: translateY(-2px);
+  border-color: rgba(234, 179, 8, 0.5);
+  box-shadow: 0 18px 36px -8px rgba(0, 0, 0, 0.5), 0 0 20px rgba(234, 179, 8, 0.2);
+  transform: translateY(-4px);
 }
 
-.tree-card.dark {
-  background: linear-gradient(140deg, #1a0a0a, #2a1010);
-  border-color: rgba(201,146,58,0.25);
+/* Root Node Specific Styling */
+.tree-card.root-node {
+  border-color: rgba(234, 179, 8, 0.6);
+  background: linear-gradient(145deg, rgba(40, 30, 15, 0.9), rgba(20, 16, 10, 0.95));
+  box-shadow: 0 12px 30px rgba(212, 175, 55, 0.25), 0 0 0 1px rgba(234, 179, 8, 0.4);
 }
 
-.tree-card.dark::before {
-  background: linear-gradient(90deg, transparent, var(--gold-light) 40%, var(--gold-mid) 50%, var(--gold-light) 60%, transparent);
+.tree-card.root-node .tree-card-accent-line {
+  height: 3px;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #b8860b, #fef08a, #b8860b);
 }
 
+/* Branch Node Styling */
 .tree-card.branch {
-  background: linear-gradient(140deg, #101a0a, #1a2a10);
-  border-color: rgba(61,168,112,0.25);
+  border-color: rgba(52, 211, 153, 0.3);
 }
 
-.tree-card.branch::before {
-  background: linear-gradient(90deg, transparent, #3da870 40%, #5ad490 50%, #3da870 60%, transparent);
+.tree-card.branch .tree-card-accent-line {
+  background: linear-gradient(90deg, transparent, #34d399 50%, transparent);
+}
+
+/* Inner Layout */
+.tree-card-inner {
+  padding: 8px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+/* Header & Badges */
+.tree-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.gen-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(234, 179, 8, 0.15);
+  color: #fef08a;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  text-transform: uppercase;
+}
+
+.tree-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.status-pill.deceased {
+  background: rgba(225, 29, 72, 0.15);
+  color: #fda4af;
+  border: 1px solid rgba(225, 29, 72, 0.3);
+}
+
+.status-pill.birthday {
+  background: rgba(168, 85, 247, 0.18);
+  color: #f0abfc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.title-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Name Row & Gender Icon */
+.tree-card-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.gender-tag {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gender-tag.root {
+  background: linear-gradient(135deg, #ca8a04, #eab308);
+  color: #0f172a;
+}
+
+.gender-tag.male {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.gender-tag.female {
+  background: rgba(236, 72, 153, 0.18);
+  color: #f472b6;
+  border: 1px solid rgba(236, 72, 153, 0.3);
 }
 
 .tree-card .name {
-  text-align: center;
-  font-size: 16px;
-  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 
-.tree-card.gen-1:not(.dark)::after { display: none; }
-.tree-card.gen-1 { box-shadow: 0 0 0 1px rgba(201,146,58,0.4), var(--shadow-md); }
+.tree-card.male .name {
+  color: #e0f2fe;
+}
 
-.tree-card-content {
-  position: relative;
-  z-index: 2;
-  height: 100%;
-  padding: 16px;
-  overflow: hidden;
-  border-radius: var(--r-lg);
+.tree-card.female .name {
+  color: #fce7f3;
+}
+
+.tree-card.root-node .name {
+  color: #fef08a;
+  font-size: 16px;
+}
+
+/* Meta Data (Birth/Death) */
+.tree-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: auto;
+  font-size: 11px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #94a3b8;
+}
+
+.meta-row.death {
+  color: #fda4af;
+}
+
+.meta-icon {
+  flex-shrink: 0;
+}
+
+.meta-icon.birth {
+  color: #eab308;
+}
+
+.meta-icon.death {
+  color: #f43f5e;
+}
+
+.meta-label {
+  font-weight: 500;
+}
+
+.meta-val {
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.meta-row.death .meta-val {
+  color: #fecdd3;
+}
+
+/* ── Floating Toggle Pill Button ── */
+.tree-toggle-pill {
+  position: absolute;
+  bottom: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #1e293b;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #fef08a;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.tree-toggle-pill:hover {
+  background: #283548;
+  border-color: #eab308;
+  transform: translateX(-50%) scale(1.08);
+  box-shadow: 0 6px 16px rgba(234, 179, 8, 0.3);
+}
+
+.tree-toggle-pill.expanded {
+  background: rgba(30, 41, 59, 0.95);
+  padding: 3px 7px;
+  color: #cbd5e1;
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.tree-toggle-pill .toggle-count {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fef08a;
 }
 
 /* ── Title Pill ── */

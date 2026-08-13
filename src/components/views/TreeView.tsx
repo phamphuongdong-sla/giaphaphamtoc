@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -10,6 +10,8 @@ import {
   NodeProps,
   Handle,
   Position,
+  ReactFlowProvider,
+  useReactFlow,
 } from '@xyflow/react';
 import dagre from '@dagrejs/dagre';
 import '@xyflow/react/dist/style.css';
@@ -24,11 +26,11 @@ interface TreeViewProps {
   onSelectPerson: (person: MemberEntry) => void;
 }
 
-const NODE_WIDTH = 300;
-const NODE_HEIGHT = 240;
+const NODE_WIDTH = 250;
+const NODE_HEIGHT = 130;
 
 // ==========================================
-// CUSTOM NODE COMPONENT (TỐI ƯU KHU VỰC BẤM ĐÓNG/MỞ)
+// CUSTOM NODE COMPONENT (UI/UX PRO MAX DESIGN)
 // ==========================================
 const FamilyMemberNode = ({ data }: NodeProps) => {
   const nodeData = data.nodeData as PersonNode;
@@ -39,94 +41,97 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
   const onSelect = data.onSelect as (person: MemberEntry) => void;
 
   const hasChildren = nodeData.children && nodeData.children.length > 0;
+  const childrenCount = nodeData.children ? nodeData.children.filter(c => !checkIsSpouseNode(c)).length : 0;
+  
   const bDate = nodeData.birthSolar;
   const currentMonth = new Date().getMonth() + 1;
   const currentDay = new Date().getDate();
   const isBirthday = !nodeData.deceased && bDate?.d && bDate?.m && bDate.m === currentMonth && bDate.d >= currentDay;
   
   const level = data.level as number;
-  const dark = level === 0;
+  const isRoot = level === 0;
   const branch = !!nodeData.branchRoot;
 
   const nameRole = getNameRole(nodeData.name);
   const badge = nameRole || (nodeData.role && !getNameRole(nodeData.name) ? nodeData.role : '');
+  const gender = nodeData.gender || 'unknown';
 
   return (
     <div style={{ width: NODE_WIDTH, height: NODE_HEIGHT, position: 'relative' }}>
       <Handle 
         type="target" 
         position={Position.Top} 
-        style={{ background: '#b8893c', width: '10px', height: '10px', zIndex: 10 }} 
+        className="tree-node-handle"
       />
 
       <article
-        className={`tree-card ${dark ? 'dark' : ''} ${branch ? 'branch' : ''} ${nodeData.gender === 'male' ? 'male' : (nodeData.gender === 'female' ? 'female' : '')} ${isBirthday ? 'birthday' : ''} gen-${Math.min(currentGen, 5)}`}
+        className={`tree-card ${isRoot ? 'root-node' : ''} ${branch ? 'branch' : ''} ${gender === 'male' ? 'male' : (gender === 'female' ? 'female' : '')} ${isBirthday ? 'birthday' : ''} gen-${Math.min(currentGen, 5)}`}
         onClick={() => onSelect(person)}
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          boxSizing: 'border-box',
-          margin: '0',
-          paddingBottom: '0px',
-          overflow: 'hidden'
-        }}
       >
-        {nodeData.deceased && <div className="deceased-mark" />}
-        {isBirthday && (
-          <div className="birthday-ribbon">
-            <Icon name="cake" size={10} /> Sinh nhật
-          </div>
-        )}
-        
-        {/* Vùng nội dung thông tin */}
-        <div style={{ padding: '16px 16px 8px 16px', flex: 1, overflowY: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <span className="gen-badge">Đời {currentGen}</span>
-          {badge && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 4 }}>
-              <span className="title-pill">{badge}</span>
+        {/* Thanh accent màu nổi trên đầu thẻ */}
+        <div className="tree-card-accent-line" />
+
+        <div className="tree-card-inner">
+          {/* Header row: Badge Đời & Trạng thái */}
+          <div className="tree-card-header">
+            <span className="gen-badge">Đời {currentGen}</span>
+
+            <div className="tree-card-badges">
+              {badge && <span className="title-pill">{badge}</span>}
+              {nodeData.deceased && (
+                <span className="status-pill deceased" title="Đã mất">
+                  <Icon name="moon" size={10} /> Mất
+                </span>
+              )}
+              {isBirthday && (
+                <span className="status-pill birthday" title="Sinh nhật tháng này">
+                  <Icon name="cake" size={10} /> Sinh nhật
+                </span>
+              )}
             </div>
-          )}
-          <h3 className="name font-display">{cleanName(nodeData.name)}</h3>
-          <div className="meta">
-            {(nodeData.birthSolar || nodeData.birthNote) && (
-              <span className="meta-item">
-                <Icon name="sun" size={12} />
-                Sinh: <b>{formatBirthDisplay(nodeData)}</b>
+          </div>
+          
+          {/* Tên thành viên & Biểu tượng giới tính */}
+          <div className="tree-card-name-row">
+            {isRoot ? (
+              <span className="gender-tag root" title="Cụ Thủy Tổ">
+                <Icon name="award" size={12} />
               </span>
+            ) : gender === 'male' ? (
+              <span className="gender-tag male" title="Nam">
+                <Icon name="user" size={11} />
+              </span>
+            ) : gender === 'female' ? (
+              <span className="gender-tag female" title="Nữ">
+                <Icon name="user" size={11} />
+              </span>
+            ) : null}
+            <h3 className="name font-display">{cleanName(nodeData.name)}</h3>
+          </div>
+
+          {/* Ngày sinh & Ngày mất */}
+          <div className="tree-card-meta">
+            {(nodeData.birthSolar || nodeData.birthNote) && (
+              <div className="meta-row">
+                <Icon name="sun" size={11} className="meta-icon birth" />
+                <span className="meta-label">Sinh:</span>
+                <span className="meta-val">{formatBirthDisplay(nodeData)}</span>
+              </div>
             )}
             {nodeData.deceased && (nodeData.deathSolar || nodeData.deathNote) && (
-              <span className="meta-item death">
-                <Icon name="moon" size={12} />
-                Mất: <b>{formatDeathDisplay(nodeData)}</b>
-              </span>
+              <div className="meta-row death">
+                <Icon name="moon" size={11} className="meta-icon death" />
+                <span className="meta-label">Mất:</span>
+                <span className="meta-val">{formatDeathDisplay(nodeData)}</span>
+              </div>
             )}
           </div>
-          {nodeData.bio && <div className="info">{nodeData.bio}</div>}
         </div>
 
-        {/* NÚT BẤM ĐÓNG / MỞ NHÁNH TO, NHẠY */}
+        {/* NÚT TOGGLE FLOATING PILL TINH TẾ Ở ĐÁY THẺ */}
         {hasChildren && (
           <button
-            className="toggle-btn-tree nodrag nopan"
-            style={{
-              display: 'flex',
-              width: '100%',
-              height: '46px',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'rgba(184,137,60,0.18)',
-              border: 'none',
-              borderTop: '1px solid rgba(184,137,60,0.25)',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: '18px',
-              flexShrink: 0,
-              zIndex: 30,
-              touchAction: 'manipulation',
-              color: 'var(--gold-light, #f0c978)'
-            }}
+            className={`tree-toggle-pill nodrag nopan ${isExpanded ? 'expanded' : 'collapsed'}`}
             onClick={(e) => {
               e.stopPropagation();
               onToggleExpand(isExpanded);
@@ -134,9 +139,13 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
-            aria-label={isExpanded ? 'Thu gọn' : 'Mở rộng'}
+            aria-label={isExpanded ? 'Thu gọn nhánh' : 'Mở rộng nhánh'}
+            title={isExpanded ? 'Thu gọn nhánh' : `Mở rộng (${childrenCount > 0 ? `${childrenCount} con` : 'chi tiết'})`}
           >
-            <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} size={20} />
+            <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} size={13} />
+            {!isExpanded && childrenCount > 0 && (
+              <span className="toggle-count">+{childrenCount}</span>
+            )}
           </button>
         )}
       </article>
@@ -144,7 +153,7 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
       <Handle 
         type="source" 
         position={Position.Bottom} 
-        style={{ background: '#b8893c', width: '10px', height: '10px', zIndex: 10 }} 
+        className="tree-node-handle"
       />
     </div>
   );
@@ -155,7 +164,7 @@ const nodeTypes = {
 };
 
 // ==========================================
-// HÀM DUYỆT CÂY, ĐẢO THỨ TỰ VÀ QUẢN LÝ ĐÓNG/MỞ MẶC ĐỊNH
+// HÀM DUYỆT CÂY VÀ BỐ TRÍ LAYOUT (DAGRE)
 // ==========================================
 const flattenTreeWithVisibility = (
   node: PersonNode,
@@ -177,7 +186,6 @@ const flattenTreeWithVisibility = (
   const currentPath = [...pathNodes, node];
   const uniqueId = currentPath.map(n => cleanName(n.name)).join(' > ');
 
-  // YÊU CẦU: Chỉ mở gốc để hiển thị ba bà; các node khác mặc định đóng.
   let isExpanded = expandedNodes[uniqueId];
   if (isExpanded === undefined) {
     isExpanded = parentNode === null;
@@ -218,7 +226,8 @@ const flattenTreeWithVisibility = (
       source: parentId,
       target: uniqueId,
       type: 'smoothstep',
-      style: { stroke: '#b8893c', strokeWidth: 2 },
+      animated: false,
+      style: { stroke: 'var(--tree-edge-color, #b8893c)', strokeWidth: 2, opacity: 0.8 },
     });
   }
 
@@ -251,12 +260,11 @@ const flattenTreeWithVisibility = (
   return { nodes, edges };
 };
 
-// Cấu hình Layout tự động
 const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   if (nodes.length === 0) return { nodes, edges };
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
-  dagreGraph.setGraph({ rankdir: 'TB', nodesep: 60, ranksep: 100 });
+  dagreGraph.setGraph({ rankdir: 'TB', nodesep: 35, ranksep: 60 });
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT });
@@ -281,12 +289,126 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   return { nodes: layoutedNodes, edges };
 };
 
-export const TreeView = ({ treeData, onSelectPerson }: TreeViewProps) => {
+// ==========================================
+// FLOATING CONTROL TOOLBAR & LEGEND
+// ==========================================
+interface FloatingToolbarProps {
+  onExpandAll: () => void;
+  onCollapseAll: () => void;
+}
+
+const FloatingToolbar = ({ onExpandAll, onCollapseAll }: FloatingToolbarProps) => {
+  const { zoomIn, zoomOut, fitView } = useReactFlow();
+  const [showLegend, setShowLegend] = useState(false);
+
+  return (
+    <>
+      {/* BAR ĐIỀU KHIỂN NỔI (TOP RIGHT) */}
+      <div className="tree-floating-toolbar">
+        <button 
+          className="tree-toolbar-btn" 
+          onClick={() => fitView({ duration: 400, padding: 0.2 })}
+          title="Căn chỉnh toàn màn hình (Fit View)"
+        >
+          <Icon name="route" size={16} />
+        </button>
+        <button 
+          className="tree-toolbar-btn" 
+          onClick={() => zoomIn({ duration: 300 })}
+          title="Phóng to (+)"
+        >
+          <Icon name="plus" size={16} />
+        </button>
+        <button 
+          className="tree-toolbar-btn" 
+          onClick={() => zoomOut({ duration: 300 })}
+          title="Thu nhỏ (-)"
+        >
+          <Icon name="minus" size={16} />
+        </button>
+
+        <div className="tree-toolbar-divider" />
+
+        <button 
+          className="tree-toolbar-btn text-btn" 
+          onClick={onExpandAll}
+          title="Mở rộng toàn bộ nhánh phả hệ"
+        >
+          <Icon name="folder-plus" size={15} />
+          <span>Mở tất cả</span>
+        </button>
+        <button 
+          className="tree-toolbar-btn text-btn" 
+          onClick={onCollapseAll}
+          title="Thu gọn phả hệ"
+        >
+          <Icon name="folder-minus" size={15} />
+          <span>Thu gọn</span>
+        </button>
+
+        <div className="tree-toolbar-divider" />
+
+        <button 
+          className={`tree-toolbar-btn ${showLegend ? 'active' : ''}`} 
+          onClick={() => setShowLegend(!showLegend)}
+          title="Xem chú thích sơ đồ"
+        >
+          <Icon name="info" size={16} />
+        </button>
+      </div>
+
+      {/* CHÚ THÍCH LEGEND (BOTTOM LEFT / POPUP) */}
+      {showLegend && (
+        <div className="tree-legend-card">
+          <div className="tree-legend-header">
+            <span className="tree-legend-title">Chú thích Sơ đồ</span>
+            <button className="tree-legend-close" onClick={() => setShowLegend(false)}>
+              <Icon name="x" size={14} />
+            </button>
+          </div>
+          <div className="tree-legend-grid">
+            <div className="legend-item">
+              <span className="legend-badge root">
+                <Icon name="award" size={11} />
+              </span>
+              <span>Thủy Tổ gia tộc</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-badge male">
+                <Icon name="user" size={11} />
+              </span>
+              <span>Nam (Thành viên)</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-badge female">
+                <Icon name="user" size={11} />
+              </span>
+              <span>Nữ (Dâu / Nữ)</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-badge deceased">🕯</span>
+              <span>Đã mất</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-badge birthday">🎂</span>
+              <span>Sinh nhật tháng này</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+// ==========================================
+// INNER TREE COMPONENT
+// ==========================================
+const TreeViewInner = ({ treeData, onSelectPerson }: TreeViewProps) => {
   const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const handleToggleExpand = (id: string, currentlyExpanded?: boolean) => {
+  const handleToggleExpand = useCallback((id: string, currentlyExpanded?: boolean) => {
     setExpandedNodes((prev) => {
       if (currentlyExpanded !== undefined) {
         return {
@@ -307,7 +429,28 @@ export const TreeView = ({ treeData, onSelectPerson }: TreeViewProps) => {
         [id]: !isRoot,
       };
     });
-  };
+  }, []);
+
+  // Hàm mở rộng toàn bộ
+  const handleExpandAll = useCallback(() => {
+    if (!treeData) return;
+    const allExpanded: Record<string, boolean> = {};
+    const collectAllKeys = (node: PersonNode, path: string[]) => {
+      const currentPath = [...path, cleanName(node.name)];
+      const id = currentPath.join(' > ');
+      allExpanded[id] = true;
+      if (node.children) {
+        node.children.forEach(child => collectAllKeys(child, currentPath));
+      }
+    };
+    collectAllKeys(treeData, []);
+    setExpandedNodes(allExpanded);
+  }, [treeData]);
+
+  // Hàm thu gọn toàn bộ (chỉ giữ Root)
+  const handleCollapseAll = useCallback(() => {
+    setExpandedNodes({});
+  }, []);
 
   useEffect(() => {
     if (!treeData) return;
@@ -323,17 +466,10 @@ export const TreeView = ({ treeData, onSelectPerson }: TreeViewProps) => {
     
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
-  }, [treeData, expandedNodes, onSelectPerson]);
+  }, [treeData, expandedNodes, handleToggleExpand, onSelectPerson]);
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: 'calc(100vh - 80px)',
-        background: 'radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.08) 0%, transparent 60%), var(--bg-base)',
-        position: 'relative',
-      }}
-    >
+    <div className="tree-container-wrapper">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -348,13 +484,22 @@ export const TreeView = ({ treeData, onSelectPerson }: TreeViewProps) => {
         maxZoom={1.5}
       >
         <Background
-          color="var(--border-gold-md)"
-          gap={24}
+          color="var(--tree-dot-color, rgba(212,175,55,0.25))"
+          gap={28}
           size={1.5}
           variant={BackgroundVariant.Dots}
-          style={{ opacity: 0.4 }}
+          style={{ opacity: 0.5 }}
         />
+        <FloatingToolbar onExpandAll={handleExpandAll} onCollapseAll={handleCollapseAll} />
       </ReactFlow>
     </div>
+  );
+};
+
+export const TreeView = (props: TreeViewProps) => {
+  return (
+    <ReactFlowProvider>
+      <TreeViewInner {...props} />
+    </ReactFlowProvider>
   );
 };
