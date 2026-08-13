@@ -226,8 +226,9 @@ const flattenTreeWithVisibility = (
       source: parentId,
       target: uniqueId,
       type: 'smoothstep',
+      pathOptions: { borderRadius: 16 },
       animated: false,
-      style: { stroke: 'var(--tree-edge-color, #b8893c)', strokeWidth: 2, opacity: 0.8 },
+      style: { stroke: 'var(--tree-edge-color, #ca8a04)', strokeWidth: 2.5, opacity: 0.9 },
     });
   }
 

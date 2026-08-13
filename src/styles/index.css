@@ -992,28 +992,28 @@ main {
 }
 
 :root {
-  --tree-edge-color: #b8893c;
-  --tree-dot-color: rgba(212, 175, 55, 0.25);
+  --tree-edge-color: #ca8a04;
+  --tree-dot-color: rgba(202, 138, 4, 0.35);
 }
 
 [data-theme="light"] {
-  --tree-edge-color: #b8860b;
-  --tree-dot-color: rgba(184, 137, 60, 0.2);
+  --tree-edge-color: #ca8a04;
+  --tree-dot-color: rgba(180, 130, 40, 0.3);
 }
 
 /* ── Custom Node Handle ── */
 .tree-node-handle {
   width: 10px !important;
   height: 10px !important;
-  background: #d4af37 !important;
+  background: #ca8a04 !important;
   border: 2px solid #1e293b !important;
-  box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+  box-shadow: 0 0 8px rgba(202, 138, 4, 0.7);
   z-index: 10 !important;
 }
 
 [data-theme="light"] .tree-node-handle {
   border: 2px solid #ffffff !important;
-  box-shadow: 0 0 6px rgba(184, 137, 60, 0.4);
+  box-shadow: 0 0 8px rgba(202, 138, 4, 0.5);
 }
 
 /* ── Tree Card Base ── */
@@ -2950,36 +2950,37 @@ dialog.modal::backdrop {
 
 [data-theme="light"] .tree-card {
   background: #ffffff;
-  border: 1px solid rgba(212,175,55,0.2);
-  box-shadow: 0 12px 36px rgba(138,94,28,0.06);
+  border: 1px solid rgba(180, 130, 40, 0.28);
+  box-shadow: 0 8px 24px -4px rgba(180, 130, 40, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="light"] .tree-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 48px rgba(212,175,55,0.12), 0 0 0 1px var(--border-gold-md);
+  border-color: rgba(202, 138, 4, 0.5);
+  box-shadow: 0 16px 36px -6px rgba(180, 130, 40, 0.2), 0 0 0 1px rgba(202, 138, 4, 0.4);
 }
 
-[data-theme="light"] .tree-card::before {
-  opacity: 0.3;
+[data-theme="light"] .tree-card.root-node {
+  background: linear-gradient(145deg, #fffdf2, #fef3c7);
+  border: 1.5px solid #ca8a04;
+  box-shadow: 0 10px 28px rgba(202, 138, 4, 0.22);
 }
 
-[data-theme="light"] .tree-card.dark {
-  background: #ffffff;
-  border-color: rgba(212,175,55,0.4);
+[data-theme="light"] .tree-card.male {
+  background: linear-gradient(145deg, #ffffff, #f0f9ff);
+  border-color: rgba(59, 130, 246, 0.3);
+  border-left: 3px solid #2563eb;
 }
 
-[data-theme="light"] .tree-card.dark::before {
-  background: linear-gradient(90deg, transparent, #d4af37 40%, #b8860b 50%, #d4af37 60%, transparent);
-  opacity: 0.8;
+[data-theme="light"] .tree-card.female {
+  background: linear-gradient(145deg, #ffffff, #fdf2f8);
+  border-color: rgba(236, 72, 153, 0.3);
+  border-left: 3px solid #db2777;
 }
 
 [data-theme="light"] .tree-card.branch {
-  background: #fdfdfc;
-  border-color: rgba(61,168,112,0.15);
-}
-
-[data-theme="light"] .tree-card .meta-item.death {
-  color: #c2185b;
+  background: linear-gradient(145deg, #ffffff, #f0fdf4);
+  border-color: rgba(34, 197, 94, 0.3);
 }
 
 /* NoticeBar Light Theme */
