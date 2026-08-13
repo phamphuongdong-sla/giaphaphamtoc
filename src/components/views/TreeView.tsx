@@ -128,26 +128,6 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
           </div>
         </div>
 
-        {/* NÚT TOGGLE FLOATING PILL TINH TẾ Ở ĐÁY THẺ */}
-        {hasChildren && (
-          <button
-            className={`tree-toggle-pill nodrag nopan ${isExpanded ? 'expanded' : 'collapsed'}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleExpand(isExpanded);
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
-            onPointerDown={(e) => e.stopPropagation()}
-            aria-label={isExpanded ? 'Thu gọn nhánh' : 'Mở rộng nhánh'}
-            title={isExpanded ? 'Thu gọn nhánh' : `Mở rộng (${childrenCount > 0 ? `${childrenCount} con` : 'chi tiết'})`}
-          >
-            <Icon name={isExpanded ? 'chevron-up' : 'chevron-down'} size={13} />
-            {!isExpanded && childrenCount > 0 && (
-              <span className="toggle-count">+{childrenCount}</span>
-            )}
-          </button>
-        )}
       </article>
 
       <Handle 
@@ -188,7 +168,7 @@ const flattenTreeWithVisibility = (
 
   let isExpanded = expandedNodes[uniqueId];
   if (isExpanded === undefined) {
-    isExpanded = parentNode === null;
+    isExpanded = true;
   }
 
   const person: MemberEntry = {
