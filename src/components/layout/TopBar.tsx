@@ -36,10 +36,18 @@ export const TopBar = ({ viewMode, onViewChange, lunarLabel, solarLabel, theme, 
           />
         </div>
         <div className="brand-text">
-          <p className="brand-kicker font-serif">Lưu trữ thế hệ gia tộc</p>
-          <h1 className="brand-title font-royal" style={{ color: 'var(--gold-light)', textShadow: '0 2px 12px rgba(201,146,58,0.35)' }}>Gia Phả Phạm Tộc</h1>
-          <p className="brand-sub">
-            <span style={{ color: 'var(--gold)', opacity: 0.8 }}>
+          <p className="brand-kicker font-serif" style={theme === 'light' ? { color: '#1C1917', opacity: 1 } : undefined}>Lưu trữ thế hệ gia tộc</p>
+          <h1
+            className="brand-title font-royal"
+            style={{
+              color: theme === 'light' ? '#1C1917' : 'var(--gold-light)',
+              textShadow: theme === 'light' ? 'none' : '0 2px 12px rgba(201,146,58,0.35)',
+            }}
+          >
+            Gia Phả Phạm Tộc
+          </h1>
+          <p className="brand-sub" style={theme === 'light' ? { color: '#44403C' } : undefined}>
+            <span style={{ color: theme === 'light' ? '#44403C' : 'var(--gold)', opacity: theme === 'light' ? 1 : 0.8 }}>
               <Icon name="calendar" size={10} style={{ display: 'inline', verticalAlign: -1, marginRight: 4 }} />
             </span>
             {solarDate}

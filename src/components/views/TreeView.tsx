@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   ReactFlow,
   Background,
@@ -65,7 +65,7 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
       />
 
       <article
-        className={`tree-card ${isRoot ? 'root-node' : ''} ${branch ? 'branch' : ''} ${gender === 'male' ? 'male' : (gender === 'female' ? 'female' : '')} ${isBirthday ? 'birthday' : ''} gen-${Math.min(currentGen, 5)}`}
+        className={`tree-card ${isRoot ? 'root-node ancestor' : ''} ${branch ? 'branch' : ''} ${gender === 'male' ? 'male' : (gender === 'female' ? 'female' : '')} ${isBirthday ? 'birthday' : ''} gen-${Math.min(currentGen, 5)}`}
         onClick={() => onSelect(person)}
       >
         {/* Thanh accent màu nổi trên đầu thẻ */}
@@ -95,15 +95,15 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
           <div className="tree-card-name-row">
             {isRoot ? (
               <span className="gender-tag root" title="Cụ Thủy Tổ">
-                <Icon name="award" size={12} />
+                <Icon name="crown" size={12} />
               </span>
             ) : gender === 'male' ? (
               <span className="gender-tag male" title="Nam">
-                <Icon name="user" size={11} />
+                <Icon name="mars" size={11} />
               </span>
             ) : gender === 'female' ? (
               <span className="gender-tag female" title="Nữ">
-                <Icon name="user" size={11} />
+                <Icon name="venus" size={11} />
               </span>
             ) : null}
             <h3 className="name font-display">{cleanName(nodeData.name)}</h3>
@@ -229,7 +229,7 @@ const flattenTreeWithVisibility = (
       pathOptions: { borderRadius: 16 },
       animated: false,
       style: { stroke: 'var(--tree-edge-color, #ca8a04)', strokeWidth: 2.5, opacity: 0.9 },
-    });
+    } as unknown as Edge);
   }
 
   if (isExpanded && node.children && Array.isArray(node.children)) {

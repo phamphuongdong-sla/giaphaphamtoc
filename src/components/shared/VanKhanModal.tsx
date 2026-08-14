@@ -473,7 +473,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            justify: 'space-between',
+            justifyContent: 'space-between',
             background: 'rgba(201, 146, 58, 0.12)',
             border: '1px solid rgba(201, 146, 58, 0.3)',
             borderRadius: 8,

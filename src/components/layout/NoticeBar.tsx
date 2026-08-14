@@ -31,7 +31,7 @@ export const NoticeBar = ({ birthdays, onSelectPerson }: NoticeBarProps) => {
             >
               <Icon name="sparkles" size={10} style={{ color: 'var(--gold)', opacity: 0.6 }} />
               {m.fullName}
-              <span style={{ opacity: 0.5, fontSize: '10px' }}>
+              <span style={{ fontSize: '10px' }}>
                 ({String(m.day).padStart(2, '0')}/{String(m.month).padStart(2, '0')})
               </span>
             </span>

@@ -114,7 +114,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
     return (
       <div style={{
-        backgroundColor: 'var(--bg-elevated)',
+        backgroundColor: 'var(--bg-card)',
         border: '1px solid var(--border-gold-md)',
         borderRadius: 8,
         padding: '8px 14px',
@@ -127,7 +127,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         {isLifespan ? (
           <>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-primary)' }}>
-              Tuổi thọ TB: <strong style={{ color: 'var(--gold)', fontSize: 15 }}>{item.value} tuổi</strong>
+              Tuổi thọ TB: <strong style={{ color: 'var(--gold-mid)', fontSize: 15 }}>{item.value} tuổi</strong>
             </p>
             {item.payload?.count !== undefined && (
               <p style={{ margin: '2px 0 0', fontSize: 11, color: 'var(--text-muted)' }}>
@@ -137,7 +137,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           </>
         ) : (
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-primary)' }}>
-            Số lượng: <strong style={{ color: 'var(--gold)', fontSize: 15 }}>{item.value} người</strong>
+            Số lượng: <strong style={{ color: 'var(--gold-mid)', fontSize: 15 }}>{item.value} người</strong>
           </p>
         )}
       </div>
@@ -525,10 +525,10 @@ export const DashboardView = ({ memberEntries = [], onSelectPerson }: DashboardV
           <div style={{ width: '100%', height: 210 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.lifespanGenderData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-glass)" vertical={false} />
                 <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} domain={[0, 100]} />
-                <RechartsTooltip cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} content={<CustomTooltip />} />
+                <RechartsTooltip cursor={{ fill: 'var(--border-glass)' }} content={<CustomTooltip />} />
                 <Bar dataKey="lifespan" fill="var(--gold)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -564,10 +564,10 @@ export const DashboardView = ({ memberEntries = [], onSelectPerson }: DashboardV
             <div style={{ width: '100%', height: 220 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.genLifespanData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-glass)" vertical={false} />
                   <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} domain={[0, 100]} />
-                  <RechartsTooltip cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} content={<CustomTooltip />} />
+                  <RechartsTooltip cursor={{ fill: 'var(--border-glass)' }} content={<CustomTooltip />} />
                   <Bar dataKey="lifespan" fill="#38bdf8" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -753,10 +753,10 @@ export const DashboardView = ({ memberEntries = [], onSelectPerson }: DashboardV
             <div style={{ width: '100%', height: 230 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.ageDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-glass)" vertical={false} />
                   <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <RechartsTooltip cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} content={<CustomTooltip />} />
+                  <RechartsTooltip cursor={{ fill: 'var(--border-glass)' }} content={<CustomTooltip />} />
                   <Bar dataKey="count" fill="var(--gold-mid)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -795,10 +795,10 @@ export const DashboardView = ({ memberEntries = [], onSelectPerson }: DashboardV
             <div style={{ width: '100%', height: 230 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.genData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-glass)" vertical={false} />
                   <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <RechartsTooltip cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }} content={<CustomTooltip />} />
+                  <RechartsTooltip cursor={{ fill: 'var(--border-glass)' }} content={<CustomTooltip />} />
                   <Bar dataKey="total" fill="#38bdf8" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

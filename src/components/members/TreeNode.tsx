@@ -62,10 +62,13 @@ export const TreeNode = ({
     setOpen(!open);
   };
 
+  const isAncestor = currentGen === 1 || level === 0;
+  const genderClass = data.gender === 'male' ? 'male' : (data.gender === 'female' ? 'female' : '');
+
   return (
-    <div className={`tree-item ${level === 0 ? 'root-node' : ''}`}>
+    <div className={`tree-item ${isAncestor ? 'root-node ancestor' : ''}`}>
       <article
-        className={`tree-card ${dark ? 'dark' : ''} ${branch ? 'branch' : ''} ${data.isSpouse ? 'spouse' : ''} ${isBirthday ? 'birthday' : ''} gen-${Math.min(currentGen, 5)}`}
+        className={`tree-card ${dark || isAncestor ? 'dark root-node ancestor' : ''} ${branch ? 'branch' : ''} ${genderClass} ${data.isSpouse ? 'spouse' : ''} ${isBirthday ? 'birthday' : ''} gen-${Math.min(currentGen, 5)}`}
         onClick={handleCardClick}
         style={{
           width: '300px',
@@ -104,7 +107,22 @@ export const TreeNode = ({
                 <span className="title-pill">{badge}</span>
               </div>
             )}
-            <h3 className="name font-display">{cleanName(data.name)}</h3>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 4 }}>
+              {isAncestor ? (
+                <span className="gender-tag root" title="Cụ Thủy Tổ">
+                  <Icon name="crown" size={12} />
+                </span>
+              ) : data.gender === 'male' ? (
+                <span className="gender-tag male" title="Nam">
+                  <Icon name="mars" size={11} />
+                </span>
+              ) : data.gender === 'female' ? (
+                <span className="gender-tag female" title="Nữ">
+                  <Icon name="venus" size={11} />
+                </span>
+              ) : null}
+              <h3 className="name font-display" style={{ margin: 0 }}>{cleanName(data.name)}</h3>
+            </div>
             <div className="meta">
               {(data.birthSolar || data.birthNote) && (
                 <span className="meta-item">

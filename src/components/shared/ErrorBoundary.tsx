@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -29,7 +29,7 @@ export class ErrorBoundary extends Component<Props, State> {
         for (const registration of registrations) {
           registration.unregister();
         }
-        if ('caches' in window) {
+        if (typeof caches !== 'undefined') {
           caches.keys().then((keys) => {
             Promise.all(keys.map((key) => caches.delete(key))).then(() => {
               window.location.reload();

@@ -142,15 +142,19 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const genColors: Record<number, string> = { 1:'#e05050', 2:'#d4943a', 3:'#3da870', 4:'#3a7fc4', 5:'#9060b8' };
-  const genColor = genColors[Math.min(displayGen, 5)] || 'var(--gold-mid)';
+  const isAncestor = displayGen === 1;
+  const gender = data.gender || (data.isSpouse ? 'female' : 'unknown');
+  const genderClass = isAncestor ? 'root-node ancestor' : (gender === 'male' ? 'male' : (gender === 'female' ? 'female' : ''));
+
+  const genColors: Record<number, string> = { 1:'#ca8a04', 2:'#d4943a', 3:'#3da870', 4:'#3a7fc4', 5:'#9060b8' };
+  const genColor = isAncestor ? '#ca8a04' : (gender === 'female' ? '#db2777' : (gender === 'male' ? '#2563eb' : (genColors[Math.min(displayGen, 5)] || 'var(--gold-mid)')));
 
   return (
     <>
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
       <div className="modal-backdrop" onClick={onClose}>
-        <div className="modal detail-modal" onClick={(e) => e.stopPropagation()}>
+        <div className={`modal detail-modal ${genderClass}`} onClick={(e) => e.stopPropagation()}>
 
           {/* Header */}
           <div className="detail-head">
@@ -174,14 +178,23 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
                 display: 'grid', placeItems: 'center',
               }}>
                 <Icon
-                  name={data.deceased ? 'moon' : 'user'}
+                  name={isAncestor ? 'crown' : (data.deceased ? 'moon' : (gender === 'female' ? 'venus' : 'mars'))}
                   size={22}
-                  style={{ color: genColor, opacity: 0.8 }}
+                  style={{ color: genColor, opacity: 0.9 }}
                 />
               </div>
 
               <div style={{ minWidth: 0, flex: 1 }}>
-                <h2 className="detail-head-name font-display">{displayName}</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <h2 className="detail-head-name font-display">{displayName}</h2>
+                  {isAncestor ? (
+                    <span className="gender-tag root" title="Cụ Thủy Tổ"><Icon name="crown" size={12} /></span>
+                  ) : gender === 'male' ? (
+                    <span className="gender-tag male" title="Nam"><Icon name="mars" size={11} /></span>
+                  ) : gender === 'female' ? (
+                    <span className="gender-tag female" title="Nữ"><Icon name="venus" size={11} /></span>
+                  ) : null}
+                </div>
                 <p className="detail-subtitle">{relation}</p>
                 {roleTags.length > 0 && (
                   <div className="detail-tags">

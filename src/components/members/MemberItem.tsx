@@ -82,6 +82,10 @@ export const MemberItem = ({
   };
   const genColor = genColors[currentGen] || '#8b5cf6';
 
+  const isAncestor = currentGen === 1;
+  const genderClass = data.gender === 'male' ? 'male' : (data.gender === 'female' ? 'female' : '');
+  const ancestorClass = isAncestor ? 'root-node ancestor royal-ancestor-glow' : '';
+
   return (
     <div style={{ position: 'relative', width: '100%', display: 'block' }}>
       {/* Connector dot - căn theo chiều cao dòng tên, không phụ thuộc số dòng ngày tháng */}
@@ -90,7 +94,7 @@ export const MemberItem = ({
       )}
 
       {/* Row */}
-      <div className={`member-row member-row-stacked micro-card-hover ${currentGen === 1 ? 'royal-ancestor-glow' : ''}`}>
+      <div className={`member-row member-row-stacked micro-card-hover ${genderClass} ${ancestorClass}`.trim()}>
         {/* Left: index + name + dates */}
         <div
           className="member-row-left"
@@ -113,18 +117,31 @@ export const MemberItem = ({
           {/* Tên + vai vế + 2 dòng ngày sinh/ngày mất, xếp dọc để mở rộng nhánh con không ảnh hưởng layout dòng này */}
           <div className="member-info-col">
             <div className="member-name-row">
-               <span className={`member-name ${data.gender === 'male' ? 'male' : (data.gender === 'female' ? 'female' : '')}`}>
-                 {cleanName(data.name)}
-                 </span>
-                  {data.deceased && (
-                    <Icon
-                    name="cross"
-                      size={11}
-                          aria-label="Đã mất"
-                        className="member-deceased-icon"
-                        />
-                      )}
-                      {badge && <span className="member-role-badge">{badge}</span>}
+              {isAncestor ? (
+                <span className="gender-tag root" title="Cụ Thủy Tổ">
+                  <Icon name="crown" size={12} />
+                </span>
+              ) : data.gender === 'male' ? (
+                <span className="gender-tag male" title="Nam">
+                  <Icon name="mars" size={11} />
+                </span>
+              ) : data.gender === 'female' ? (
+                <span className="gender-tag female" title="Nữ">
+                  <Icon name="venus" size={11} />
+                </span>
+              ) : null}
+              <span className={`member-name ${genderClass} ${isAncestor ? 'root ancestor' : ''}`}>
+                {cleanName(data.name)}
+              </span>
+              {data.deceased && (
+                <Icon
+                  name="cross"
+                  size={11}
+                  aria-label="Đã mất"
+                  className="member-deceased-icon"
+                />
+              )}
+              {badge && <span className="member-role-badge">{badge}</span>}
             </div>
 
             {hasBirth && (
