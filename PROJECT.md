@@ -27,7 +27,7 @@
 |---|------|-------|-------------|--------|
 | M1 | Light Mode Color Palette & Contrast | R1: `index.css`, `TopBar.tsx`, `NoticeBar.tsx`, `DashboardView.tsx` theme variables, WCAG contrast 4.5:1, shadow `box-shadow: 0 4px 20px -2px rgba(184, 137, 60, 0.08)` | none | DONE |
 | M2 | Member Cards & Tree Nodes Redesign | R2: `MemberItem.tsx`, `TreeView.tsx`, `TreeNode.tsx`, `PersonDetailModal.tsx`, gender card backgrounds (`#f0f9ff`, `#fdf2f8`, `#fef3c7`), 3D hover `200ms ease-out` | M1 | DONE |
-| M3 | TypeScript Fixes, Build Verification & Deployment | R3: Fix 5 TS errors, `npm run build`, browser check, git commit & push to `main` and `gh-pages` | M1, M2 | PLANNED |
+| M3 | TypeScript Fixes, Build Verification & Deployment | R3: Fix 5 TS errors, `npm run build`, browser check, git commit & push to `main` and `gh-pages` | M1, M2 | DONE |
 
 ## Interface Contracts
 ### `[data-theme="light"]` Theme Contracts
