@@ -82,8 +82,8 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
           {/* Header row: Badge Đời & Vai vế xếp sát nhau */}
           <div className="tree-card-header">
             <div className="tree-card-badges">
-              <span className="gen-badge">Đời {currentGen}</span>
               {badge && <span className="title-pill">{badge}</span>}
+              <span className="gen-badge">Đời {currentGen}</span>
               {isBirthday && (
                 <span className="status-pill birthday" title="Sinh nhật tháng này">
                   <Icon name="cake" size={10} /> Sinh nhật

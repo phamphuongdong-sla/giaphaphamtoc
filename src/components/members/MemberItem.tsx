@@ -117,9 +117,6 @@ export const MemberItem = ({
             )}
           </span>
 
-          {/* Generation color indicator — co dãn theo toàn bộ chiều cao khối thông tin */}
-          <div className="member-gen-bar" style={{ background: genColor }} />
-
           {/* Tên + vai vế + 2 dòng ngày sinh/ngày mất, xếp dọc để mở rộng nhánh con không ảnh hưởng layout dòng này */}
           <div className="member-info-col">
             <div className="member-name-row">
@@ -139,8 +136,8 @@ export const MemberItem = ({
               <span className={`member-name ${genderClass} ${isAncestor ? 'root ancestor' : ''}`}>
                 {cleanName(data.name)}
               </span>
-              <span className="gen-badge">Đời {currentGen}</span>
               {badge && <span className="member-role-badge">{badge}</span>}
+              <span className="gen-badge">Đời {currentGen}</span>
             </div>
 
             {hasBirth && (
