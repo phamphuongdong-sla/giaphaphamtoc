@@ -71,18 +71,19 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
         {/* Thanh accent màu nổi trên đầu thẻ */}
         <div className="tree-card-accent-line" />
 
-        <div className="tree-card-inner">
-          {/* Header row: Badge Đời & Trạng thái */}
-          <div className="tree-card-header">
-            <span className="gen-badge">Đời {currentGen}</span>
+        {/* Dải băng đen chéo góc phải dành cho người đã mất */}
+        {nodeData.deceased && (
+          <div className="deceased-ribbon" title="Đã mất">
+            MẤT
+          </div>
+        )}
 
+        <div className="tree-card-inner">
+          {/* Header row: Badge Đời & Vai vế */}
+          <div className="tree-card-header">
             <div className="tree-card-badges">
               {badge && <span className="title-pill">{badge}</span>}
-              {nodeData.deceased && (
-                <span className="status-pill deceased" title="Đã mất">
-                  <Icon name="moon" size={10} /> Mất
-                </span>
-              )}
+              <span className="gen-badge">Đời {currentGen}</span>
               {isBirthday && (
                 <span className="status-pill birthday" title="Sinh nhật tháng này">
                   <Icon name="cake" size={10} /> Sinh nhật

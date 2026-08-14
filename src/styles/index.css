@@ -609,6 +609,8 @@ main {
 }
 
 .member-row {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1031,6 +1033,7 @@ main {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .tree-card-accent-line {
@@ -1043,6 +1046,36 @@ main {
   border-radius: 2px;
   opacity: 0.8;
   pointer-events: none;
+}
+
+/* ── Deceased Diagonal Black Mourning Ribbon Banner ── */
+.deceased-ribbon {
+  position: absolute;
+  top: 9px;
+  right: -24px;
+  width: 82px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #090d16, #1f2937);
+  color: #f3f4f6;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 2.5px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 25;
+  pointer-events: none;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+[data-theme="light"] .deceased-ribbon {
+  background: linear-gradient(135deg, #18181b, #090d16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .tree-card:hover {

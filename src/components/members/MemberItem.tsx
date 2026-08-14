@@ -95,6 +95,12 @@ export const MemberItem = ({
 
       {/* Row */}
       <div className={`member-row member-row-stacked micro-card-hover ${genderClass} ${ancestorClass}`.trim()}>
+        {data.deceased && (
+          <div className="deceased-ribbon" title="Đã mất">
+            MẤT
+          </div>
+        )}
+
         {/* Left: index + name + dates */}
         <div
           className="member-row-left"
@@ -133,14 +139,6 @@ export const MemberItem = ({
               <span className={`member-name ${genderClass} ${isAncestor ? 'root ancestor' : ''}`}>
                 {cleanName(data.name)}
               </span>
-              {data.deceased && (
-                <Icon
-                  name="cross"
-                  size={11}
-                  aria-label="Đã mất"
-                  className="member-deceased-icon"
-                />
-              )}
               {badge && <span className="member-role-badge">{badge}</span>}
             </div>
 
