@@ -614,7 +614,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 8px 36px 8px 12px;
   margin-bottom: 4px;
   border-radius: var(--r-md);
   border: 1px solid rgba(201,146,58,0.1);
@@ -1052,8 +1052,8 @@ main {
   position: absolute;
   top: 0;
   right: 0;
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   overflow: hidden;
   border-top-right-radius: 14px;
   pointer-events: none;
@@ -1062,21 +1062,21 @@ main {
 
 .deceased-ribbon {
   position: absolute;
-  top: 10px;
-  right: -24px;
-  width: 76px;
-  height: 12px;
+  top: 8px;
+  right: -20px;
+  width: 64px;
+  height: 10px;
   transform: rotate(45deg);
   background: linear-gradient(135deg, #090d16, #1f2937);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 [data-theme="light"] .deceased-ribbon {
   background: linear-gradient(135deg, #18181b, #090d16);
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
 }
 
 .tree-card:hover {
@@ -1125,6 +1125,7 @@ main {
   justify-content: flex-start;
   gap: 6px;
   min-height: 22px;
+  padding-right: 36px;
 }
 
 .gen-badge {
