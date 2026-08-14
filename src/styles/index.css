@@ -1411,6 +1411,13 @@ main {
   white-space: nowrap;
 }
 
+[data-theme="light"] .gen-badge {
+  background: #fef3c7 !important;
+  color: #78350f !important;
+  border: 1px solid rgba(202, 138, 4, 0.4) !important;
+  font-weight: 800 !important;
+}
+
 /* ── Info / Bio ── */
 .info {
   margin-top: 8px;

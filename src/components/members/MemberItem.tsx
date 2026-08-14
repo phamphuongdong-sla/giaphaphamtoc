@@ -142,13 +142,15 @@ export const MemberItem = ({
 
             {hasBirth && (
               <span className="member-dates-line">
-                <Icon name="sun" size={10} style={{ marginRight: 4, verticalAlign: -1, opacity: 0.65 }} />
+                <Icon name="sun" size={10} style={{ marginRight: 4, verticalAlign: -1, opacity: 0.75 }} />
+                <span style={{ opacity: 0.85, marginRight: 3, fontWeight: 600, fontSize: '11px' }}>Sinh:</span>
                 {birthText}
               </span>
             )}
             {hasDeath && (
               <span className="member-dates-line">
-                <span style={{ opacity: 0.7, marginRight: 4, fontSize: '10px' }}>Mất:</span>
+                <Icon name="moon" size={10} style={{ marginRight: 4, verticalAlign: -1, color: '#f87171', opacity: 0.85 }} />
+                <span style={{ opacity: 0.85, marginRight: 3, fontWeight: 600, fontSize: '11px', color: '#f87171' }}>Mất:</span>
                 {deathText}
               </span>
             )}
