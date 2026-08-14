@@ -1033,7 +1033,6 @@ main {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .tree-card-accent-line {
@@ -1048,34 +1047,36 @@ main {
   pointer-events: none;
 }
 
-/* ── Deceased Diagonal Black Mourning Ribbon Banner ── */
+/* ── Deceased Diagonal Black Mourning Ribbon Wrapper & Banner ── */
+.deceased-ribbon-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-top-right-radius: 14px;
+  pointer-events: none;
+  z-index: 25;
+}
+
 .deceased-ribbon {
   position: absolute;
-  top: 9px;
+  top: 10px;
   right: -24px;
-  width: 82px;
+  width: 76px;
+  height: 12px;
   transform: rotate(45deg);
   background: linear-gradient(135deg, #090d16, #1f2937);
-  color: #f3f4f6;
-  font-size: 8.5px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-align: center;
-  padding: 2.5px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
   border-top: 1px solid rgba(255, 255, 255, 0.3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  z-index: 25;
-  pointer-events: none;
-  text-transform: uppercase;
-  user-select: none;
 }
 
 [data-theme="light"] .deceased-ribbon {
   background: linear-gradient(135deg, #18181b, #090d16);
-  color: #ffffff;
   border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .tree-card:hover {
@@ -1287,7 +1288,7 @@ main {
   bottom: -13px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 40;
+  z-index: 50;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -1299,9 +1300,10 @@ main {
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+  white-space: nowrap;
 }
 
 .tree-toggle-pill:hover {
@@ -1319,9 +1321,9 @@ main {
 }
 
 .tree-toggle-pill .toggle-count {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
-  color: #fef08a;
+  color: inherit;
 }
 
 /* ── Title Pill ── */

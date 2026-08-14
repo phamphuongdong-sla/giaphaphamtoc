@@ -68,22 +68,22 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
         className={`tree-card ${isRoot ? 'root-node ancestor' : ''} ${branch ? 'branch' : ''} ${gender === 'male' ? 'male' : (gender === 'female' ? 'female' : '')} ${isBirthday ? 'birthday' : ''} gen-${Math.min(currentGen, 5)}`}
         onClick={() => onSelect(person)}
       >
-        {/* Thanh accent màu nổi trên đầu thẻ */}
-        <div className="tree-card-accent-line" />
-
-        {/* Dải băng đen chéo góc phải dành cho người đã mất */}
+        {/* Dải băng đen chéo góc phải dành cho người đã mất (không có chữ) */}
         {nodeData.deceased && (
-          <div className="deceased-ribbon" title="Đã mất">
-            MẤT
+          <div className="deceased-ribbon-wrapper">
+            <div className="deceased-ribbon" title="Đã mất" />
           </div>
         )}
 
+        {/* Thanh accent màu nổi trên đầu thẻ */}
+        <div className="tree-card-accent-line" />
+
         <div className="tree-card-inner">
-          {/* Header row: Badge Đời & Vai vế */}
+          {/* Header row: Badge Đời & Vai vế xếp sát nhau */}
           <div className="tree-card-header">
             <div className="tree-card-badges">
-              {badge && <span className="title-pill">{badge}</span>}
               <span className="gen-badge">Đời {currentGen}</span>
+              {badge && <span className="title-pill">{badge}</span>}
               {isBirthday && (
                 <span className="status-pill birthday" title="Sinh nhật tháng này">
                   <Icon name="cake" size={10} /> Sinh nhật

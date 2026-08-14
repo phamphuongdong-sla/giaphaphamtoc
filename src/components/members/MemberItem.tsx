@@ -96,8 +96,8 @@ export const MemberItem = ({
       {/* Row */}
       <div className={`member-row member-row-stacked micro-card-hover ${genderClass} ${ancestorClass}`.trim()}>
         {data.deceased && (
-          <div className="deceased-ribbon" title="Đã mất">
-            MẤT
+          <div className="deceased-ribbon-wrapper">
+            <div className="deceased-ribbon" title="Đã mất" />
           </div>
         )}
 
