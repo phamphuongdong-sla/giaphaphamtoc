@@ -299,37 +299,12 @@ interface FloatingToolbarProps {
 }
 
 const FloatingToolbar = ({ onExpandAll, onCollapseAll }: FloatingToolbarProps) => {
-  const { zoomIn, zoomOut, fitView } = useReactFlow();
   const [showLegend, setShowLegend] = useState(false);
 
   return (
     <>
-      {/* BAR ĐIỀU KHIỂN NỔI (TOP RIGHT) */}
-      <div className="tree-floating-toolbar">
-        <button 
-          className="tree-toolbar-btn" 
-          onClick={() => fitView({ duration: 400, padding: 0.2 })}
-          title="Căn chỉnh toàn màn hình (Fit View)"
-        >
-          <Icon name="route" size={16} />
-        </button>
-        <button 
-          className="tree-toolbar-btn" 
-          onClick={() => zoomIn({ duration: 300 })}
-          title="Phóng to (+)"
-        >
-          <Icon name="plus" size={16} />
-        </button>
-        <button 
-          className="tree-toolbar-btn" 
-          onClick={() => zoomOut({ duration: 300 })}
-          title="Thu nhỏ (-)"
-        >
-          <Icon name="minus" size={16} />
-        </button>
-
-        <div className="tree-toolbar-divider" />
-
+      {/* THANH CÔNG CỤ TÁC VỤ FLOATING TOOLBAR GÓC TRÊN PHẢI */}
+      <div className="tree-floating-toolbar nodrag nopan">
         <button 
           className="tree-toolbar-btn text-btn" 
           onClick={onExpandAll}
