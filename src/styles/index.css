@@ -1392,25 +1392,23 @@ main {
 
 /* ── Gen Badge ── */
 .gen-badge {
-  position: absolute;
-  top: 7px;
-  right: 8px;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 18px;
-  padding: 0 7px;
-  border-radius: var(--r-pill);
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  height: 20px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: rgba(0,0,0,0.4);
-  border: 1px solid var(--border-gold);
-  color: var(--gold-mid);
-  pointer-events: none;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  color: #fef08a;
   z-index: 5;
   font-family: var(--font-body);
+  white-space: nowrap;
 }
 
 /* ── Info / Bio ── */
