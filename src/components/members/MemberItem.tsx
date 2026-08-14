@@ -139,6 +139,7 @@ export const MemberItem = ({
               <span className={`member-name ${genderClass} ${isAncestor ? 'root ancestor' : ''}`}>
                 {cleanName(data.name)}
               </span>
+              <span className="gen-badge">Đời {currentGen}</span>
               {badge && <span className="member-role-badge">{badge}</span>}
             </div>
 
@@ -150,7 +151,7 @@ export const MemberItem = ({
             )}
             {hasDeath && (
               <span className="member-dates-line">
-                <Icon name="moon" size={10} style={{ marginRight: 4, verticalAlign: -1, opacity: 0.65 }} />
+                <span style={{ opacity: 0.7, marginRight: 4, fontSize: '10px' }}>Mất:</span>
                 {deathText}
               </span>
             )}

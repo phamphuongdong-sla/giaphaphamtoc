@@ -121,7 +121,6 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
             )}
             {nodeData.deceased && (nodeData.deathSolar || nodeData.deathNote) && (
               <div className="meta-row death">
-                <Icon name="moon" size={11} className="meta-icon death" />
                 <span className="meta-label">Mất:</span>
                 <span className="meta-val">{formatDeathDisplay(nodeData)}</span>
               </div>
