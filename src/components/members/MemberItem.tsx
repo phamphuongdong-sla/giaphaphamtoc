@@ -133,11 +133,11 @@ export const MemberItem = ({
                   <Icon name="venus" size={11} />
                 </span>
               ) : null}
+              <span className="gen-badge">Đời {currentGen}</span>
+              {badge && <span className="member-role-badge">{badge}</span>}
               <span className={`member-name ${genderClass} ${isAncestor ? 'root ancestor' : ''}`}>
                 {cleanName(data.name)}
               </span>
-              {badge && <span className="member-role-badge">{badge}</span>}
-              <span className="gen-badge">Đời {currentGen}</span>
             </div>
 
             {hasBirth && (
