@@ -291,92 +291,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 };
 
 // ==========================================
-// FLOATING CONTROL TOOLBAR & LEGEND
-// ==========================================
-interface FloatingToolbarProps {
-  onExpandAll: () => void;
-  onCollapseAll: () => void;
-}
-
-const FloatingToolbar = ({ onExpandAll, onCollapseAll }: FloatingToolbarProps) => {
-  const [showLegend, setShowLegend] = useState(false);
-
-  return (
-    <>
-      {/* THANH CÔNG CỤ TÁC VỤ FLOATING TOOLBAR GÓC TRÊN PHẢI */}
-      <div className="tree-floating-toolbar nodrag nopan">
-        <button 
-          className="tree-toolbar-btn text-btn" 
-          onClick={onExpandAll}
-          title="Mở rộng toàn bộ nhánh phả hệ"
-        >
-          <Icon name="folder-plus" size={15} />
-          <span>Mở tất cả</span>
-        </button>
-        <button 
-          className="tree-toolbar-btn text-btn" 
-          onClick={onCollapseAll}
-          title="Thu gọn phả hệ"
-        >
-          <Icon name="folder-minus" size={15} />
-          <span>Thu gọn</span>
-        </button>
-
-        <div className="tree-toolbar-divider" />
-
-        <button 
-          className={`tree-toolbar-btn ${showLegend ? 'active' : ''}`} 
-          onClick={() => setShowLegend(!showLegend)}
-          title="Xem chú thích sơ đồ"
-        >
-          <Icon name="info" size={16} />
-        </button>
-      </div>
-
-      {/* CHÚ THÍCH LEGEND (BOTTOM LEFT / POPUP) */}
-      {showLegend && (
-        <div className="tree-legend-card">
-          <div className="tree-legend-header">
-            <span className="tree-legend-title">Chú thích Sơ đồ</span>
-            <button className="tree-legend-close" onClick={() => setShowLegend(false)}>
-              <Icon name="x" size={14} />
-            </button>
-          </div>
-          <div className="tree-legend-grid">
-            <div className="legend-item">
-              <span className="legend-badge root">
-                <Icon name="award" size={11} />
-              </span>
-              <span>Thủy Tổ gia tộc</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-badge male">
-                <Icon name="user" size={11} />
-              </span>
-              <span>Nam (Thành viên)</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-badge female">
-                <Icon name="user" size={11} />
-              </span>
-              <span>Nữ (Dâu / Nữ)</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-badge deceased">🕯</span>
-              <span>Đã mất</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-badge birthday">🎂</span>
-              <span>Sinh nhật tháng này</span>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-// ==========================================
 // INNER TREE COMPONENT
 // ==========================================
 const TreeViewInner = ({ treeData, onSelectPerson }: TreeViewProps) => {
@@ -466,7 +380,6 @@ const TreeViewInner = ({ treeData, onSelectPerson }: TreeViewProps) => {
           variant={BackgroundVariant.Dots}
           style={{ opacity: 0.5 }}
         />
-        <FloatingToolbar onExpandAll={handleExpandAll} onCollapseAll={handleCollapseAll} />
       </ReactFlow>
     </div>
   );
