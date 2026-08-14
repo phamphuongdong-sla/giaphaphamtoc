@@ -2742,18 +2742,11 @@ dialog.modal::backdrop {
   transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out, background-color 200ms ease-out;
 }
 
-[data-theme="light"] .member-row.male {
-  background: linear-gradient(145deg, #ffffff, #f0f9ff);
-  border-color: rgba(147, 197, 253, 0.6);
-  border-left: 3.5px solid #2563eb;
-  box-shadow: 0 4px 18px -2px rgba(37, 99, 235, 0.08);
-}
-
+[data-theme="light"] .member-row.male,
 [data-theme="light"] .member-row.female {
-  background: linear-gradient(145deg, #ffffff, #fdf2f8);
-  border-color: rgba(251, 207, 232, 0.6);
-  border-left: 3.5px solid #db2777;
-  box-shadow: 0 4px 18px -2px rgba(219, 39, 119, 0.08);
+  background: #ffffff;
+  border: 1px solid rgba(180, 130, 40, 0.18);
+  box-shadow: 0 4px 18px -2px rgba(180, 130, 40, 0.06);
 }
 
 [data-theme="light"] .member-row.ancestor,
@@ -2764,18 +2757,9 @@ dialog.modal::backdrop {
 }
 
 [data-theme="light"] .member-row:hover {
-  transform: translateY(-4px) scale(1.008);
-  box-shadow: 0 12px 28px -4px rgba(184, 137, 60, 0.18), 0 4px 12px -2px rgba(184, 137, 60, 0.1);
-}
-
-[data-theme="light"] .member-row.male:hover {
-  border-color: #2563eb;
-  box-shadow: 0 12px 28px -4px rgba(37, 99, 235, 0.18), 0 4px 12px -2px rgba(37, 99, 235, 0.1);
-}
-
-[data-theme="light"] .member-row.female:hover {
-  border-color: #db2777;
-  box-shadow: 0 12px 28px -4px rgba(219, 39, 119, 0.18), 0 4px 12px -2px rgba(219, 39, 119, 0.1);
+  transform: translateY(-4px);
+  border-color: rgba(202, 138, 4, 0.4);
+  box-shadow: 0 12px 28px -4px rgba(184, 137, 60, 0.16);
 }
 
 [data-theme="light"] .member-row.ancestor:hover,
@@ -3037,39 +3021,18 @@ dialog.modal::backdrop {
   box-shadow: 0 10px 28px rgba(202, 138, 4, 0.22);
 }
 
-[data-theme="light"] .tree-card.male {
-  background: linear-gradient(145deg, #ffffff, #f0f9ff);
-  border-color: rgba(59, 130, 246, 0.3);
-  border-left: 3.5px solid #2563eb;
-  box-shadow: 0 4px 18px -2px rgba(37, 99, 235, 0.08);
-}
-
-[data-theme="light"] .tree-card.female {
-  background: linear-gradient(145deg, #ffffff, #fdf2f8);
-  border-color: rgba(236, 72, 153, 0.3);
-  border-left: 3.5px solid #db2777;
-  box-shadow: 0 4px 18px -2px rgba(219, 39, 119, 0.08);
-}
-
+[data-theme="light"] .tree-card.male,
+[data-theme="light"] .tree-card.female,
 [data-theme="light"] .tree-card.branch {
-  background: linear-gradient(145deg, #ffffff, #f0fdf4);
-  border-color: rgba(34, 197, 94, 0.3);
+  background: #ffffff;
+  border: 1px solid rgba(180, 130, 40, 0.28);
+  box-shadow: 0 4px 20px -2px rgba(180, 130, 40, 0.08);
 }
 
-[data-theme="light"] .tree-card.male:hover {
-  border-color: #2563eb;
-  box-shadow: 0 14px 32px -4px rgba(37, 99, 235, 0.22);
-}
-
-[data-theme="light"] .tree-card.female:hover {
-  border-color: #db2777;
-  box-shadow: 0 14px 32px -4px rgba(219, 39, 119, 0.22);
-}
-
-[data-theme="light"] .tree-card.root-node:hover,
-[data-theme="light"] .tree-card.ancestor:hover {
-  border-color: #ca8a04;
-  box-shadow: 0 16px 36px -4px rgba(202, 138, 4, 0.28);
+[data-theme="light"] .tree-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(202, 138, 4, 0.5);
+  box-shadow: 0 14px 32px -4px rgba(180, 130, 40, 0.2), 0 0 0 1px rgba(202, 138, 4, 0.4);
 }
 
 /* NoticeBar Light Theme */
@@ -3133,12 +3096,6 @@ dialog.modal::backdrop {
 }
 
 /* Gender Colors & Typography */
-.tree-card.male, .member-row.male {
-  border-left: 3.5px solid #3b82f6;
-}
-.tree-card.female, .member-row.female {
-  border-left: 3.5px solid #ec4899;
-}
 .tree-card.female .name, .member-name.female {
   color: #fbcfe8;
 }
@@ -3169,19 +3126,8 @@ dialog.modal::backdrop {
   box-shadow: 0 20px 48px rgba(90, 60, 20, 0.15);
 }
 
-[data-theme="light"] .modal.detail-modal.male .detail-head {
-  background: linear-gradient(145deg, #ffffff, #f0f9ff);
-  border-bottom: 1px solid rgba(147, 197, 253, 0.5);
-}
-
-[data-theme="light"] .modal.detail-modal.female .detail-head {
-  background: linear-gradient(145deg, #ffffff, #fdf2f8);
-  border-bottom: 1px solid rgba(251, 207, 232, 0.5);
-}
-
-[data-theme="light"] .modal.detail-modal.ancestor .detail-head,
-[data-theme="light"] .modal.detail-modal.root-node .detail-head {
-  background: linear-gradient(145deg, #fffdf2, #fef3c7);
+[data-theme="light"] .modal.detail-modal .detail-head {
+  background: linear-gradient(145deg, #fefce8, #fef3c7);
   border-bottom: 1px solid rgba(202, 138, 4, 0.3);
 }
 
