@@ -408,10 +408,9 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
         className="modal" 
         onClick={(e) => e.stopPropagation()} 
         style={{ 
-          maxWidth: '840px', 
-          width: '100%', 
-          height: '94vh', 
-          maxHeight: '94vh', 
+          width: isFullscreen ? '98%' : '100%', 
+          maxWidth: isFullscreen ? '1400px' : '900px', 
+          height: isFullscreen ? '96vh' : '92vh',
           display: 'flex', 
           flexDirection: 'column',
           borderRadius: '16px',
@@ -423,7 +422,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
       >
         {/* Header */}
         <div 
-          className="modal-head" 
+          className="modal-head vankhan-modal-head" 
           style={{ 
             padding: isFullscreen ? '10px 14px 8px' : '12px 14px 10px', 
             borderBottom: '1px solid var(--border-gold-md)',
@@ -470,17 +469,20 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           </div>
 
           {/* Hàng 2: Tự động gán ngày Âm lịch */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            background: 'rgba(201, 146, 58, 0.12)',
-            border: '1px solid rgba(201, 146, 58, 0.3)',
-            borderRadius: 8,
-            padding: '6px 10px',
-            marginBottom: 8,
-            fontSize: 12
-          }}>
+          <div 
+            className="vankhan-date-notice"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'rgba(201, 146, 58, 0.12)',
+              border: '1px solid rgba(201, 146, 58, 0.3)',
+              borderRadius: 8,
+              padding: '6px 10px',
+              marginBottom: 8,
+              fontSize: 12
+            }}
+          >
             <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--gold-light)', width: '100%' }}>
               <input
                 type="checkbox"
@@ -489,7 +491,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 style={{ accentColor: 'var(--gold)', width: 15, height: 15, cursor: 'pointer' }}
               />
               <span>
-                Tự động điền ngày Âm lịch hôm nay cho <strong>TẤT CẢ</strong> bài khấn: <strong style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong>
+                Tự động điền ngày Âm lịch hôm nay cho <strong>TẤT CẢ</strong> bài khấn: <strong className="vankhan-lunar-highlight" style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong>
               </span>
             </label>
           </div>
@@ -513,6 +515,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                className={`vankhan-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
                 style={{
                   flex: '1 1 auto',
                   minWidth: '85px',
@@ -553,6 +556,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             return (
               <div
                 key={item.id}
+                className="vankhan-item-card"
                 style={{
                   background: 'var(--bg-elevated)',
                   border: '1px solid var(--border-gold)',
@@ -566,28 +570,34 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                 }}
               >
                 {/* Header bài khấn */}
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  gap: 6, 
-                  borderBottom: '1px solid rgba(201,146,58,0.2)', 
-                  paddingBottom: 10 
-                }}>
+                <div 
+                  className="vankhan-item-header"
+                  style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    gap: 6, 
+                    borderBottom: '1px solid rgba(201,146,58,0.2)', 
+                    paddingBottom: 10 
+                  }}
+                >
                   {/* Hàng 1: Badge trái + Nút phải */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                    <span style={{
-                      display: 'inline-block',
-                      fontSize: 10.5,
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      color: 'var(--gold-mid)',
-                      background: 'rgba(201,146,58,0.12)',
-                      padding: '2px 8px',
-                      borderRadius: 4,
-                      border: '1px solid rgba(201,146,58,0.2)',
-                      flexShrink: 0
-                    }}>
+                    <span 
+                      className="vankhan-badge"
+                      style={{
+                        display: 'inline-block',
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        color: 'var(--gold-mid)',
+                        background: 'rgba(201,146,58,0.12)',
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        border: '1px solid rgba(201,146,58,0.2)',
+                        flexShrink: 0
+                      }}
+                    >
                       {item.badge}
                     </span>
 
@@ -596,6 +606,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                       <button
                         onClick={() => openFullscreen(item.id)}
                         title="Mở toàn màn hình bài khấn này"
+                        className="vankhan-action-btn"
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: 5,
                           padding: '5px 11px', borderRadius: 8, height: 32,
@@ -613,6 +624,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                       <button
                         onClick={() => handleCopy(item.id, item.content, item.category)}
                         title="Sao chép toàn bộ bài văn khấn này"
+                        className="vankhan-action-btn"
                         style={{
                           display: 'inline-flex', alignItems: 'center', gap: 5,
                           padding: '5px 11px', borderRadius: 8, height: 32,
@@ -630,7 +642,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                   </div>
 
                   {/* Hàng 2: Tên bài — nhấp nháy nếu sắp đến ngày đặc biệt */}
-                  <h3 className="font-serif" style={{
+                  <h3 className="font-serif vankhan-title" style={{
                     margin: 0, fontSize: 13.5, fontWeight: 700,
                     color: blink ? '#fef08a' : 'var(--gold-light)',
                     lineHeight: 1.35,
@@ -641,14 +653,14 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                   </h3>
 
                   {/* Hàng 3: Mô tả */}
-                  <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.4 }}>
+                  <p className="vankhan-subtitle" style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.4 }}>
                     {item.subtitle}
                   </p>
                 </div>
 
                 {/* Khung văn khấn hiển thị cực lớn & dễ đọc */}
                 <div
-                  className="font-serif"
+                  className="font-serif vankhan-text-box"
                   style={{
                     margin: 0,
                     padding: isFullscreen ? '20px 22px' : '16px 16px',
@@ -675,6 +687,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
         {/* Footer */}
         <div 
+          className="vankhan-modal-footer"
           style={{ 
             padding: '10px 14px 12px', 
             borderTop: '1px solid var(--border-gold-md)', 
@@ -686,24 +699,30 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           }}
         >
           {/* Thanh chỉnh cỡ chữ */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            background: 'rgba(0,0,0,0.4)',
-            border: '1px solid var(--border-gold)',
-            borderRadius: 10,
-            padding: '6px 10px',
-            gap: 8
-          }}>
+          <div 
+            className="vankhan-font-bar"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'rgba(0,0,0,0.4)',
+              border: '1px solid var(--border-gold)',
+              borderRadius: 10,
+              padding: '6px 10px',
+              gap: 8
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <Icon name="type" size={13} style={{ color: 'var(--gold-mid)' }} />
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold-mid)' }}>Cỡ chữ:</span>
-              <span style={{ 
-                fontSize: 12, fontWeight: 700, color: 'var(--gold-light)', 
-                background: 'rgba(201,146,58,0.25)', padding: '3px 8px', 
-                borderRadius: 6, border: '1px solid rgba(201,146,58,0.4)' 
-              }}>
+              <span 
+                className="vankhan-size-pill"
+                style={{ 
+                  fontSize: 12, fontWeight: 700, color: 'var(--gold-light)', 
+                  background: 'rgba(201,146,58,0.25)', padding: '3px 8px', 
+                  borderRadius: 6, border: '1px solid rgba(201,146,58,0.4)' 
+                }}
+              >
                 {fontSize}px
               </span>
             </div>
@@ -712,6 +731,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
               <button
                 onClick={decreaseFontSize}
                 disabled={fontSize <= 16}
+                className="vankhan-font-btn"
                 style={{
                   background: fontSize <= 16 ? 'rgba(255,255,255,0.04)' : 'rgba(201,146,58,0.2)',
                   border: '1px solid ' + (fontSize <= 16 ? 'rgba(255,255,255,0.08)' : 'var(--border-gold)'),
@@ -728,6 +748,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
               <button
                 onClick={() => setFontSize(20)}
+                className="vankhan-font-btn"
                 style={{
                   background: fontSize === 20 ? 'rgba(201,146,58,0.35)' : 'rgba(255,255,255,0.06)',
                   border: '1px solid ' + (fontSize === 20 ? 'var(--gold)' : 'rgba(255,255,255,0.12)'),
@@ -745,6 +766,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
               <button
                 onClick={increaseFontSize}
                 disabled={fontSize >= 32}
+                className="vankhan-font-btn"
                 style={{
                   background: fontSize >= 32 ? 'rgba(255,255,255,0.04)' : 'rgba(201,146,58,0.25)',
                   border: '1px solid ' + (fontSize >= 32 ? 'rgba(255,255,255,0.08)' : 'var(--gold)'),
