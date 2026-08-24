@@ -64,26 +64,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onUpdate
         </div>
 
         <div style={{ padding: '20px 16px', color: 'var(--text-primary)' }}>
-          
           <div style={{
             background: 'var(--bg-glass)',
             border: '1px solid var(--border-gold)',
-            borderRadius: '12px',
-            padding: '16px',
-            marginBottom: '16px'
+            borderRadius: '14px',
+            padding: '18px 16px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
           }}>
-            <h3 style={{ fontSize: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--gold-light)' }}>
               <Icon name="bell-ring" size={18} style={{ color: 'var(--gold-mid)' }} />
-              Thông báo ngày giỗ
+              Nhắc nhở ngày giỗ & Số đỏ Icon
             </h3>
             
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: 1.5 }}>
-              Nhận thông báo trên thiết bị trước 7 ngày, 3 ngày, 1 ngày và đúng ngày giỗ.
+              Tự động gửi thông báo nhắc giỗ trước 7 ngày, 3 ngày, 1 ngày và hiển thị số đếm màu đỏ trên icon ứng dụng ở màn hình chính.
             </p>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            {/* Bật / Tắt */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: settings.isEnabled ? '16px' : '0' }}>
               <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Bật thông báo</span>
               <button 
+                type="button"
                 onClick={handleToggle}
                 style={{
                   width: '44px',
@@ -111,64 +112,81 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onUpdate
             </div>
 
             {settings.isEnabled && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-gold)', paddingTop: '16px' }}>
-                <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Giờ nhắc nhở</span>
-                <input 
-                  type="time" 
-                  value={settings.time}
-                  onChange={handleTimeChange}
-                  style={{
-                    background: 'var(--bg-elevated)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-gold)',
-                    padding: '6px 12px',
-                    borderRadius: '8px',
-                    fontFamily: 'inherit',
-                    fontSize: '14px'
-                  }}
-                />
-              </div>
+              <>
+                {/* Chọn giờ */}
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between', 
+                  borderTop: '1px solid var(--border-gold)', 
+                  paddingTop: '14px',
+                  marginBottom: '16px'
+                }}>
+                  <div>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', display: 'block' }}>Giờ nhắc nhở</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Thời gian kiểm tra nhắc nhở hàng ngày</span>
+                  </div>
+                  <input 
+                    type="time" 
+                    value={settings.time}
+                    onChange={handleTimeChange}
+                    style={{
+                      background: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border-gold)',
+                      padding: '6px 10px',
+                      borderRadius: '8px',
+                      fontFamily: 'inherit',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}
+                  />
+                </div>
+
+                {/* Nút kiểm tra thử */}
+                <div style={{ 
+                  borderTop: '1px solid var(--border-gold)', 
+                  paddingTop: '14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--gold-mid)' }}>Thử nghiệm trên máy:</span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="action-button"
+                      onClick={async () => {
+                        await sendTestNotificationWithBadge(1);
+                      }}
+                      style={{ fontSize: '12px', padding: '6px 12px', flex: 1, justifyContent: 'center' }}
+                      title="Gửi thông báo và hiện số đỏ 1 trên icon app"
+                    >
+                      <Icon name="bell-ring" size={14} /> Thử số đỏ trên Icon
+                    </button>
+
+                    <button
+                      type="button"
+                      className="action-button"
+                      onClick={async () => {
+                        await clearAppBadge();
+                      }}
+                      style={{ fontSize: '12px', padding: '6px 12px', background: 'rgba(255,255,255,0.06)' }}
+                      title="Xóa số đỏ trên icon"
+                    >
+                      <Icon name="x" size={14} /> Xóa số đỏ
+                    </button>
+                  </div>
+
+                  <p style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.4, margin: '2px 0 0' }}>
+                    💡 <em>Lưu ý: Để thấy số đỏ trên icon, hãy cài đặt app ra Màn hình chính (PWA/Home Screen).</em>
+                  </p>
+                </div>
+              </>
             )}
-          </div>
-
-          <div style={{
-            background: 'var(--bg-glass)',
-            border: '1px solid var(--border-gold)',
-            borderRadius: '12px',
-            padding: '16px',
-            marginBottom: '16px'
-          }}>
-            <h3 style={{ fontSize: '15px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-              <Icon name="sparkles" size={17} style={{ color: 'var(--gold-mid)' }} />
-              Số đỏ trên Icon PWA (App Badge)
-            </h3>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.5 }}>
-              Số đỏ hiển thị số sự kiện/giỗ sắp tới trên icon app ngoài màn hình chính (yêu cầu đã cài đặt PWA ra Home Screen / Desktop).
-            </p>
-
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                className="action-button"
-                onClick={async () => {
-                  await sendTestNotificationWithBadge(1);
-                }}
-                style={{ fontSize: '12px', padding: '6px 12px' }}
-              >
-                <Icon name="bell-ring" size={14} /> Thử số đỏ trên Icon
-              </button>
-
-              <button
-                type="button"
-                className="action-button"
-                onClick={async () => {
-                  await clearAppBadge();
-                }}
-                style={{ fontSize: '12px', padding: '6px 12px', background: 'rgba(255,255,255,0.05)' }}
-              >
-                <Icon name="x" size={14} /> Xóa số đỏ
-              </button>
-            </div>
           </div>
         </div>
 
