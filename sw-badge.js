@@ -46,13 +46,6 @@ self.addEventListener('notificationclick', (event) => {
   const urlToOpen = event.notification.data || '/giaphaphamtoc/';
 
   event.waitUntil((async () => {
-    // Xóa hoặc giảm badge khi nhấn vào thông báo
-    if ('clearAppBadge' in self.navigator) {
-      try {
-        await self.navigator.clearAppBadge();
-      } catch (e) {}
-    }
-
     const windowClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of windowClients) {
       if (client.url.includes('/giaphaphamtoc/') && 'focus' in client) {
