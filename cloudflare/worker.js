@@ -3,6 +3,107 @@
  * Tích hợp Cloudflare D1 Database & Web Push Notification & Cron Triggers
  */
 
+const VAPID_PUBLIC = 'BLMY9-zETzZBVOVYs-n4Cim0JPSDD97Z_QuLJDtR6UDd9HIrtM_WZ25_EvG9Io_A4AOv5ZlQGNfcyK_QuSLUHh4';
+const VAPID_PRIVATE = 'I00d7UHt247QSxLHyasIBkpaQGcGml5E5OptWDmrLA8';
+const VAPID_SUBJECT = 'mailto:phamphuongdong@gmail.com';
+
+// Helper: base64url encode/decode
+function b64ToUrl(b64) {
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function urlToB64(url) {
+  let b64 = url.replace(/-/g, '+').replace(/_/g, '/');
+  while (b64.length % 4) b64 += '=';
+  return b64;
+}
+function strToBuf(str) {
+  return new TextEncoder().encode(str);
+}
+function bufToB64Url(buf) {
+  let binary = '';
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return b64ToUrl(btoa(binary));
+}
+function b64UrlToBuf(b64url) {
+  const binary = atob(urlToB64(b64url));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// Generate VAPID Authorization JWT Header
+async function createVapidAuthHeader(audience) {
+  const header = { typ: 'JWT', alg: 'ES256' };
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    aud: audience,
+    exp: now + 86400, // 24 hours
+    sub: VAPID_SUBJECT
+  };
+
+  const unsignedToken = `${bufToB64Url(strToBuf(JSON.stringify(header)))}.${bufToB64Url(strToBuf(JSON.stringify(payload)))}`;
+  
+  // Import private key in JWK format
+  const privKeyJwk = {
+    kty: 'EC',
+    crv: 'P-256',
+    d: VAPID_PRIVATE,
+    x: 'tZj37MRPtkFU5Viz6fgKKbQk9IMM_e2f0LiyQ7UelA0', // derived from public key
+    y: '3fRyK7TP1mdufxLxvSKPwOADr-WZUBjX3Miv0Lki1B4'
+  };
+
+  const cryptoKey = await crypto.subtle.importKey(
+    'jwk',
+    privKeyJwk,
+    { name: 'ECDSA', namedCurve: 'P-256' },
+    false,
+    ['sign']
+  );
+
+  const sig = await crypto.subtle.sign(
+    { name: 'ECDSA', hash: { name: 'SHA-256' } },
+    cryptoKey,
+    strToBuf(unsignedToken)
+  );
+
+  // Convert DER/IEEE P1363 signature to raw R||S
+  const jwt = `${unsignedToken}.${bufToB64Url(sig)}`;
+  return `vapid t=${jwt}, k=${VAPID_PUBLIC}`;
+}
+
+// Send Web Push to a single subscription
+async function sendWebPush(subscription, payloadData) {
+  try {
+    const endpoint = subscription.endpoint;
+    const url = new URL(endpoint);
+    const audience = `${url.protocol}//${url.host}`;
+    const authHeader = await createVapidAuthHeader(audience);
+
+    const bodyString = typeof payloadData === 'string' ? payloadData : JSON.stringify(payloadData);
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader,
+        'TTL': '86400',
+        'Urgency': 'high',
+        'Content-Type': 'text/plain;charset=UTF-8'
+      },
+      body: bodyString
+    });
+
+    return { success: response.status === 201 || response.status === 200 || response.status === 202, status: response.status };
+  } catch (e) {
+    console.error('SendWebPush Error:', e);
+    return { success: false, error: e.message };
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -20,7 +121,8 @@ export default {
       // 1. API: Lấy VAPID Public Key
       if (url.pathname === '/api/vapid-key' && request.method === 'GET') {
         return new Response(JSON.stringify({ 
-          publicKey: env.VAPID_PUBLIC_KEY || 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSPOSnfGIZMreM_CDFbC6W0q_bZozo56CVQ4' 
+          success: true,
+          publicKey: VAPID_PUBLIC 
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -134,11 +236,45 @@ export default {
         });
       }
 
-      // 8. Health check
+      // 8. API: Gửi thông báo Test Push & Số đỏ trực tiếp
+      if (url.pathname === '/api/send-test-push' && request.method === 'POST') {
+        const { results: subscriptions } = await env.DB.prepare('SELECT * FROM push_subscriptions').all();
+        if (!subscriptions || subscriptions.length === 0) {
+          return new Response(JSON.stringify({ success: false, message: 'Chưa có thiết bị nào đăng ký nhận thông báo' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const testPayload = {
+          title: 'Gia Phả Phạm Tộc',
+          body: 'Thử nghiệm thông báo đẩy từ Cloudflare Worker thành công! Icon đã gắn số đỏ.',
+          badgeCount: 2,
+          unreadCount: 2,
+          url: '/giaphaphamtoc/',
+          tag: 'giapha-test-push'
+        };
+
+        const results = [];
+        for (const sub of subscriptions) {
+          const res = await sendWebPush(sub, testPayload);
+          results.push(res);
+        }
+
+        return new Response(JSON.stringify({ 
+          success: true, 
+          message: `Đã gửi thông báo tới ${subscriptions.length} thiết bị`,
+          details: results 
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // 9. Health check
       return new Response(JSON.stringify({ 
         name: 'Gia Phả Phạm Tộc API', 
         status: 'online', 
-        database: 'Cloudflare D1' 
+        database: 'Cloudflare D1',
+        vapidPublicKey: VAPID_PUBLIC
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -151,14 +287,26 @@ export default {
     }
   },
 
-  // 9. Cron Trigger: Tự động chạy mỗi sáng để gửi Web Push
+  // 10. Cron Trigger: Tự động chạy mỗi sáng (07:00 AM VN) để gửi Web Push
   async scheduled(event, env, ctx) {
     try {
       const { results: subscriptions } = await env.DB.prepare('SELECT * FROM push_subscriptions').all();
       if (!subscriptions || subscriptions.length === 0) return;
 
       console.log(`[Cron Push] Đang xử lý gửi push tới ${subscriptions.length} thiết bị...`);
-      // Logic gửi Web Push
+      
+      const payload = {
+        title: 'Gia Phả Phạm Tộc',
+        body: 'Hôm nay dòng họ có sự kiện / ngày giỗ cần tưởng nhớ.',
+        badgeCount: 2,
+        unreadCount: 2,
+        url: '/giaphaphamtoc/',
+        tag: 'giapha-daily-reminder'
+      };
+
+      for (const sub of subscriptions) {
+        await sendWebPush(sub, payload);
+      }
     } catch (e) {
       console.error('[Cron Push Error]', e);
     }

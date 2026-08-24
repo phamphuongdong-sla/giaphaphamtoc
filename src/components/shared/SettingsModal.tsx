@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from '../ui/Icon';
 import { NotificationSettings } from '../../hooks/useNotificationSettings';
-import { sendTestNotificationWithBadge, clearAppBadge } from '../../utils/badgeUtils';
+import { sendTestNotificationWithBadge, clearAppBadge, subscribeToCloudflarePush } from '../../utils/badgeUtils';
 
 interface SettingsModalProps {
   settings: NotificationSettings;
@@ -25,11 +25,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onUpdate
         setPermissionStatus(result);
         if (result === 'granted') {
           onUpdate({ isEnabled: true });
+          await subscribeToCloudflarePush();
         } else {
           alert('Bạn cần cấp quyền thông báo trên trình duyệt để sử dụng tính năng này.');
         }
       } else {
         onUpdate({ isEnabled: true });
+        await subscribeToCloudflarePush();
       }
     } else {
       onUpdate({ isEnabled: false });
