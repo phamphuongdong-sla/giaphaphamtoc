@@ -68,6 +68,9 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
   const [memberToDelete, setMemberToDelete] = useState<SheetRow | null>(null);
   const [deleting, setDeleting] = useState<boolean>(false);
 
+  // Export / Backup modal state
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+
   // Apps Script modal state
   const [showScriptModal, setShowScriptModal] = useState<boolean>(false);
   const [copiedScript, setCopiedScript] = useState<boolean>(false);
@@ -624,11 +627,74 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
     }
   };
 
-  const handleExportBackup = () => {
+  const handleExportJSON = () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(rows, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
     downloadAnchor.setAttribute("download", `GiaPha_Backup_${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleExportSQL = () => {
+    const escapeSql = (str: any) => {
+      if (str === null || str === undefined || str === '') return 'NULL';
+      return `'${String(str).replace(/'/g, "''")}'`;
+    };
+
+    let sql = `-- Backup Cloudflare D1 Database - Gia Phả Phạm Tộc\n`;
+    sql += `-- Ngày xuất: ${new Date().toLocaleString('vi-VN')}\n`;
+    sql += `-- Tổng số thành viên: ${rows.length}\n\n`;
+    sql += `CREATE TABLE IF NOT EXISTS members (\n  id TEXT PRIMARY KEY,\n  parentId TEXT,\n  name TEXT NOT NULL,\n  gender TEXT DEFAULT 'male',\n  birth TEXT,\n  death TEXT,\n  isDead INTEGER DEFAULT 0,\n  bio TEXT,\n  title TEXT,\n  branch TEXT,\n  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP\n);\n\n`;
+    sql += `DELETE FROM members;\n\n`;
+
+    rows.forEach(r => {
+      const isDeadVal = r.isDead && r.isDead.trim() !== '' ? 1 : 0;
+      sql += `INSERT INTO members (id, parentId, name, gender, birth, death, isDead, bio, title, branch) VALUES (${escapeSql(r.id)}, ${escapeSql(r.parentId)}, ${escapeSql(r.name)}, ${escapeSql(r.gender)}, ${escapeSql(r.birth)}, ${escapeSql(r.death)}, ${isDeadVal}, ${escapeSql(r.bio)}, ${escapeSql(r.title)}, ${escapeSql(r.branch)});\n`;
+    });
+
+    const dataStr = "data:text/sql;charset=utf-8," + encodeURIComponent(sql);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `GiaPha_CloudflareD1_${new Date().toISOString().split('T')[0]}.sql`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleExportCSV = () => {
+    const headers = ['Mã ID', 'ID Bố/Mẹ', 'Họ và tên', 'Giới tính', 'Ngày sinh', 'Ngày mất', 'Đã mất', 'Tiểu sử / Ghi chú', 'Vai vế / Danh xưng', 'Chi nhánh'];
+    const escapeCsv = (val: string) => {
+      const str = String(val || '');
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const csvRows = [headers.join(',')];
+    rows.forEach(r => {
+      csvRows.push([
+        escapeCsv(r.id),
+        escapeCsv(r.parentId),
+        escapeCsv(r.name),
+        escapeCsv(r.gender),
+        escapeCsv(r.birth),
+        escapeCsv(r.death),
+        escapeCsv(r.isDead),
+        escapeCsv(r.bio),
+        escapeCsv(r.title),
+        escapeCsv(r.branch || '')
+      ].join(','));
+    });
+
+    const csvContent = '\uFEFF' + csvRows.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", url);
+    downloadAnchor.setAttribute("download", `GiaPha_Excel_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -911,22 +977,23 @@ function responseJSON(obj) {
           </button>
 
           <button
-            onClick={handleExportBackup}
+            onClick={() => setShowExportModal(true)}
             className="action-button"
             style={{
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-glass)',
-              padding: '8px 10px',
+              background: 'rgba(201,146,58,0.15)',
+              color: 'var(--gold-light)',
+              border: '1px solid var(--border-gold)',
+              padding: '8px 12px',
               borderRadius: 'var(--r-md)',
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              fontSize: 12
+              fontSize: 12,
+              fontWeight: 600
             }}
-            title="Tải về bản sao lưu dữ liệu JSON"
+            title="Xuất dữ liệu / Sao lưu Database (SQL, Excel CSV, JSON)"
           >
-            <Icon name="download" size={14} /> Backup
+            <Icon name="download" size={14} /> Xuất Database
           </button>
 
           <button
@@ -2343,6 +2410,162 @@ function responseJSON(obj) {
                 onClick={() => setShowScriptModal(false)}
                 className="action-button"
                 style={{ padding: '6px 16px', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Xuất & Sao Lưu Database */}
+      {showExportModal && (
+        <div className="modal-backdrop" onClick={() => setShowExportModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <div className="modal-head">
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: 14,
+                  background: 'rgba(201,146,58,0.15)',
+                  border: '1px solid var(--border-gold)',
+                  display: 'grid', placeItems: 'center',
+                }}>
+                  <Icon name="download" size={26} style={{ color: 'var(--gold-mid)' }} />
+                </div>
+              </div>
+              <h2 className="font-display" style={{
+                fontSize: 22, fontWeight: 700,
+                color: 'var(--gold-light)', textAlign: 'center',
+                letterSpacing: '0.02em',
+              }}>
+                Xuất & Sao Lưu Database
+              </h2>
+              <p style={{
+                marginTop: 6, fontSize: 12,
+                color: 'var(--text-muted)', textAlign: 'center',
+              }}>
+                Đang có tổng cộng <strong>{rows.length}</strong> thành viên trong Database
+              </p>
+            </div>
+
+            <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {/* Option 1: SQL File */}
+              <div 
+                onClick={() => {
+                  handleExportSQL();
+                  setShowExportModal(false);
+                }}
+                style={{
+                  background: 'var(--bg-glass)',
+                  border: '1px solid var(--border-gold)',
+                  borderRadius: 12,
+                  padding: '14px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                className="hover-card"
+              >
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10,
+                  background: 'rgba(201,146,58,0.2)',
+                  display: 'grid', placeItems: 'center', flexShrink: 0
+                }}>
+                  <Icon name="database" size={22} style={{ color: 'var(--gold-light)' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: 14, fontWeight: 600, color: 'var(--gold-light)', marginBottom: 2 }}>
+                    Xuất file SQL (.sql) - Cloudflare D1
+                  </h4>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                    Bản sao lưu chuẩn SQL chứa lệnh tạo bảng và 100% dữ liệu để nạp lại vào Cloudflare D1.
+                  </p>
+                </div>
+                <Icon name="download" size={16} style={{ color: 'var(--gold-mid)' }} />
+              </div>
+
+              {/* Option 2: Excel / CSV */}
+              <div 
+                onClick={() => {
+                  handleExportCSV();
+                  setShowExportModal(false);
+                }}
+                style={{
+                  background: 'var(--bg-glass)',
+                  border: '1px solid var(--border-glass)',
+                  borderRadius: 12,
+                  padding: '14px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                className="hover-card"
+              >
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10,
+                  background: 'rgba(34,197,94,0.15)',
+                  display: 'grid', placeItems: 'center', flexShrink: 0
+                }}>
+                  <Icon name="file-text" size={22} style={{ color: '#4ade80' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: 14, fontWeight: 600, color: '#4ade80', marginBottom: 2 }}>
+                    Xuất file Excel (.csv)
+                  </h4>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                    Định dạng bảng tính Excel tiếng Việt UTF-8 chuẩn, dễ dàng mở xem và in ấn.
+                  </p>
+                </div>
+                <Icon name="download" size={16} style={{ color: '#4ade80' }} />
+              </div>
+
+              {/* Option 3: JSON */}
+              <div 
+                onClick={() => {
+                  handleExportJSON();
+                  setShowExportModal(false);
+                }}
+                style={{
+                  background: 'var(--bg-glass)',
+                  border: '1px solid var(--border-glass)',
+                  borderRadius: 12,
+                  padding: '14px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                className="hover-card"
+              >
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10,
+                  background: 'rgba(59,130,246,0.15)',
+                  display: 'grid', placeItems: 'center', flexShrink: 0
+                }}>
+                  <Icon name="file-code" size={22} style={{ color: '#60a5fa' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: 14, fontWeight: 600, color: '#60a5fa', marginBottom: 2 }}>
+                    Xuất file JSON (.json)
+                  </h4>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                    Dữ liệu đối tượng JSON đầy đủ các trường thông tin.
+                  </p>
+                </div>
+                <Icon name="download" size={16} style={{ color: '#60a5fa' }} />
+              </div>
+            </div>
+
+            <div style={{ padding: '12px 20px 16px', borderTop: '1px solid var(--border-glass)', textAlign: 'right' }}>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="action-button"
+                style={{ padding: '6px 18px', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               >
                 Đóng
               </button>
