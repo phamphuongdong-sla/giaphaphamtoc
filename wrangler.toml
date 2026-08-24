@@ -1,0 +1,11 @@
+name = "giapha-api"
+main = "cloudflare/worker.js"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "giapha-db"
+database_id = "f27730dd-3044-4dab-8bdf-b0a93bde01ae"
+
+[triggers]
+crons = ["0 0 * * *"]

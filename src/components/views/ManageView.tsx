@@ -1,5 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { SheetRow, fetchRawSheetRows, addMemberToSheet, updateMemberInSheet, deleteMemberFromSheet, APPS_SCRIPT_ID, SHEET_ID } from '@/services/googleSheets';
+import { 
+  fetchRawCloudflareRows, 
+  addMemberToCloudflare, 
+  updateMemberInCloudflare, 
+  deleteMemberFromCloudflare, 
+  CLOUDFLARE_API_URL 
+} from '@/services/cloudflareApi';
 import { Icon } from '@/components/ui/Icon';
 import { solarToLunar, getCanChiYear } from '@/utils/dateUtils';
 import { formatBranchName } from '@/utils/genealogyUtils';
@@ -72,10 +79,13 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
   const loadSheetRows = async () => {
     setLoading(true);
     try {
-      const data = await fetchRawSheetRows();
+      let data = await fetchRawCloudflareRows();
+      if (!data || data.length === 0) {
+        data = await fetchRawSheetRows();
+      }
       setRows(data);
     } catch (err) {
-      console.error('Failed to load sheet rows:', err);
+      console.error('Failed to load members:', err);
     } finally {
       setLoading(false);
     }
@@ -559,9 +569,16 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
     setSaving(true);
     setStatusMessage(null);
 
-    const result = isEditing
-      ? await updateMemberInSheet(currentMember)
-      : await addMemberToSheet(currentMember);
+    let result;
+    if (CLOUDFLARE_API_URL) {
+      result = isEditing
+        ? await updateMemberInCloudflare(currentMember)
+        : await addMemberToCloudflare(currentMember);
+    } else {
+      result = isEditing
+        ? await updateMemberInSheet(currentMember)
+        : await addMemberToSheet(currentMember);
+    }
 
     setSaving(false);
 
@@ -574,7 +591,7 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
         setShowEditModal(false);
       }, 1000);
     } else {
-      setStatusMessage({ type: 'error', text: result.message || 'Có lỗi xảy ra khi lưu lên Google Sheets.' });
+      setStatusMessage({ type: 'error', text: result.message || 'Có lỗi xảy ra khi lưu dữ liệu.' });
     }
   };
 
@@ -592,7 +609,9 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
     if (!memberToDelete) return;
 
     setDeleting(true);
-    const result = await deleteMemberFromSheet(memberToDelete.id);
+    const result = CLOUDFLARE_API_URL
+      ? await deleteMemberFromCloudflare(memberToDelete.id)
+      : await deleteMemberFromSheet(memberToDelete.id);
     setDeleting(false);
 
     if (result.success) {

@@ -1,7 +1,7 @@
 import { PersonNode } from '../types';
 import { SheetRow } from './googleSheets';
 
-export const CLOUDFLARE_API_URL = import.meta.env.VITE_CLOUDFLARE_API_URL || '';
+export const CLOUDFLARE_API_URL = import.meta.env.VITE_CLOUDFLARE_API_URL || 'https://giapha-api.mrdong-sothuchi.workers.dev';
 
 export interface CloudflareMemberRow {
   id: string;
@@ -14,6 +14,31 @@ export interface CloudflareMemberRow {
   bio: string | null;
   title: string | null;
   branch: string | null;
+}
+
+export async function fetchRawCloudflareRows(): Promise<SheetRow[]> {
+  if (!CLOUDFLARE_API_URL) return [];
+  try {
+    const res = await fetch(`${CLOUDFLARE_API_URL}/api/members`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    if (!json.success || !Array.isArray(json.data)) return [];
+    return json.data.map((r: CloudflareMemberRow) => ({
+      id: r.id,
+      parentId: r.parentId || '',
+      name: r.name || '',
+      gender: r.gender || 'Nam',
+      birth: r.birth || '',
+      death: r.death || '',
+      isDead: r.isDead === 1 ? 'TRUE' : '',
+      bio: r.bio || '',
+      title: r.title || '',
+      branch: r.branch || '',
+    }));
+  } catch (e) {
+    console.warn('Error fetching raw Cloudflare rows:', e);
+    return [];
+  }
 }
 
 export async function fetchFamilyTreeFromCloudflare(): Promise<PersonNode | null> {
