@@ -105,19 +105,43 @@ function App() {
         await clearAppBadge();
       }
 
-      // Tự động đóng thông báo của những sự kiện đã kết thúc
-      if ('serviceWorker' in navigator) {
+      // Đảm bảo thông báo được ghim vào thanh trạng thái hệ thống qua Service Worker
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted' && 'serviceWorker' in navigator) {
         try {
           const registration = await navigator.serviceWorker.ready;
           const activeNotifications = await registration.getNotifications();
           const activeTags = reminders.map(r => `giapha-reminder-${r.fullName}`);
+
+          // 1. Đóng những thông báo của sự kiện đã kết thúc
           for (const notif of activeNotifications) {
             if (notif.tag && notif.tag.startsWith('giapha-reminder-') && !activeTags.includes(notif.tag)) {
               notif.close();
             }
           }
+
+          // 2. Ghim các thông báo sự kiện còn hiệu lực lên thanh trạng thái
+          const existingTags = new Set(activeNotifications.map(n => n.tag));
+          for (const reminder of reminders) {
+            const tag = `giapha-reminder-${reminder.fullName}`;
+            // Nếu chưa có thông báo ghim trên thanh trạng thái, đăng ký ngay
+            if (!existingTags.has(tag)) {
+              const daysText = reminder.days === 0 ? 'Hôm nay' : `Còn ${reminder.days} ngày`;
+              const title = `Sắp đến ngày giỗ: ${reminder.fullName}`;
+              const solarText = reminder.solarDateStr ? ` · Dương: ${reminder.solarDateStr}` : '';
+              
+              await registration.showNotification(title, {
+                body: `${reminder.date}${solarText} (${daysText})`,
+                icon: '/giaphaphamtoc/icons/icon-192.png',
+                badge: '/giaphaphamtoc/icons/icon-192.png',
+                tag: tag,
+                renotify: false,
+                requireInteraction: true,
+                data: { url: '/giaphaphamtoc/', fullName: reminder.fullName }
+              });
+            }
+          }
         } catch (e) {
-          console.warn('Error syncing active notifications:', e);
+          console.warn('Error syncing active notifications with Service Worker:', e);
         }
       }
     };
@@ -134,7 +158,7 @@ function App() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [reminders, settings.isEnabled]);
 
-  // Push Notification logic check
+  // Push Notification logic check (nhắc nhở định kỳ theo giờ đã cài đặt)
   useEffect(() => {
     if (!settings.isEnabled) return;
 
