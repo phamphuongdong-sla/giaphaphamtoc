@@ -96,27 +96,43 @@ function App() {
     }
   }, [reminders]);
 
-  // Handle App Badge separately
+  // Handle App Badge and sync active notifications
   useEffect(() => {
-    const updateBadge = async () => {
+    const updateBadgeAndSyncNotifications = async () => {
       if (reminders.length > 0) {
         await setAppBadge(reminders.length);
       } else {
         await clearAppBadge();
       }
+
+      // Tự động đóng thông báo của những sự kiện đã kết thúc
+      if ('serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.ready;
+          const activeNotifications = await registration.getNotifications();
+          const activeTags = reminders.map(r => `giapha-reminder-${r.fullName}`);
+          for (const notif of activeNotifications) {
+            if (notif.tag && notif.tag.startsWith('giapha-reminder-') && !activeTags.includes(notif.tag)) {
+              notif.close();
+            }
+          }
+        } catch (e) {
+          console.warn('Error syncing active notifications:', e);
+        }
+      }
     };
     
-    updateBadge();
+    updateBadgeAndSyncNotifications();
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        updateBadge();
+        updateBadgeAndSyncNotifications();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [reminders.length, settings.isEnabled]);
+  }, [reminders, settings.isEnabled]);
 
   // Push Notification logic check
   useEffect(() => {
@@ -149,7 +165,7 @@ function App() {
                   requireInteraction: true
                 };
                 
-                // Cập nhật số đỏ trên icon khi gửi thông báo
+                // Cập nhật số đỏ trên icon chính xác theo tổng số sự kiện chưa kết thúc
                 setAppBadge(reminders.length || 1);
 
                 if ('serviceWorker' in navigator) {
