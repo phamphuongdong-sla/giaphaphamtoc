@@ -1,7 +1,7 @@
 import { PersonNode } from '../types';
 import { SheetRow } from './googleSheets';
 
-export const CLOUDFLARE_API_URL = import.meta.env.VITE_CLOUDFLARE_API_URL || 'https://giapha-api.mrdong-sothuchi.workers.dev';
+export const CLOUDFLARE_API_URL = import.meta.env.VITE_CLOUDFLARE_API_URL || 'https://giapha-api.phamphuongdong.workers.dev';
 
 export interface CloudflareMemberRow {
   id: string;
