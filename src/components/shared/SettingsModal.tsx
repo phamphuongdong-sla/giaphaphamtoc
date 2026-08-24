@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from '../ui/Icon';
 import { NotificationSettings } from '../../hooks/useNotificationSettings';
+import { sendTestNotificationWithBadge, clearAppBadge } from '../../utils/badgeUtils';
 
 interface SettingsModalProps {
   settings: NotificationSettings;
@@ -128,6 +129,46 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ settings, onUpdate
                 />
               </div>
             )}
+          </div>
+
+          <div style={{
+            background: 'var(--bg-glass)',
+            border: '1px solid var(--border-gold)',
+            borderRadius: '12px',
+            padding: '16px',
+            marginBottom: '16px'
+          }}>
+            <h3 style={{ fontSize: '15px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
+              <Icon name="sparkles" size={17} style={{ color: 'var(--gold-mid)' }} />
+              Số đỏ trên Icon PWA (App Badge)
+            </h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: 1.5 }}>
+              Số đỏ hiển thị số sự kiện/giỗ sắp tới trên icon app ngoài màn hình chính (yêu cầu đã cài đặt PWA ra Home Screen / Desktop).
+            </p>
+
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="action-button"
+                onClick={async () => {
+                  await sendTestNotificationWithBadge(1);
+                }}
+                style={{ fontSize: '12px', padding: '6px 12px' }}
+              >
+                <Icon name="bell-ring" size={14} /> Thử số đỏ trên Icon
+              </button>
+
+              <button
+                type="button"
+                className="action-button"
+                onClick={async () => {
+                  await clearAppBadge();
+                }}
+                style={{ fontSize: '12px', padding: '6px 12px', background: 'rgba(255,255,255,0.05)' }}
+              >
+                <Icon name="x" size={14} /> Xóa số đỏ
+              </button>
+            </div>
           </div>
         </div>
 

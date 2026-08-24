@@ -11,6 +11,7 @@ export default defineConfig({
       includeAssets: ['logotrang.png', 'logoden.png', 'icons/*.png'],
       manifest: false, // Sử dụng manifest.json tĩnh trong public/
       workbox: {
+        importScripts: ['sw-badge.js'],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         runtimeCaching: [
           {

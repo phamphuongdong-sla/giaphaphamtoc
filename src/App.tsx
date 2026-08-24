@@ -13,6 +13,7 @@ import { useNotificationSettings } from './hooks/useNotificationSettings';
 import { ManageAuthModal } from './components/shared/ManageAuthModal';
 import { VanKhanModal } from './components/shared/VanKhanModal';
 import { MemberEntry } from './types';
+import { setAppBadge, clearAppBadge } from './utils/badgeUtils';
 import './styles/index.css';
 
 // Dynamic imports for code-splitting heavy components
@@ -98,22 +99,23 @@ function App() {
   // Handle App Badge separately
   useEffect(() => {
     const updateBadge = async () => {
-      if ('setAppBadge' in navigator) {
-        try {
-          if (reminders.length > 0) {
-            // @ts-ignore
-            await navigator.setAppBadge(reminders.length);
-          } else {
-            // @ts-ignore
-            await navigator.clearAppBadge();
-          }
-        } catch (error) {
-          console.warn('App Badging API error:', error);
-        }
+      if (reminders.length > 0) {
+        await setAppBadge(reminders.length);
+      } else {
+        await clearAppBadge();
       }
     };
     
     updateBadge();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateBadge();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [reminders.length, settings.isEnabled]);
 
   // Push Notification logic check
@@ -140,10 +142,13 @@ function App() {
                 const solarText = reminder.solarDateStr ? ` · Dương: ${reminder.solarDateStr}` : '';
                 const options = {
                   body: `${reminder.date}${solarText} (${daysText})`,
-                  icon: '/giaphaphamtoc/icons/icon-192x192.png',
-                  badge: '/giaphaphamtoc/icons/icon-192x192.png'
+                  icon: '/giaphaphamtoc/icons/icon-192.png',
+                  badge: '/giaphaphamtoc/icons/icon-192.png'
                 };
                 
+                // Cập nhật số đỏ trên icon khi gửi thông báo
+                setAppBadge(reminders.length || 1);
+
                 if ('serviceWorker' in navigator) {
                   navigator.serviceWorker.ready.then(registration => {
                     registration.showNotification(title, options).catch(err => {
