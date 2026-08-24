@@ -65,6 +65,8 @@ export const sendTestNotificationWithBadge = async (unreadCount: number = 1): Pr
     tag: 'test-badge-notification',
     // @ts-ignore
     renotify: true,
+    // @ts-ignore
+    requireInteraction: true,
   };
 
   try {

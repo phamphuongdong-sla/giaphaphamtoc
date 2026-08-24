@@ -143,7 +143,10 @@ function App() {
                 const options = {
                   body: `${reminder.date}${solarText} (${daysText})`,
                   icon: '/giaphaphamtoc/icons/icon-192.png',
-                  badge: '/giaphaphamtoc/icons/icon-192.png'
+                  badge: '/giaphaphamtoc/icons/icon-192.png',
+                  tag: `giapha-reminder-${reminder.fullName}`,
+                  renotify: true,
+                  requireInteraction: true
                 };
                 
                 // Cập nhật số đỏ trên icon khi gửi thông báo

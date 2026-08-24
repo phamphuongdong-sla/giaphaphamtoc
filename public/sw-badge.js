@@ -33,7 +33,8 @@ self.addEventListener('push', (event) => {
       data: data.url || '/giaphaphamtoc/',
       vibrate: [100, 50, 100],
       tag: data.tag || 'giapha-notification',
-      renotify: true
+      renotify: true,
+      requireInteraction: true
     };
 
     return self.registration.showNotification(title, options);
