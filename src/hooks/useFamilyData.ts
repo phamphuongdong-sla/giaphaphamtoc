@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { GIA_PHA_DATA } from '@/data/giapha';
 import { PersonNode, MemberEntry } from '@/types';
 import { fetchFamilyTreeFromSheet } from '@/services/googleSheets';
+import { fetchFamilyTreeFromCloudflare } from '@/services/cloudflareApi';
 import {
   normalizeGenealogy,
   buildMemberEntries,
@@ -17,12 +18,19 @@ export const useFamilyData = () => {
     let mounted = true;
     const loadData = async () => {
       try {
-        const sheetTree = await fetchFamilyTreeFromSheet();
-        if (mounted && sheetTree) {
-          setRawTree(sheetTree);
+        // 1. Ưu tiên lấy từ Cloudflare D1 Database
+        let tree = await fetchFamilyTreeFromCloudflare();
+        
+        // 2. Nếu chưa cấu hình Cloudflare hoặc lỗi, fallback sang Google Sheets
+        if (!tree) {
+          tree = await fetchFamilyTreeFromSheet();
+        }
+
+        if (mounted && tree) {
+          setRawTree(tree);
         }
       } catch (err) {
-        console.error("Error loading from Google Sheets:", err);
+        console.error("Error loading family data:", err);
       }
     };
     loadData();
