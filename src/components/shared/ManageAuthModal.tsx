@@ -155,7 +155,7 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
         const superAdminUser: AuthUser = {
           id: 'USR001',
           username: 'admin',
-          full_name: 'Phạm Phương Đông (Trưởng Tộc)',
+          full_name: 'Phạm Phương Đông (Admin)',
           role: 'super_admin',
           branch: 'Trực hệ',
           status: 'active'
@@ -184,7 +184,7 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
     try {
       const res = await loginUser(username.trim(), password);
       if (res.success && res.user) {
-        setSuccessMsg(`Chào mừng ${res.user.full_name} (${res.user.role === 'super_admin' ? 'Trưởng Tộc' : 'Trưởng Chi / Biên Tập'})!`);
+        setSuccessMsg(`Chào mừng ${res.user.full_name} (${res.user.role === 'super_admin' ? 'Quản trị viên' : 'Biên tập viên'})!`);
         setTimeout(() => {
           onSuccess(res.user!);
         }, 600);
@@ -217,10 +217,10 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
             <Icon name="lock" size={24} style={{ color: 'var(--gold-light)' }} />
           </div>
           <h2 className="font-display" style={{ fontSize: 20, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
-            Đăng Nhập Quản Trị Gia Phả
+            Đăng Nhập Quản Trị
           </h2>
           <p style={{ marginTop: 4, fontSize: 12, color: 'var(--text-muted)' }}>
-            Hệ thống phân quyền Trưởng Tộc & Trưởng Chi
+            Hệ thống phân quyền Quản trị viên & Biên tập viên
           </p>
         </div>
 

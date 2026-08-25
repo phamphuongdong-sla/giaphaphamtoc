@@ -892,7 +892,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
               gap: 4
             }}>
               <Icon name={authUser?.role === 'super_admin' ? 'shield-check' : 'user'} size={12} />
-              {authUser?.full_name || 'Quản trị viên'} ({authUser?.role === 'super_admin' ? 'Trưởng Tộc' : 'Trưởng Chi / Biên Tập'})
+              {authUser?.full_name || 'Quản trị viên'} ({authUser?.role === 'super_admin' ? 'Quản trị viên' : 'Biên tập viên'})
             </span>
           </div>
           <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>
@@ -2012,10 +2012,10 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
           }}>
             <div>
               <h3 style={{ margin: 0, fontSize: 16, color: 'var(--gold-light)' }}>
-                Danh Sách Quản Trị Viên & Trưởng Chi
+                Danh Sách Tài Khoản & Phân Quyền
               </h3>
               <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>
-                Cấp tài khoản cho các trưởng chi để cùng biên tập nhánh họ mà không lo bị xóa mất dữ liệu chung.
+                Cấp tài khoản cho các biên tập viên để cùng cập nhật dữ liệu gia phả mà không lo bị xóa mất dữ liệu chung.
               </p>
             </div>
 
@@ -2077,7 +2077,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                           fontSize: 18,
                           fontWeight: 700
                         }}>
-                          {isSuper ? '👑' : '✍️'}
+                          {isSuper ? '🛡️' : '✍️'}
                         </div>
                         <div>
                           <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
@@ -2116,7 +2116,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                       <div>
                         <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: 10 }}>Vai trò:</span>
                         <span style={{ color: isSuper ? 'var(--gold-mid)' : '#93c5fd', fontWeight: 600 }}>
-                          {isSuper ? 'Trưởng Tộc (Toàn quyền)' : 'Trưởng Chi (Biên tập)'}
+                          {isSuper ? 'Quản trị viên (Admin)' : 'Biên tập viên (Editor)'}
                         </span>
                       </div>
                       <div>
@@ -3088,7 +3088,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     disabled={userSaving}
                     value={editingUser.full_name || ''}
                     onChange={e => setEditingUser(prev => ({ ...prev!, full_name: e.target.value }))}
-                    placeholder="VD: Phạm Văn Hải (Trưởng Chi 2)"
+                    placeholder="VD: Phạm Văn Hải"
                     style={{
                       width: '100%',
                       padding: '10px 12px',
@@ -3122,8 +3122,8 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                       outline: 'none'
                     }}
                   >
-                    <option value="editor">✍️ Trưởng Chi / Biên Tập (Thêm & Sửa thành viên, KHÔNG được Xóa)</option>
-                    <option value="super_admin">👑 Trưởng Tộc (Toàn quyền Thêm, Sửa, Xóa & Quản lý User)</option>
+                    <option value="editor">✍️ Biên tập viên (Editor) - Thêm & Sửa thành viên, không được Xóa</option>
+                    <option value="super_admin">🛡️ Quản trị viên (Admin) - Toàn quyền Thêm, Sửa, Xóa & Quản lý User</option>
                   </select>
                 </div>
 
