@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { SheetRow, fetchRawSheetRows, addMemberToSheet, updateMemberInSheet, deleteMemberFromSheet, APPS_SCRIPT_ID, SHEET_ID } from '@/services/googleSheets';
+import { SheetRow, fetchRawSheetRows, addMemberToSheet, updateMemberInSheet, deleteMemberFromSheet } from '@/services/googleSheets';
 import { 
   fetchRawCloudflareRows, 
   addMemberToCloudflare, 
@@ -70,10 +70,6 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
 
   // Export / Backup modal state
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
-
-  // Apps Script modal state
-  const [showScriptModal, setShowScriptModal] = useState<boolean>(false);
-  const [copiedScript, setCopiedScript] = useState<boolean>(false);
 
   // Solar to Lunar Converter helper state inside form
   const [_solarDateInput, setSolarDateInput] = useState<string>('');
@@ -700,186 +696,6 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
     downloadAnchor.remove();
   };
 
-  const appsScriptCode = `/**
- * GIA PHẢ PHẠM TỘC - GOOGLE APPS SCRIPT BACKEND
- * Mã Web App Deployment ID: ${APPS_SCRIPT_ID}
- */
-
-function doGet(e) {
-  try {
-    var sheet = getTargetSheet();
-    var action = e && e.parameter ? e.parameter.action : "";
-    if (action === "delete" && e.parameter.id) {
-      return deleteMemberRow(sheet, e.parameter.id);
-    }
-    var data = readSheetData(sheet);
-    return responseJSON({ success: true, count: data.length, data: data });
-  } catch (err) {
-    return responseJSON({ success: false, error: err.toString() });
-  }
-}
-
-function doPost(e) {
-  try {
-    var sheet = getTargetSheet();
-    var contents = {};
-    if (e && e.postData && e.postData.contents) {
-      contents = JSON.parse(e.postData.contents);
-    }
-    
-    var action = contents.action || (e.parameter ? e.parameter.action : "");
-    var payload = contents.data || contents.payload || contents;
-    
-    if (action === "send_reset_code") {
-      var targetEmail = contents.email || "phamphuongdong@gmail.com";
-      var code = Math.floor(100000 + Math.random() * 900000).toString();
-      var subject = "🔑 [Gia Phả Phạm Tộc] Mã khôi phục mật khẩu quản trị";
-      var body = "Xin chào Quản trị viên,\n\n" +
-                 "Mã xác minh khôi phục mật khẩu trang Quản lý Gia Phả của bạn là: " + code + "\n\n" +
-                 "Mã này có hiệu lực để bạn đặt lại mật khẩu mới.\n" +
-                 "Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.\n\n" +
-                 "Trân trọng,\nGia Phả Phạm Tộc System";
-      try {
-        MailApp.sendEmail(targetEmail, subject, body);
-      } catch(mErr) {
-        console.warn("MailApp error:", mErr);
-      }
-      return responseJSON({ success: true, message: "Đã gửi mã xác minh 6 chữ số tới " + targetEmail, code: code });
-    } else if (action === "create" || action === "add") {
-      return addMemberRow(sheet, payload);
-    } else if (action === "update" || action === "edit") {
-      return updateMemberRow(sheet, payload);
-    } else if (action === "delete") {
-      return deleteMemberRow(sheet, contents.id || payload.id);
-    } else if (action === "read") {
-      var data = readSheetData(sheet);
-      return responseJSON({ success: true, count: data.length, data: data });
-    } else {
-      return responseJSON({ success: false, message: "Hành động không hợp lệ: " + action });
-    }
-  } catch (err) {
-    return responseJSON({ success: false, error: err.toString() });
-  }
-}
-
-function getTargetSheet() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) {
-    ss = SpreadsheetApp.openById("${SHEET_ID}");
-  }
-  var sheet = ss.getSheetByName("Data");
-  if (!sheet) {
-    sheet = ss.getSheets()[0];
-  }
-  return sheet;
-}
-
-function readSheetData(sheet) {
-  var values = sheet.getDataRange().getValues();
-  if (values.length < 2) return [];
-  var headers = values[0].map(function(h) { return String(h).trim(); });
-  var result = [];
-  for (var i = 1; i < values.length; i++) {
-    var row = values[i];
-    var obj = {};
-    for (var j = 0; j < headers.length; j++) {
-      obj[headers[j]] = row[j] !== undefined && row[j] !== null ? String(row[j]) : "";
-    }
-    result.push(obj);
-  }
-  return result;
-}
-
-function addMemberRow(sheet, data) {
-  var newId = String(data.id || "").trim();
-  if (!newId) {
-    return responseJSON({ success: false, message: "ID thành viên không được để trống" });
-  }
-  var values = sheet.getDataRange().getValues();
-  for (var i = 1; i < values.length; i++) {
-    if (String(values[i][0]).trim() === newId) {
-      return responseJSON({ success: false, message: "Mã ID '" + newId + "' đã tồn tại!" });
-    }
-  }
-  var newRow = [
-    newId,
-    String(data.parentId || "").trim(),
-    String(data.name || "").trim(),
-    String(data.gender || "").trim(),
-    String(data.birth || "").trim(),
-    String(data.death || "").trim(),
-    String(data.isDead || "").trim(),
-    String(data.bio || "").trim(),
-    String(data.title || "").trim(),
-    String(data.branch || "").trim()
-  ];
-  sheet.appendRow(newRow);
-  return responseJSON({ success: true, message: "Thêm thành viên '" + data.name + "' thành công!", id: newId });
-}
-
-function updateMemberRow(sheet, data) {
-  var targetId = String(data.id || "").trim();
-  if (!targetId) {
-    return responseJSON({ success: false, message: "ID thành viên không được để trống" });
-  }
-  var values = sheet.getDataRange().getValues();
-  var foundRowIndex = -1;
-  for (var i = 1; i < values.length; i++) {
-    if (String(values[i][0]).trim() === targetId) {
-      foundRowIndex = i + 1;
-      break;
-    }
-  }
-  if (foundRowIndex === -1) {
-    return responseJSON({ success: false, message: "Không tìm thấy thành viên có ID: " + targetId });
-  }
-  var updatedRow = [
-    targetId,
-    String(data.parentId || "").trim(),
-    String(data.name || "").trim(),
-    String(data.gender || "").trim(),
-    String(data.birth || "").trim(),
-    String(data.death || "").trim(),
-    String(data.isDead || "").trim(),
-    String(data.bio || "").trim(),
-    String(data.title || "").trim(),
-    String(data.branch || "").trim()
-  ];
-  sheet.getRange(foundRowIndex, 1, 1, 10).setValues([updatedRow]);
-  return responseJSON({ success: true, message: "Cập nhật thông tin '" + data.name + "' thành công!" });
-}
-
-function deleteMemberRow(sheet, targetId) {
-  var idStr = String(targetId || "").trim();
-  if (!idStr) {
-    return responseJSON({ success: false, message: "ID thành viên không được để trống" });
-  }
-  var values = sheet.getDataRange().getValues();
-  var foundRowIndex = -1;
-  for (var i = 1; i < values.length; i++) {
-    if (String(values[i][0]).trim() === idStr) {
-      foundRowIndex = i + 1;
-      break;
-    }
-  }
-  if (foundRowIndex === -1) {
-    return responseJSON({ success: false, message: "Không tìm thấy thành viên có ID: " + idStr });
-  }
-  sheet.deleteRow(foundRowIndex);
-  return responseJSON({ success: true, message: "Xóa thành viên ID " + idStr + " thành công!" });
-}
-
-function responseJSON(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
-}`;
-
-  const copyAppsScriptCode = () => {
-    navigator.clipboard.writeText(appsScriptCode);
-    setCopiedScript(true);
-    setTimeout(() => setCopiedScript(false), 2000);
-  };
-
   const currentLineage = useMemo(() => {
     return getLineageChain(currentMember.parentId);
   }, [currentMember.parentId, memberMap]);
@@ -994,24 +810,6 @@ function responseJSON(obj) {
             title="Xuất dữ liệu / Sao lưu Database (SQL, Excel CSV, JSON)"
           >
             <Icon name="download" size={14} /> Xuất Database
-          </button>
-
-          <button
-            onClick={() => setShowScriptModal(true)}
-            className="action-button"
-            style={{
-              background: 'rgba(139,26,26,0.2)',
-              color: 'var(--gold-mid)',
-              border: '1px solid rgba(201,146,58,0.3)',
-              padding: '8px 10px',
-              borderRadius: 'var(--r-md)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 12
-            }}
-          >
-            <Icon name="code" size={14} /> Script
           </button>
 
           {onLogout && (
@@ -2329,89 +2127,6 @@ function responseJSON(obj) {
                 }}
               >
                 {deleting ? 'Đang xóa...' : 'Đồng ý xóa'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Apps Script Setup Instructions Modal */}
-      {showScriptModal && (
-        <div className="modal-backdrop" onClick={() => setShowScriptModal(false)}>
-          <div className="modal" style={{ maxWidth: 720, width: isMobile ? '95%' : '92%' }} onClick={(e) => e.stopPropagation()}>
-            <div className="modal-head" style={{ borderBottom: '1px solid var(--border-gold)', paddingBottom: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h2 className="font-display" style={{ fontSize: 18, color: 'var(--gold-light)', margin: 0 }}>
-                  Cấu Hình Google Apps Script
-                </h2>
-                <button onClick={() => setShowScriptModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                  <Icon name="x" size={18} />
-                </button>
-              </div>
-            </div>
-
-            <div style={{ padding: '16px 20px', maxHeight: '70vh', overflowY: 'auto', fontSize: 13, color: 'var(--text-secondary)' }}>
-              <p style={{ margin: '0 0 12px' }}>
-                Để ứng dụng web có thể tự động <strong>Thêm / Sửa / Xóa</strong> thành viên trực tiếp vào file Google Sheets, bạn hãy làm theo các bước:
-              </p>
-
-              <ol style={{ paddingLeft: 20, margin: '0 0 16px', lineHeight: 1.6 }}>
-                <li>Mở file Google Sheet gia tộc của bạn (`ID: {SHEET_ID}`).</li>
-                <li>Vào menu <strong>Tiện ích mở rộng (Extensions)</strong> &gt; chọn <strong>Apps Script</strong>.</li>
-                <li>Dán toàn bộ đoạn mã bên dưới vào file <code style={{ color: 'var(--gold)' }}>Code.gs</code> rồi bấm <strong>Lưu (Save)</strong>.</li>
-                <li>
-                  Bấm <strong>Triển khai (Deploy)</strong> &gt; <strong>Triển khai dưới dạng ứng dụng web (New Deployment)</strong>:
-                  <ul style={{ margin: '4px 0', paddingLeft: 20 }}>
-                    <li><strong>Thực thi dưới danh nghĩa (Execute as):</strong> Chọn <i>Tôi (Me)</i>.</li>
-                    <li><strong>Ai có quyền truy cập (Who has access):</strong> Chọn <i>Bất kỳ ai (Anyone)</i>.</li>
-                  </ul>
-                </li>
-              </ol>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ fontWeight: 600, color: 'var(--gold-mid)' }}>Mã Nguồn Code.gs:</span>
-                <button
-                  onClick={copyAppsScriptCode}
-                  style={{
-                    background: copiedScript ? 'rgba(34,197,94,0.2)' : 'rgba(201,146,58,0.2)',
-                    border: '1px solid var(--border-gold)',
-                    color: copiedScript ? '#4ade80' : 'var(--gold-light)',
-                    padding: '4px 12px',
-                    borderRadius: 'var(--r-sm)',
-                    fontSize: 12,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6
-                  }}
-                >
-                  <Icon name={copiedScript ? 'check' : 'copy'} size={13} />
-                  {copiedScript ? 'Đã sao chép!' : 'Sao chép mã Code.gs'}
-                </button>
-              </div>
-
-              <pre style={{
-                background: '#090909',
-                border: '1px solid var(--border-glass)',
-                borderRadius: 'var(--r-sm)',
-                padding: 12,
-                fontSize: 11,
-                fontFamily: 'Consolas, Monaco, monospace',
-                color: '#e2e8f0',
-                overflowX: 'auto',
-                maxHeight: 280
-              }}>
-                {appsScriptCode}
-              </pre>
-            </div>
-
-            <div style={{ padding: '12px 20px', borderTop: '1px solid var(--border-glass)', textAlign: 'right' }}>
-              <button
-                onClick={() => setShowScriptModal(false)}
-                className="action-button"
-                style={{ padding: '6px 16px', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
-              >
-                Đóng
               </button>
             </div>
           </div>
