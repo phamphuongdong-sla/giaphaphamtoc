@@ -5,7 +5,15 @@ import {
   addMemberToCloudflare, 
   updateMemberInCloudflare, 
   deleteMemberFromCloudflare, 
-  CLOUDFLARE_API_URL 
+  fetchAuditLogs,
+  fetchUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  CLOUDFLARE_API_URL,
+  AuthUser,
+  UserRow,
+  AuditLogRow
 } from '@/services/cloudflareApi';
 import { Icon } from '@/components/ui/Icon';
 import { solarToLunar, getCanChiYear } from '@/utils/dateUtils';
@@ -19,17 +27,35 @@ const formatSolarDateInput = (val: string): string => {
 };
 
 interface ManageViewProps {
+  authUser?: AuthUser | null;
   onRefreshData?: () => Promise<void>;
   onLogout?: () => void;
 }
 
-export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
+export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProps) => {
   const [rows, setRows] = useState<SheetRow[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'nam' | 'nu'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'alive' | 'dead'>('all');
   const [genFilter, setGenFilter] = useState<string>('all');
+
+  // Sub-tabs: 'members' | 'logs' | 'users'
+  const [activeTab, setActiveTab] = useState<'members' | 'logs' | 'users'>('members');
+
+  // Audit Logs state
+  const [auditLogs, setAuditLogs] = useState<AuditLogRow[]>([]);
+  const [logsLoading, setLogsLoading] = useState<boolean>(false);
+  const [logSearch, setLogSearch] = useState<string>('');
+  const [logActionFilter, setLogActionFilter] = useState<string>('all');
+
+  // Users & RBAC state
+  const [usersList, setUsersList] = useState<UserRow[]>([]);
+  const [usersLoading, setUsersLoading] = useState<boolean>(false);
+  const [showUserModal, setShowUserModal] = useState<boolean>(false);
+  const [editingUser, setEditingUser] = useState<Partial<UserRow> & { password?: string } | null>(null);
+  const [userSaving, setUserSaving] = useState<boolean>(false);
+  const [userFormError, setUserFormError] = useState<string>('');
 
   // Mobile detection & Layout mode (cards vs table)
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth <= 768);
@@ -87,6 +113,30 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
       console.error('Failed to load members:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAuditLogs = async () => {
+    setLogsLoading(true);
+    try {
+      const logs = await fetchAuditLogs(300);
+      setAuditLogs(logs);
+    } catch (err) {
+      console.error('Failed to load audit logs:', err);
+    } finally {
+      setLogsLoading(false);
+    }
+  };
+
+  const loadUsers = async () => {
+    setUsersLoading(true);
+    try {
+      const users = await fetchUsers();
+      setUsersList(users);
+    } catch (err) {
+      console.error('Failed to load users:', err);
+    } finally {
+      setUsersLoading(false);
     }
   };
 
@@ -571,8 +621,8 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
     let result;
     if (CLOUDFLARE_API_URL) {
       result = isEditing
-        ? await updateMemberInCloudflare(currentMember)
-        : await addMemberToCloudflare(currentMember);
+        ? await updateMemberInCloudflare(currentMember, authUser)
+        : await addMemberToCloudflare(currentMember, authUser);
     } else {
       result = isEditing
         ? await updateMemberInSheet(currentMember)
@@ -609,7 +659,7 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
 
     setDeleting(true);
     const result = CLOUDFLARE_API_URL
-      ? await deleteMemberFromCloudflare(memberToDelete.id)
+      ? await deleteMemberFromCloudflare(memberToDelete.id, authUser)
       : await deleteMemberFromSheet(memberToDelete.id);
     setDeleting(false);
 
@@ -621,6 +671,93 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
     } else {
       alert(`Xóa thất bại: ${result.message}`);
     }
+  };
+
+  // User Management Actions
+  const handleOpenAddUser = () => {
+    setEditingUser({
+      username: '',
+      full_name: '',
+      role: 'editor',
+      branch: '',
+      phone: '',
+      status: 'active',
+      password: '',
+    });
+    setUserFormError('');
+    setShowUserModal(true);
+  };
+
+  const handleOpenEditUser = (u: UserRow) => {
+    setEditingUser({
+      ...u,
+      password: '',
+    });
+    setUserFormError('');
+    setShowUserModal(true);
+  };
+
+  const handleSaveUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    if (!editingUser.username?.trim()) {
+      setUserFormError('Vui lòng nhập Tên đăng nhập.');
+      return;
+    }
+    if (!editingUser.full_name?.trim()) {
+      setUserFormError('Vui lòng nhập Họ và tên.');
+      return;
+    }
+
+    const isCreating = !editingUser.id;
+    if (isCreating && (!editingUser.password || editingUser.password.length < 4)) {
+      setUserFormError('Mật khẩu mới phải có ít nhất 4 ký tự.');
+      return;
+    }
+
+    setUserSaving(true);
+    setUserFormError('');
+
+    let res;
+    if (isCreating) {
+      res = await createUser(editingUser, authUser);
+    } else {
+      res = await updateUser(editingUser.id!, editingUser, authUser);
+    }
+
+    setUserSaving(false);
+
+    if (res.success) {
+      setShowUserModal(false);
+      setEditingUser(null);
+      await loadUsers();
+    } else {
+      setUserFormError(res.message || 'Lỗi khi lưu tài khoản.');
+    }
+  };
+
+  const handleToggleLockUser = async (u: UserRow) => {
+    if (u.id === authUser?.id) {
+      alert('Bạn không thể tự khóa tài khoản của chính mình!');
+      return;
+    }
+    const newStatus = u.status === 'active' ? 'locked' : 'active';
+    const actionText = newStatus === 'locked' ? 'khóa' : 'mở khóa';
+    if (!confirm(`Bạn có chắc chắn muốn ${actionText} tài khoản "${u.full_name}" không?`)) return;
+
+    await updateUser(u.id, { ...u, status: newStatus }, authUser);
+    await loadUsers();
+  };
+
+  const handleDeleteUser = async (u: UserRow) => {
+    if (u.id === authUser?.id) {
+      alert('Bạn không thể tự xóa tài khoản của chính mình!');
+      return;
+    }
+    if (!confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản "${u.full_name}" (${u.username}) không?`)) return;
+
+    await deleteUser(u.id, authUser);
+    await loadUsers();
   };
 
   const handleExportJSON = () => {
@@ -696,6 +833,22 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
     downloadAnchor.remove();
   };
 
+  // Filtered Audit Logs
+  const filteredLogs = useMemo(() => {
+    return auditLogs.filter(log => {
+      if (logActionFilter !== 'all') {
+        if (logActionFilter === 'USER' && !log.action.includes('USER')) return false;
+        if (logActionFilter !== 'USER' && log.action !== logActionFilter) return false;
+      }
+      if (logSearch.trim()) {
+        const q = logSearch.toLowerCase();
+        const text = `${log.user_name} ${log.target_name} ${log.details} ${log.action}`.toLowerCase();
+        return text.includes(q);
+      }
+      return true;
+    });
+  }, [auditLogs, logActionFilter, logSearch]);
+
   const currentLineage = useMemo(() => {
     return getLineageChain(currentMember.parentId);
   }, [currentMember.parentId, memberMap]);
@@ -724,56 +877,87 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <h1 className="font-display" style={{ fontSize: isMobile ? 20 : 24, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
-              Quản Lý Thành Viên
+              Quản Trị Gia Phả
             </h1>
             <span style={{
-              background: 'rgba(201,146,58,0.15)',
-              color: 'var(--gold-mid)',
-              border: '1px solid var(--border-gold)',
-              fontSize: 10,
+              background: authUser?.role === 'super_admin' ? 'rgba(201,146,58,0.2)' : 'rgba(59,130,246,0.2)',
+              color: authUser?.role === 'super_admin' ? 'var(--gold-light)' : '#93c5fd',
+              border: `1px solid ${authUser?.role === 'super_admin' ? 'var(--border-gold)' : 'rgba(59,130,246,0.3)'}`,
+              fontSize: 11,
               fontWeight: 600,
-              padding: '2px 6px',
-              borderRadius: 10,
+              padding: '2px 8px',
+              borderRadius: 12,
               display: 'flex',
               alignItems: 'center',
               gap: 4
             }}>
-              <Icon name="database" size={11} /> Sheets Sync
+              <Icon name={authUser?.role === 'super_admin' ? 'shield-check' : 'user'} size={12} />
+              {authUser?.full_name || 'Quản trị viên'} ({authUser?.role === 'super_admin' ? 'Trưởng Tộc' : 'Trưởng Chi / Biên Tập'})
             </span>
           </div>
           <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>
-            Quản lý Thêm, Sửa, Xóa và tự động thừa kế phả hệ gia tộc.
+            Hệ thống quản lý phả hệ, nhật ký thay đổi và phân quyền tài khoản trên Cloudflare D1.
           </p>
         </div>
 
         {/* Action buttons */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <button
-            onClick={handleOpenAddModal}
-            className="action-button primary"
-            style={{
-              flex: isMobile ? '1 1 100%' : 'initial',
-              justifyContent: 'center',
-              background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
-              color: '#000',
-              fontWeight: 700,
-              padding: '10px 16px',
-              borderRadius: 'var(--r-md)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              boxShadow: 'var(--shadow-gold-glow)'
-            }}
-          >
-            <Icon name="plus" size={16} /> Thêm Thành Viên Mới
-          </button>
+          {activeTab === 'members' && (
+            <button
+              onClick={handleOpenAddModal}
+              className="action-button primary"
+              style={{
+                flex: isMobile ? '1 1 100%' : 'initial',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
+                color: '#000',
+                fontWeight: 700,
+                padding: '10px 16px',
+                borderRadius: 'var(--r-md)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                boxShadow: 'var(--shadow-gold-glow)'
+              }}
+            >
+              <Icon name="plus" size={16} /> Thêm Thành Viên Mới
+            </button>
+          )}
+
+          {activeTab === 'users' && authUser?.role === 'super_admin' && (
+            <button
+              onClick={handleOpenAddUser}
+              className="action-button primary"
+              style={{
+                flex: isMobile ? '1 1 100%' : 'initial',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
+                color: '#000',
+                fontWeight: 700,
+                padding: '10px 16px',
+                borderRadius: 'var(--r-md)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                boxShadow: 'var(--shadow-gold-glow)'
+              }}
+            >
+              <Icon name="user-plus" size={16} /> Thêm Tài Khoản Mới
+            </button>
+          )}
 
           <button
             onClick={async () => {
-              await loadSheetRows();
-              if (onRefreshData) await onRefreshData();
+              if (activeTab === 'members') {
+                await loadSheetRows();
+                if (onRefreshData) await onRefreshData();
+              } else if (activeTab === 'logs') {
+                await loadAuditLogs();
+              } else if (activeTab === 'users') {
+                await loadUsers();
+              }
             }}
-            disabled={loading}
+            disabled={loading || logsLoading || usersLoading}
             className="action-button"
             style={{
               background: 'var(--bg-card)',
@@ -786,9 +970,9 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
               gap: 6,
               fontSize: 12
             }}
-            title="Đồng bộ lại từ Google Sheets"
+            title="Tải lại dữ liệu"
           >
-            <Icon name="refresh-cw" size={14} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
+            <Icon name="refresh-cw" size={14} style={{ animation: (loading || logsLoading || usersLoading) ? 'spin 1s linear infinite' : 'none' }} />
             Tải Lại
           </button>
 
@@ -835,101 +1019,183 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
         </div>
       </div>
 
-      {/* Stats Counter Bar */}
+      {/* Sub-tabs Navigation Bar */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))',
-        gap: 10,
-        marginBottom: 16
+        display: 'flex',
+        gap: 6,
+        marginBottom: 16,
+        borderBottom: '1px solid var(--border-glass)',
+        paddingBottom: 8,
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch'
       }}>
-        <div style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-gold)',
-          borderRadius: 'var(--r-md)',
-          padding: '10px 12px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10
-        }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: 'rgba(201,146,58,0.15)', color: 'var(--gold-mid)',
-            display: 'grid', placeItems: 'center'
-          }}>
-            <Icon name="users" size={18} />
-          </div>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tổng số</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold-light)' }}>{stats.total}</div>
-          </div>
-        </div>
+        <button
+          onClick={() => setActiveTab('members')}
+          style={{
+            padding: '8px 14px',
+            borderRadius: 'var(--r-sm)',
+            background: activeTab === 'members' ? 'var(--gold)' : 'var(--bg-glass)',
+            color: activeTab === 'members' ? '#000' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'members' ? 700 : 500,
+            fontSize: 13,
+            border: activeTab === 'members' ? '1px solid var(--gold)' : '1px solid var(--border-glass)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            whiteSpace: 'nowrap'
+          }}
+        >
+          <Icon name="users" size={15} /> Danh Sách Thành Viên ({rows.length})
+        </button>
 
-        <div style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-glass)',
-          borderRadius: 'var(--r-md)',
-          padding: '10px 12px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10
-        }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: 'rgba(59,130,246,0.15)', color: '#60a5fa',
-            display: 'grid', placeItems: 'center'
-          }}>
-            <Icon name="user" size={18} />
-          </div>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Nam giới</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#93c5fd' }}>{stats.male}</div>
-          </div>
-        </div>
+        <button
+          onClick={() => {
+            setActiveTab('logs');
+            loadAuditLogs();
+          }}
+          style={{
+            padding: '8px 14px',
+            borderRadius: 'var(--r-sm)',
+            background: activeTab === 'logs' ? 'var(--gold)' : 'var(--bg-glass)',
+            color: activeTab === 'logs' ? '#000' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'logs' ? 700 : 500,
+            fontSize: 13,
+            border: activeTab === 'logs' ? '1px solid var(--gold)' : '1px solid var(--border-glass)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            whiteSpace: 'nowrap'
+          }}
+        >
+          <Icon name="clock" size={15} /> Nhật Ký Thay Đổi
+        </button>
 
-        <div style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-glass)',
-          borderRadius: 'var(--r-md)',
-          padding: '10px 12px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10
-        }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: 'rgba(236,72,153,0.15)', color: '#f472b6',
-            display: 'grid', placeItems: 'center'
-          }}>
-            <Icon name="heart" size={18} />
-          </div>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Nữ giới</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#fbcfe8' }}>{stats.female}</div>
-          </div>
-        </div>
-
-        <div style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-glass)',
-          borderRadius: 'var(--r-md)',
-          padding: '10px 12px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10
-        }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: 'rgba(34,197,94,0.15)', color: '#4ade80',
-            display: 'grid', placeItems: 'center'
-          }}>
-            <Icon name="user-check" size={18} />
-          </div>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Còn sống</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#86efac' }}>{stats.alive}</div>
-          </div>
-        </div>
+        {authUser?.role === 'super_admin' && (
+          <button
+            onClick={() => {
+              setActiveTab('users');
+              loadUsers();
+            }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 'var(--r-sm)',
+              background: activeTab === 'users' ? 'var(--gold)' : 'var(--bg-glass)',
+              color: activeTab === 'users' ? '#000' : 'var(--text-secondary)',
+              fontWeight: activeTab === 'users' ? 700 : 500,
+              fontSize: 13,
+              border: activeTab === 'users' ? '1px solid var(--gold)' : '1px solid var(--border-glass)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <Icon name="shield-check" size={15} /> Tài Khoản & Phân Quyền
+          </button>
+        )}
       </div>
+
+      {/* 1. TAB: DANH SÁCH THÀNH VIÊN */}
+      {activeTab === 'members' && (
+        <>
+          {/* Stats Counter Bar */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: 10,
+            marginBottom: 16
+          }}>
+            <div style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-gold)',
+              borderRadius: 'var(--r-md)',
+              padding: '10px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10
+            }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 8,
+                background: 'rgba(201,146,58,0.15)', color: 'var(--gold-mid)',
+                display: 'grid', placeItems: 'center'
+              }}>
+                <Icon name="users" size={18} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tổng số</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold-light)' }}>{stats.total}</div>
+              </div>
+            </div>
+
+            <div style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-glass)',
+              borderRadius: 'var(--r-md)',
+              padding: '10px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10
+            }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 8,
+                background: 'rgba(59,130,246,0.15)', color: '#60a5fa',
+                display: 'grid', placeItems: 'center'
+              }}>
+                <Icon name="user" size={18} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Nam giới</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#93c5fd' }}>{stats.male}</div>
+              </div>
+            </div>
+
+            <div style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-glass)',
+              borderRadius: 'var(--r-md)',
+              padding: '10px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10
+            }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 8,
+                background: 'rgba(236,72,153,0.15)', color: '#f472b6',
+                display: 'grid', placeItems: 'center'
+              }}>
+                <Icon name="heart" size={18} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Nữ giới</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#fbcfe8' }}>{stats.female}</div>
+              </div>
+            </div>
+
+            <div style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-glass)',
+              borderRadius: 'var(--r-md)',
+              padding: '10px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10
+            }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 8,
+                background: 'rgba(34,197,94,0.15)', color: '#4ade80',
+                display: 'grid', placeItems: 'center'
+              }}>
+                <Icon name="user-check" size={18} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Còn sống</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#86efac' }}>{stats.alive}</div>
+              </div>
+            </div>
+          </div>
 
       {/* Toolbar / Search & Filter */}
       <div style={{
@@ -1296,24 +1562,26 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
                     <Icon name="edit" size={13} /> Sửa
                   </button>
 
-                  <button
-                    onClick={() => handleOpenDeleteModal(row)}
-                    style={{
-                      minHeight: 34,
-                      padding: '0 10px',
-                      background: 'rgba(224,80,80,0.15)',
-                      border: '1px solid rgba(224,80,80,0.3)',
-                      color: '#f87171',
-                      borderRadius: 'var(--r-sm)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                    title="Xóa thành viên"
-                  >
-                    <Icon name="trash-2" size={14} />
-                  </button>
+                  {authUser?.role === 'super_admin' && (
+                    <button
+                      onClick={() => handleOpenDeleteModal(row)}
+                      style={{
+                        minHeight: 34,
+                        padding: '0 10px',
+                        background: 'rgba(224,80,80,0.15)',
+                        border: '1px solid rgba(224,80,80,0.3)',
+                        color: '#f87171',
+                        borderRadius: 'var(--r-sm)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title="Xóa thành viên"
+                    >
+                      <Icon name="trash-2" size={14} />
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -1515,23 +1783,25 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
                             <Icon name="edit" size={12} /> Sửa
                           </button>
 
-                          <button
-                            onClick={() => handleOpenDeleteModal(row)}
-                            style={{
-                              background: 'rgba(224,80,80,0.15)',
-                              border: '1px solid rgba(224,80,80,0.3)',
-                              color: '#f87171',
-                              padding: '4px 6px',
-                              borderRadius: 'var(--r-sm)',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              fontSize: 11
-                            }}
-                            title="Xóa thành viên"
-                          >
-                            <Icon name="trash-2" size={12} />
-                          </button>
+                          {authUser?.role === 'super_admin' && (
+                            <button
+                              onClick={() => handleOpenDeleteModal(row)}
+                              style={{
+                                background: 'rgba(224,80,80,0.15)',
+                                border: '1px solid rgba(224,80,80,0.3)',
+                                color: '#f87171',
+                                padding: '4px 6px',
+                                borderRadius: 'var(--r-sm)',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                fontSize: 11
+                              }}
+                              title="Xóa thành viên"
+                            >
+                              <Icon name="trash-2" size={12} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1540,6 +1810,399 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+      </>
+    )}
+
+      {/* 2. TAB: NHẬT KÝ THAY ĐỔI (AUDIT LOGS) */}
+      {activeTab === 'logs' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Filters & Search for Logs */}
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-glass)',
+            borderRadius: 'var(--r-md)',
+            padding: '12px 14px',
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: 10,
+            alignItems: isMobile ? 'stretch' : 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <Icon name="search" size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                value={logSearch}
+                onChange={e => setLogSearch(e.target.value)}
+                placeholder="Tìm theo tên người thực hiện, thành viên, nội dung..."
+                style={{
+                  width: '100%',
+                  padding: '9px 12px 9px 36px',
+                  borderRadius: 'var(--r-sm)',
+                  background: 'var(--bg-base)',
+                  border: '1px solid var(--border-glass)',
+                  color: 'var(--text-primary)',
+                  fontSize: 13,
+                  outline: 'none'
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+              {[
+                { id: 'all', label: 'Tất cả' },
+                { id: 'CREATE_MEMBER', label: 'Thêm người' },
+                { id: 'UPDATE_MEMBER', label: 'Sửa thông tin' },
+                { id: 'DELETE_MEMBER', label: 'Xóa' },
+                { id: 'USER', label: 'Tài khoản' },
+                { id: 'LOGIN', label: 'Đăng nhập' }
+              ].map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => setLogActionFilter(f.id)}
+                  style={{
+                    padding: '6px 10px',
+                    borderRadius: 'var(--r-sm)',
+                    background: logActionFilter === f.id ? 'rgba(201,146,58,0.25)' : 'var(--bg-base)',
+                    border: `1px solid ${logActionFilter === f.id ? 'var(--border-gold)' : 'var(--border-glass)'}`,
+                    color: logActionFilter === f.id ? 'var(--gold-light)' : 'var(--text-muted)',
+                    fontSize: 11,
+                    fontWeight: logActionFilter === f.id ? 700 : 500,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Log Timeline List */}
+          {logsLoading ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--bg-card)', borderRadius: 'var(--r-md)', color: 'var(--gold-mid)' }}>
+              <Icon name="sparkles" size={24} style={{ animation: 'spin 1.5s linear infinite', marginBottom: 8 }} />
+              <div>Đang tải nhật ký thay đổi...</div>
+            </div>
+          ) : filteredLogs.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '50px 20px', background: 'var(--bg-card)', borderRadius: 'var(--r-md)', color: 'var(--text-muted)' }}>
+              <Icon name="clock" size={32} style={{ marginBottom: 8, opacity: 0.5 }} />
+              <p style={{ margin: 0, fontSize: 14 }}>Chưa có bản ghi nhật ký nào phù hợp.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {filteredLogs.map(log => {
+                let badgeColor = 'rgba(201,146,58,0.15)';
+                let badgeText = 'var(--gold-light)';
+                let badgeBorder = 'var(--border-gold)';
+                let iconName = 'edit';
+                let actionTitle = 'Cập nhật';
+
+                if (log.action === 'CREATE_MEMBER') {
+                  badgeColor = 'rgba(34,197,94,0.15)';
+                  badgeText = '#4ade80';
+                  badgeBorder = 'rgba(34,197,94,0.3)';
+                  iconName = 'user-plus';
+                  actionTitle = 'Thêm thành viên';
+                } else if (log.action === 'DELETE_MEMBER') {
+                  badgeColor = 'rgba(239,68,68,0.15)';
+                  badgeText = '#f87171';
+                  badgeBorder = 'rgba(239,68,68,0.3)';
+                  iconName = 'trash-2';
+                  actionTitle = 'Xóa thành viên';
+                } else if (log.action.includes('USER')) {
+                  badgeColor = 'rgba(59,130,246,0.15)';
+                  badgeText = '#60a5fa';
+                  badgeBorder = 'rgba(59,130,246,0.3)';
+                  iconName = 'shield-check';
+                  actionTitle = 'Tài khoản';
+                } else if (log.action === 'LOGIN') {
+                  badgeColor = 'rgba(168,85,247,0.15)';
+                  badgeText = '#c084fc';
+                  badgeBorder = 'rgba(168,85,247,0.3)';
+                  iconName = 'key';
+                  actionTitle = 'Đăng nhập';
+                } else if (log.action === 'SYSTEM') {
+                  badgeColor = 'rgba(201,146,58,0.2)';
+                  badgeText = 'var(--gold-light)';
+                  badgeBorder = 'var(--border-gold)';
+                  iconName = 'sparkles';
+                  actionTitle = 'Hệ thống';
+                }
+
+                return (
+                  <div
+                    key={log.id}
+                    style={{
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: 'var(--r-md)',
+                      padding: '12px 16px',
+                      display: 'flex',
+                      gap: 14,
+                      alignItems: 'flex-start'
+                    }}
+                  >
+                    <div style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: badgeColor,
+                      border: `1px solid ${badgeBorder}`,
+                      color: badgeText,
+                      display: 'grid',
+                      placeItems: 'center',
+                      flexShrink: 0,
+                      marginTop: 2
+                    }}>
+                      <Icon name={iconName} size={18} />
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginBottom: 4 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            padding: '2px 6px',
+                            borderRadius: 4,
+                            background: badgeColor,
+                            color: badgeText,
+                            border: `1px solid ${badgeBorder}`,
+                            textTransform: 'uppercase'
+                          }}>
+                            {actionTitle}
+                          </span>
+                          <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>
+                            {log.user_name || 'Quản trị viên'}
+                          </strong>
+                        </div>
+
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                          🕒 {log.created_at ? new Date(log.created_at.replace(' ', 'T') + 'Z').toLocaleString('vi-VN', { hour12: false }) : ''}
+                        </span>
+                      </div>
+
+                      <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, wordBreak: 'break-word' }}>
+                        {log.details}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 3. TAB: TÀI KHOẢN & PHÂN QUYỀN (RBAC - SUPER ADMIN ONLY) */}
+      {activeTab === 'users' && authUser?.role === 'super_admin' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-glass)',
+            borderRadius: 'var(--r-md)',
+            padding: '14px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 10
+          }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 16, color: 'var(--gold-light)' }}>
+                Danh Sách Quản Trị Viên & Trưởng Chi
+              </h3>
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>
+                Cấp tài khoản cho các trưởng chi để cùng biên tập nhánh họ mà không lo bị xóa mất dữ liệu chung.
+              </p>
+            </div>
+
+            <button
+              onClick={handleOpenAddUser}
+              className="action-button primary"
+              style={{
+                background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
+                color: '#000',
+                fontWeight: 700,
+                padding: '8px 16px',
+                borderRadius: 'var(--r-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 13
+              }}
+            >
+              <Icon name="user-plus" size={15} /> Tạo Tài Khoản Mới
+            </button>
+          </div>
+
+          {usersLoading ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--bg-card)', borderRadius: 'var(--r-md)', color: 'var(--gold-mid)' }}>
+              <Icon name="sparkles" size={24} style={{ animation: 'spin 1.5s linear infinite', marginBottom: 8 }} />
+              <div>Đang tải danh sách tài khoản...</div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
+              {usersList.map(u => {
+                const isSuper = u.role === 'super_admin';
+                const isLocked = u.status === 'locked';
+
+                return (
+                  <div
+                    key={u.id}
+                    style={{
+                      background: 'var(--bg-card)',
+                      border: `1px solid ${isSuper ? 'var(--border-gold)' : 'var(--border-glass)'}`,
+                      borderRadius: 'var(--r-md)',
+                      padding: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 12,
+                      opacity: isLocked ? 0.6 : 1
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <div style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 12,
+                          background: isSuper ? 'rgba(201,146,58,0.2)' : 'rgba(59,130,246,0.15)',
+                          border: `1px solid ${isSuper ? 'var(--border-gold)' : 'rgba(59,130,246,0.3)'}`,
+                          color: isSuper ? 'var(--gold-light)' : '#60a5fa',
+                          display: 'grid',
+                          placeItems: 'center',
+                          fontSize: 18,
+                          fontWeight: 700
+                        }}>
+                          {isSuper ? '👑' : '✍️'}
+                        </div>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
+                            {u.full_name}
+                          </h4>
+                          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                            @{u.username}
+                          </div>
+                        </div>
+                      </div>
+
+                      <span style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '2px 8px',
+                        borderRadius: 10,
+                        background: isLocked ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)',
+                        color: isLocked ? '#f87171' : '#4ade80',
+                        border: `1px solid ${isLocked ? 'rgba(239,68,68,0.3)' : 'rgba(34,197,94,0.3)'}`,
+                        textTransform: 'uppercase'
+                      }}>
+                        {isLocked ? 'Đã khóa' : 'Hoạt động'}
+                      </span>
+                    </div>
+
+                    <div style={{
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: 'var(--r-sm)',
+                      padding: '8px 10px',
+                      fontSize: 12,
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 6
+                    }}>
+                      <div>
+                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: 10 }}>Vai trò:</span>
+                        <span style={{ color: isSuper ? 'var(--gold-mid)' : '#93c5fd', fontWeight: 600 }}>
+                          {isSuper ? 'Trưởng Tộc (Toàn quyền)' : 'Trưởng Chi (Biên tập)'}
+                        </span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: 10 }}>Chi nhánh:</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          {u.branch || 'Tất cả các chi'}
+                        </span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: 10 }}>Điện thoại:</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          {u.phone || 'Chưa cập nhật'}
+                        </span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: 10 }}>Mã ID:</span>
+                        <span style={{ color: 'var(--text-muted)' }}>
+                          {u.id}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div style={{ display: 'flex', gap: 6, marginTop: 'auto' }}>
+                      <button
+                        onClick={() => handleOpenEditUser(u)}
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          borderRadius: 'var(--r-sm)',
+                          background: 'rgba(201,146,58,0.15)',
+                          border: '1px solid var(--border-gold)',
+                          color: 'var(--gold-light)',
+                          fontSize: 12,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 4
+                        }}
+                      >
+                        <Icon name="edit" size={13} /> Sửa / Đổi mật khẩu
+                      </button>
+
+                      {u.id !== authUser?.id && (
+                        <>
+                          <button
+                            onClick={() => handleToggleLockUser(u)}
+                            style={{
+                              padding: '6px 10px',
+                              borderRadius: 'var(--r-sm)',
+                              background: isLocked ? 'rgba(34,197,94,0.15)' : 'rgba(234,179,8,0.15)',
+                              border: `1px solid ${isLocked ? 'rgba(34,197,94,0.3)' : 'rgba(234,179,8,0.3)'}`,
+                              color: isLocked ? '#4ade80' : '#facc15',
+                              fontSize: 12,
+                              cursor: 'pointer'
+                            }}
+                            title={isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}
+                          >
+                            <Icon name={isLocked ? 'unlock' : 'lock'} size={13} />
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteUser(u)}
+                            style={{
+                              padding: '6px 10px',
+                              borderRadius: 'var(--r-sm)',
+                              background: 'rgba(239,68,68,0.15)',
+                              border: '1px solid rgba(239,68,68,0.3)',
+                              color: '#f87171',
+                              fontSize: 12,
+                              cursor: 'pointer'
+                            }}
+                            title="Xóa tài khoản"
+                          >
+                            <Icon name="trash-2" size={13} />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -2285,6 +2948,294 @@ export const ManageView = ({ onRefreshData, onLogout }: ManageViewProps) => {
                 Đóng
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Management Modal Form */}
+      {showUserModal && editingUser && (
+        <div className="modal-backdrop" onClick={() => !userSaving && setShowUserModal(false)}>
+          <div
+            className="modal"
+            style={{ maxWidth: 500, width: '92%' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-head" style={{ borderBottom: '1px solid var(--border-gold)', paddingBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10,
+                    background: 'rgba(201,146,58,0.2)', color: 'var(--gold-light)',
+                    display: 'grid', placeItems: 'center'
+                  }}>
+                    <Icon name="shield-check" size={18} />
+                  </div>
+                  <div>
+                    <h2 className="font-display" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
+                      {editingUser.id ? `Sửa Tài Khoản: @${editingUser.username}` : 'Thêm Tài Khoản Mới'}
+                    </h2>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      Phân quyền quản trị và biên tập gia phả
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  disabled={userSaving}
+                  onClick={() => setShowUserModal(false)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: 4
+                  }}
+                >
+                  <Icon name="x" size={20} />
+                </button>
+              </div>
+            </div>
+
+            {userFormError && (
+              <div style={{
+                margin: '12px 20px 0',
+                padding: '10px 12px',
+                borderRadius: 'var(--r-sm)',
+                background: 'rgba(239,68,68,0.15)',
+                border: '1px solid rgba(239,68,68,0.3)',
+                color: '#f87171',
+                fontSize: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}>
+                <Icon name="alert-triangle" size={15} style={{ flexShrink: 0 }} />
+                <div>{userFormError}</div>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveUser} style={{ padding: '16px 20px 20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {/* Username */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                    Tên đăng nhập (Username) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    disabled={!!editingUser.id || userSaving}
+                    value={editingUser.username || ''}
+                    onChange={e => setEditingUser(prev => ({ ...prev!, username: e.target.value.trim() }))}
+                    placeholder="VD: truongchi_1, phamhai..."
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--r-sm)',
+                      background: 'var(--bg-base)',
+                      border: '1px solid var(--border-glass)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Full name */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                    Họ và tên *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    disabled={userSaving}
+                    value={editingUser.full_name || ''}
+                    onChange={e => setEditingUser(prev => ({ ...prev!, full_name: e.target.value }))}
+                    placeholder="VD: Phạm Văn Hải (Trưởng Chi 2)"
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--r-sm)',
+                      background: 'var(--bg-base)',
+                      border: '1px solid var(--border-glass)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Role */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                    Vai trò & Quyền hạn *
+                  </label>
+                  <select
+                    value={editingUser.role || 'editor'}
+                    disabled={userSaving || editingUser.id === authUser?.id}
+                    onChange={e => setEditingUser(prev => ({ ...prev!, role: e.target.value as any }))}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--r-sm)',
+                      background: 'var(--bg-base)',
+                      border: '1px solid var(--border-glass)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="editor">✍️ Trưởng Chi / Biên Tập (Thêm & Sửa, KHÔNG được Xóa)</option>
+                    <option value="super_admin">👑 Trưởng Tộc (Toàn quyền Thêm, Sửa, Xóa & Quản lý User)</option>
+                  </select>
+                </div>
+
+                {/* Branch */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                    Chi nhánh phụ trách
+                  </label>
+                  <input
+                    type="text"
+                    disabled={userSaving}
+                    value={editingUser.branch || ''}
+                    onChange={e => setEditingUser(prev => ({ ...prev!, branch: e.target.value }))}
+                    placeholder="VD: Chi 2, Nhánh Giáp (để trống nếu toàn bộ dòng họ)..."
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--r-sm)',
+                      background: 'var(--bg-base)',
+                      border: '1px solid var(--border-glass)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                    Số điện thoại
+                  </label>
+                  <input
+                    type="tel"
+                    disabled={userSaving}
+                    value={editingUser.phone || ''}
+                    onChange={e => setEditingUser(prev => ({ ...prev!, phone: e.target.value }))}
+                    placeholder="VD: 0912345678"
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--r-sm)',
+                      background: 'var(--bg-base)',
+                      border: '1px solid var(--border-glass)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                    {editingUser.id ? 'Đổi mật khẩu mới (để trống nếu không đổi)' : 'Mật khẩu đăng nhập *'}
+                  </label>
+                  <input
+                    type="password"
+                    required={!editingUser.id}
+                    disabled={userSaving}
+                    value={editingUser.password || ''}
+                    onChange={e => setEditingUser(prev => ({ ...prev!, password: e.target.value }))}
+                    placeholder={editingUser.id ? 'Nhập mật khẩu mới...' : 'Nhập mật khẩu cho tài khoản...'}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--r-sm)',
+                      background: 'var(--bg-base)',
+                      border: '1px solid var(--border-glass)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                    Trạng thái tài khoản
+                  </label>
+                  <select
+                    value={editingUser.status || 'active'}
+                    disabled={userSaving || editingUser.id === authUser?.id}
+                    onChange={e => setEditingUser(prev => ({ ...prev!, status: e.target.value as any }))}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--r-sm)',
+                      background: 'var(--bg-base)',
+                      border: '1px solid var(--border-glass)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="active">🟢 Đang hoạt động (Cho phép đăng nhập)</option>
+                    <option value="locked">🔴 Khóa tài khoản (Chặn đăng nhập)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+                <button
+                  type="button"
+                  disabled={userSaving}
+                  onClick={() => setShowUserModal(false)}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: 'var(--r-sm)',
+                    background: 'var(--bg-base)',
+                    border: '1px solid var(--border-glass)',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Hủy
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={userSaving}
+                  style={{
+                    flex: 1.5,
+                    padding: '10px',
+                    borderRadius: 'var(--r-sm)',
+                    background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
+                    border: 'none',
+                    color: '#000',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6
+                  }}
+                >
+                  {userSaving ? (
+                    <Icon name="sparkles" size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                  ) : (
+                    <>
+                      <Icon name="save" size={16} /> Lưu Tài Khoản
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

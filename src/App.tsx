@@ -14,6 +14,7 @@ import { ManageAuthModal } from './components/shared/ManageAuthModal';
 import { VanKhanModal } from './components/shared/VanKhanModal';
 import { MemberEntry } from './types';
 import { setAppBadge, clearAppBadge } from './utils/badgeUtils';
+import { AuthUser } from './services/cloudflareApi';
 import './styles/index.css';
 
 // Dynamic imports for code-splitting heavy components
@@ -33,6 +34,14 @@ function App() {
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [showVanKhanModal, setShowVanKhanModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(() => {
+    try {
+      const saved = localStorage.getItem('giapha_auth_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
   });
@@ -43,19 +52,19 @@ function App() {
   // View Transitions API wrapper for smooth SPA transitions
   const handleViewChange = (mode: 'list' | 'tree' | 'lich' | 'stats' | 'manage') => {
     // @ts-ignore - Bypass View Transitions for manage view to prevent DOM screenshot freeze
-    if (!document.startViewTransition || mode === 'manage' || viewMode === 'manage') {
+    if (mode === 'manage' || viewMode === 'manage' || !document.startViewTransition) {
       setViewMode(mode);
-    } else {
-      // @ts-ignore
-      document.startViewTransition(() => {
-        setViewMode(mode);
-      });
+      return;
     }
+
+    // @ts-ignore
+    document.startViewTransition(() => {
+      setViewMode(mode);
+    });
   };
 
   const handleOpenManage = () => {
-    const isAuth = sessionStorage.getItem('manage_authenticated') === 'true';
-    if (isAuth) {
+    if (authUser) {
       handleViewChange('manage');
     } else {
       setShowAuthModal(true);
@@ -63,6 +72,8 @@ function App() {
   };
 
   const handleLogoutManage = () => {
+    setAuthUser(null);
+    localStorage.removeItem('giapha_auth_user');
     sessionStorage.removeItem('manage_authenticated');
     handleViewChange('list');
   };
@@ -354,7 +365,10 @@ function App() {
       <ManageAuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onSuccess={() => {
+        onSuccess={(user) => {
+          setAuthUser(user);
+          localStorage.setItem('giapha_auth_user', JSON.stringify(user));
+          sessionStorage.setItem('manage_authenticated', 'true');
           setShowAuthModal(false);
           handleViewChange('manage');
         }}
@@ -415,6 +429,7 @@ function App() {
           )}
           {viewMode === 'manage' && (
             <ManageView
+              authUser={authUser}
               onRefreshData={refreshFamilyData}
               onLogout={handleLogoutManage}
             />

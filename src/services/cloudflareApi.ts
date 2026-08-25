@@ -16,6 +16,132 @@ export interface CloudflareMemberRow {
   branch: string | null;
 }
 
+export interface AuthUser {
+  id: string;
+  username: string;
+  full_name: string;
+  role: 'super_admin' | 'editor';
+  branch?: string | null;
+  phone?: string | null;
+  status: 'active' | 'locked';
+}
+
+export interface UserRow {
+  id: string;
+  username: string;
+  full_name: string;
+  role: 'super_admin' | 'editor';
+  branch: string | null;
+  phone: string | null;
+  status: 'active' | 'locked';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AuditLogRow {
+  id: number;
+  user_id: string;
+  user_name: string;
+  action: 'CREATE_MEMBER' | 'UPDATE_MEMBER' | 'DELETE_MEMBER' | 'CREATE_USER' | 'UPDATE_USER' | 'DELETE_USER' | 'LOGIN' | 'SYSTEM' | string;
+  target_id: string;
+  target_name: string;
+  details: string;
+  created_at: string;
+}
+
+function getUserHeaders(authUser?: AuthUser | null): HeadersInit {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (authUser) {
+    headers['X-User-Id'] = authUser.id;
+    headers['X-User-Name'] = encodeURIComponent(authUser.full_name);
+    headers['X-User-Role'] = authUser.role;
+  }
+  return headers;
+}
+
+export async function loginUser(username: string, password: string): Promise<{ success: boolean; message: string; user?: AuthUser }> {
+  if (!CLOUDFLARE_API_URL) return { success: false, message: 'Chưa cấu hình Cloudflare API URL' };
+  try {
+    const res = await fetch(`${CLOUDFLARE_API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Lỗi kết nối máy chủ' };
+  }
+}
+
+export async function fetchUsers(): Promise<UserRow[]> {
+  if (!CLOUDFLARE_API_URL) return [];
+  try {
+    const res = await fetch(`${CLOUDFLARE_API_URL}/api/users`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    return json.success && Array.isArray(json.data) ? json.data : [];
+  } catch (e) {
+    console.warn('Lỗi lấy danh sách người dùng:', e);
+    return [];
+  }
+}
+
+export async function createUser(userData: Partial<UserRow> & { password?: string }, authUser?: AuthUser | null): Promise<{ success: boolean; message: string; id?: string }> {
+  if (!CLOUDFLARE_API_URL) return { success: false, message: 'Chưa cấu hình Cloudflare API' };
+  try {
+    const res = await fetch(`${CLOUDFLARE_API_URL}/api/users`, {
+      method: 'POST',
+      headers: getUserHeaders(authUser),
+      body: JSON.stringify(userData),
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Lỗi tạo tài khoản' };
+  }
+}
+
+export async function updateUser(id: string, userData: Partial<UserRow> & { password?: string }, authUser?: AuthUser | null): Promise<{ success: boolean; message: string }> {
+  if (!CLOUDFLARE_API_URL) return { success: false, message: 'Chưa cấu hình Cloudflare API' };
+  try {
+    const res = await fetch(`${CLOUDFLARE_API_URL}/api/users/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: getUserHeaders(authUser),
+      body: JSON.stringify(userData),
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Lỗi cập nhật tài khoản' };
+  }
+}
+
+export async function deleteUser(id: string, authUser?: AuthUser | null): Promise<{ success: boolean; message: string }> {
+  if (!CLOUDFLARE_API_URL) return { success: false, message: 'Chưa cấu hình Cloudflare API' };
+  try {
+    const res = await fetch(`${CLOUDFLARE_API_URL}/api/users/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: getUserHeaders(authUser),
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Lỗi xóa tài khoản' };
+  }
+}
+
+export async function fetchAuditLogs(limit: number = 200): Promise<AuditLogRow[]> {
+  if (!CLOUDFLARE_API_URL) return [];
+  try {
+    const res = await fetch(`${CLOUDFLARE_API_URL}/api/audit-logs?limit=${limit}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    return json.success && Array.isArray(json.data) ? json.data : [];
+  } catch (e) {
+    console.warn('Lỗi lấy nhật ký thay đổi:', e);
+    return [];
+  }
+}
+
 export async function fetchRawCloudflareRows(): Promise<SheetRow[]> {
   if (!CLOUDFLARE_API_URL) return [];
   try {
@@ -117,12 +243,12 @@ export async function fetchFamilyTreeFromCloudflare(): Promise<PersonNode | null
   }
 }
 
-export async function addMemberToCloudflare(row: SheetRow): Promise<{ success: boolean; message: string }> {
+export async function addMemberToCloudflare(row: SheetRow, authUser?: AuthUser | null): Promise<{ success: boolean; message: string }> {
   if (!CLOUDFLARE_API_URL) return { success: false, message: 'Chưa cấu hình VITE_CLOUDFLARE_API_URL' };
   try {
     const res = await fetch(`${CLOUDFLARE_API_URL}/api/members`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getUserHeaders(authUser),
       body: JSON.stringify(row),
     });
     return await res.json();
@@ -131,12 +257,12 @@ export async function addMemberToCloudflare(row: SheetRow): Promise<{ success: b
   }
 }
 
-export async function updateMemberInCloudflare(row: SheetRow): Promise<{ success: boolean; message: string }> {
+export async function updateMemberInCloudflare(row: SheetRow, authUser?: AuthUser | null): Promise<{ success: boolean; message: string }> {
   if (!CLOUDFLARE_API_URL) return { success: false, message: 'Chưa cấu hình VITE_CLOUDFLARE_API_URL' };
   try {
     const res = await fetch(`${CLOUDFLARE_API_URL}/api/members/${encodeURIComponent(row.id)}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getUserHeaders(authUser),
       body: JSON.stringify(row),
     });
     return await res.json();
@@ -145,11 +271,12 @@ export async function updateMemberInCloudflare(row: SheetRow): Promise<{ success
   }
 }
 
-export async function deleteMemberFromCloudflare(id: string): Promise<{ success: boolean; message: string }> {
+export async function deleteMemberFromCloudflare(id: string, authUser?: AuthUser | null): Promise<{ success: boolean; message: string }> {
   if (!CLOUDFLARE_API_URL) return { success: false, message: 'Chưa cấu hình VITE_CLOUDFLARE_API_URL' };
   try {
     const res = await fetch(`${CLOUDFLARE_API_URL}/api/members/${encodeURIComponent(id)}`, {
       method: 'DELETE',
+      headers: getUserHeaders(authUser),
     });
     return await res.json();
   } catch (err: any) {

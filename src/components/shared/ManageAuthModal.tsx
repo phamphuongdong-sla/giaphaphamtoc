@@ -1,23 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Icon } from '@/components/ui/Icon';
-import { sendResetCodeToEmail } from '@/services/googleSheets';
+import { loginUser, AuthUser } from '@/services/cloudflareApi';
 
 interface ManageAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (user: AuthUser) => void;
 }
-
-const ADMIN_EMAIL = 'phamphuongdong@gmail.com';
-const SALT = '_giaphaphamtoc_salt_2026';
-
-const hashPassword = async (pwd: string): Promise<string> => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(pwd.trim() + SALT);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-};
 
 // WebAuthn Biometric Helpers
 const bufferToBase64 = (buffer: ArrayBuffer): string => {
@@ -44,25 +33,16 @@ const isBiometricSupported = async (): Promise<boolean> => {
     if (PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
       return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
     }
-  } catch (e) {
+  } catch {
     return false;
   }
   return false;
 };
 
 export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalProps) => {
-  const [authMode, setAuthMode] = useState<'login' | 'change' | 'forgot' | 'verify'>('login');
-  
-  // Login & Change pass state
+  const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  // Email Reset OTP state
-  const [emailInput, setEmailInput] = useState(ADMIN_EMAIL);
-  const [otpInput, setOtpInput] = useState('');
-  const [serverOtp, setServerOtp] = useState('');
 
   // Biometric FaceID/TouchID state
   const [isBioAvailable, setIsBioAvailable] = useState(false);
@@ -77,14 +57,8 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
   useEffect(() => {
     if (isOpen) {
       setPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      setEmailInput(ADMIN_EMAIL);
-      setOtpInput('');
-      setServerOtp('');
       setError('');
       setSuccessMsg('');
-      setAuthMode('login');
 
       let isMounted = true;
       isBiometricSupported().then((supported) => {
@@ -115,7 +89,7 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
           rp: { name: 'Gia Phả Phạm Tộc' },
           user: {
             id: userId,
-            name: ADMIN_EMAIL,
+            name: 'phamphuongdong@gmail.com',
             displayName: 'Quản trị viên Gia Phả',
           },
           pubKeyCredParams: [
@@ -176,9 +150,19 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
 
       if (assertion) {
         setSuccessMsg('Xác thực FaceID / TouchID thành công! Đang đăng nhập...');
-        sessionStorage.setItem('manage_authenticated', 'true');
+        
+        // Auto sign in as super admin
+        const superAdminUser: AuthUser = {
+          id: 'USR001',
+          username: 'admin',
+          full_name: 'Phạm Phương Đông (Trưởng Tộc)',
+          role: 'super_admin',
+          branch: 'Trực hệ',
+          status: 'active'
+        };
+
         setTimeout(() => {
-          onSuccess();
+          onSuccess(superAdminUser);
         }, 500);
       }
     } catch (err: any) {
@@ -198,123 +182,17 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
     setSubmitting(true);
 
     try {
-      const inputHash = await hashPassword(password);
-      const savedHash = localStorage.getItem('manage_admin_password_hash');
-
-      const defaultHash1 = await hashPassword('123456');
-      const defaultHash2 = await hashPassword('phamphuongdong');
-
-      const isMatch = savedHash
-        ? (inputHash === savedHash || inputHash === defaultHash2)
-        : (inputHash === defaultHash1 || inputHash === defaultHash2);
-
-      if (isMatch) {
-        sessionStorage.setItem('manage_authenticated', 'true');
-        onSuccess();
+      const res = await loginUser(username.trim(), password);
+      if (res.success && res.user) {
+        setSuccessMsg(`Chào mừng ${res.user.full_name} (${res.user.role === 'super_admin' ? 'Trưởng Tộc' : 'Trưởng Chi / Biên Tập'})!`);
+        setTimeout(() => {
+          onSuccess(res.user!);
+        }, 600);
       } else {
-        setError('Mật khẩu không chính xác! Vui lòng thử lại.');
+        setError(res.message || 'Tên đăng nhập hoặc mật khẩu không chính xác!');
       }
-    } catch (err) {
+    } catch {
       setError('Có lỗi xảy ra khi xác thực mật khẩu.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    if (newPassword.length < 4) {
-      setError('Mật khẩu mới phải có ít nhất 4 ký tự.');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp.');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const newHash = await hashPassword(newPassword);
-      localStorage.setItem('manage_admin_password_hash', newHash);
-      localStorage.removeItem('manage_admin_password');
-
-      setSuccessMsg('Đổi mật khẩu thành công! Mật khẩu mới đã được lưu an toàn.');
-      setAuthMode('login');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (err) {
-      setError('Có lỗi khi lưu mật khẩu mới.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // Step 1: Send OTP reset code to Admin Email via Google Apps Script MailApp
-  const handleSendResetEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    if (emailInput.trim().toLowerCase() !== ADMIN_EMAIL) {
-      setError(`Email không chính xác. Email quản trị viên đã đăng ký là: ${ADMIN_EMAIL}`);
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const res = await sendResetCodeToEmail(emailInput.trim());
-      if (res.success && res.code) {
-        setServerOtp(res.code);
-        setSuccessMsg(`Đã gửi mã xác minh 6 chữ số tới ${ADMIN_EMAIL}. Vui lòng kiểm tra Hộp thư/Spam!`);
-        setAuthMode('verify');
-      } else {
-        setError(res.message || 'Không thể gửi Email khôi phục. Vui lòng kiểm tra lại thiết lập Google Apps Script!');
-      }
-    } catch (err: any) {
-      setError(err?.message || 'Có lỗi khi gửi Email xác minh. Vui lòng thử lại sau.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // Step 2: Verify OTP code and reset password
-  const handleVerifyOtpAndReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccessMsg('');
-
-    if (otpInput.trim() !== serverOtp) {
-      setError('Mã xác minh 6 chữ số không đúng. Vui lòng kiểm tra lại Email!');
-      return;
-    }
-
-    if (newPassword.length < 4) {
-      setError('Mật khẩu mới phải có ít nhất 4 ký tự.');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp.');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const newHash = await hashPassword(newPassword);
-      localStorage.setItem('manage_admin_password_hash', newHash);
-      localStorage.removeItem('manage_admin_password');
-      sessionStorage.setItem('manage_authenticated', 'true');
-
-      setSuccessMsg('Đặt lại mật khẩu thành công! Đang đăng nhập...');
-      setTimeout(() => {
-        onSuccess();
-      }, 1000);
-    } catch (err) {
-      setError('Có lỗi khi lưu mật khẩu mới.');
     } finally {
       setSubmitting(false);
     }
@@ -336,19 +214,13 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
             margin: '0 auto 12px',
             boxShadow: 'var(--shadow-gold-glow)'
           }}>
-            <Icon name={authMode === 'forgot' || authMode === 'verify' ? 'mail' : 'lock'} size={24} style={{ color: 'var(--gold-light)' }} />
+            <Icon name="lock" size={24} style={{ color: 'var(--gold-light)' }} />
           </div>
           <h2 className="font-display" style={{ fontSize: 20, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
-            {authMode === 'login' && 'Xác Thực Quản Trị Viên'}
-            {authMode === 'change' && 'Đổi Mật Khẩu Quản Trị'}
-            {authMode === 'forgot' && 'Khôi Phục Quyền Truy Cập'}
-            {authMode === 'verify' && 'Nhập Mã Xác Minh Email'}
+            Đăng Nhập Quản Trị Gia Phả
           </h2>
           <p style={{ marginTop: 4, fontSize: 12, color: 'var(--text-muted)' }}>
-            {authMode === 'login' && 'Vui lòng nhập mật khẩu để truy cập trang quản lý thành viên'}
-            {authMode === 'change' && 'Nhập mật khẩu mới để bảo vệ trang Quản lý Gia Phả'}
-            {authMode === 'forgot' && `Mã xác minh sẽ được gửi tới Email: ${ADMIN_EMAIL}`}
-            {authMode === 'verify' && `Vui lòng nhập mã 6 số từ Email ${ADMIN_EMAIL} và tạo mật khẩu mới`}
+            Hệ thống phân quyền Trưởng Tộc & Trưởng Chi
           </p>
         </div>
 
@@ -388,485 +260,182 @@ export const ManageAuthModal = ({ isOpen, onClose, onSuccess }: ManageAuthModalP
           </div>
         )}
 
-        {/* Mode 1: Login Form */}
-        {authMode === 'login' && (
-          <form onSubmit={handleLogin} style={{ padding: '0 20px 20px' }}>
-            {/* Biometric Quick Login Option */}
-            {isBioAvailable && hasBioRegistered && (
-              <div style={{ marginBottom: 16 }}>
-                <button
-                  type="button"
-                  disabled={bioSubmitting || submitting}
-                  onClick={handleLoginWithBiometric}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    borderRadius: 'var(--r-md)',
-                    background: 'linear-gradient(135deg, rgba(201,146,58,0.25), rgba(139,26,26,0.3))',
-                    border: '1px solid var(--border-gold)',
-                    color: 'var(--gold-light)',
-                    fontWeight: 700,
-                    fontSize: 14,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    boxShadow: 'var(--shadow-gold-glow)',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  {bioSubmitting ? (
-                    <Icon name="sparkles" size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                  ) : (
-                    <>
-                      <Icon name="shield-check" size={18} style={{ color: 'var(--gold)' }} />
-                      Đăng Nhập bằng FaceID / TouchID
-                    </>
-                  )}
-                </button>
-                <div style={{ textAlign: 'center', margin: '12px 0 8px', fontSize: 11, color: 'var(--text-muted)' }}>
-                  ─── Hoặc nhập mật khẩu ───
-                </div>
-              </div>
-            )}
-
-            {isBioAvailable && !hasBioRegistered && (
-              <div style={{ marginBottom: 14, textAlign: 'center' }}>
-                <button
-                  type="button"
-                  disabled={bioSubmitting}
-                  onClick={handleRegisterBiometric}
-                  style={{
-                    background: 'rgba(201,146,58,0.12)',
-                    border: '1px solid var(--border-gold)',
-                    color: 'var(--gold-mid)',
-                    padding: '6px 12px',
-                    borderRadius: 'var(--r-sm)',
-                    fontSize: 12,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  <Icon name="sparkles" size={13} />
-                  {bioSubmitting ? 'Đang kích hoạt...' : '🔑 Kích hoạt FaceID / TouchID cho máy này'}
-                </button>
-              </div>
-            )}
-
+        <form onSubmit={handleLogin} style={{ padding: '0 20px 20px' }}>
+          {/* Biometric Quick Login Option */}
+          {isBioAvailable && hasBioRegistered && (
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 6 }}>
-                Mật khẩu đăng nhập
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  autoFocus
-                  disabled={submitting}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Nhập mật khẩu..."
-                  style={{
-                    width: '100%',
-                    padding: '10px 40px 10px 14px',
-                    borderRadius: 'var(--r-sm)',
-                    background: 'var(--bg-base)',
-                    border: '1px solid var(--border-gold)',
-                    color: 'var(--text-primary)',
-                    fontSize: 14,
-                    outline: 'none'
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer'
-                  }}
-                >
-                  <Icon name={showPassword ? 'eye-off' : 'eye'} size={16} />
-                </button>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11 }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setError('');
-                    setSuccessMsg('');
-                    setAuthMode('forgot');
-                  }}
-                  style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                  📧 Quên mật khẩu? (Gửi Email)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setError('');
-                    setSuccessMsg('');
-                    setAuthMode('change');
-                  }}
-                  style={{ background: 'none', border: 'none', color: 'var(--gold-mid)', cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                  Đổi mật khẩu?
-                </button>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
               <button
                 type="button"
-                disabled={submitting}
-                onClick={onClose}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  minHeight: 42
-                }}
-              >
-                Đóng
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
-                  border: 'none',
-                  color: '#000',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                  minHeight: 42
-                }}
-              >
-                {submitting ? (
-                  <Icon name="sparkles" size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                ) : (
-                  <>
-                    <Icon name="shield-check" size={16} /> Đăng Nhập
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* Mode 2: Change Password Form */}
-        {authMode === 'change' && (
-          <form onSubmit={handleChangePassword} style={{ padding: '0 20px 20px' }}>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                Mật khẩu mới
-              </label>
-              <input
-                type="password"
-                required
-                autoFocus
-                disabled={submitting}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Ít nhất 4 ký tự..."
+                disabled={bioSubmitting || submitting}
+                onClick={handleLoginWithBiometric}
                 style={{
                   width: '100%',
-                  padding: '9px 12px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-primary)',
-                  fontSize: 14
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                Xác nhận mật khẩu mới
-              </label>
-              <input
-                type="password"
-                required
-                disabled={submitting}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Nhập lại mật khẩu mới..."
-                style={{
-                  width: '100%',
-                  padding: '9px 12px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-primary)',
-                  fontSize: 14
-                }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button
-                type="button"
-                disabled={submitting}
-                onClick={() => setAuthMode('login')}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  minHeight: 42
-                }}
-              >
-                Quay lại
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
-                  border: 'none',
-                  color: '#000',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                  minHeight: 42
-                }}
-              >
-                <Icon name="key" size={16} /> Lưu Mật Khẩu
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* Mode 3: Forgot Password - Send OTP Email */}
-        {authMode === 'forgot' && (
-          <form onSubmit={handleSendResetEmail} style={{ padding: '0 20px 20px' }}>
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 6 }}>
-                Email Quản Trị Viên
-              </label>
-              <input
-                type="email"
-                required
-                autoFocus
-                disabled={submitting}
-                value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
-                placeholder="VD: phamphuongdong@gmail.com"
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-gold)',
-                  color: 'var(--text-primary)',
-                  fontSize: 14
-                }}
-              />
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
-                Mã xác minh khôi phục sẽ được gửi trực tiếp tới email này.
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button
-                type="button"
-                disabled={submitting}
-                onClick={() => setAuthMode('login')}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  minHeight: 42
-                }}
-              >
-                Quay lại
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  flex: 1.5,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
-                  border: 'none',
-                  color: '#000',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                  minHeight: 42
-                }}
-              >
-                {submitting ? (
-                  <>
-                    <Icon name="sparkles" size={15} style={{ animation: 'spin 1s linear infinite' }} />
-                    Đang gửi Email...
-                  </>
-                ) : (
-                  <>
-                    <Icon name="mail" size={16} /> Gửi Mã Về Email
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* Mode 4: Verify Email OTP & Reset Password */}
-        {authMode === 'verify' && (
-          <form onSubmit={handleVerifyOtpAndReset} style={{ padding: '0 20px 20px' }}>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                Mã Xác Minh 6 Chữ Số từ Email
-              </label>
-              <input
-                type="text"
-                required
-                autoFocus
-                maxLength={6}
-                disabled={submitting}
-                value={otpInput}
-                onChange={(e) => setOtpInput(e.target.value)}
-                placeholder="Nhập 6 số trong Email..."
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
+                  padding: '12px 16px',
+                  borderRadius: 'var(--r-md)',
+                  background: 'linear-gradient(135deg, rgba(201,146,58,0.25), rgba(139,26,26,0.3))',
                   border: '1px solid var(--border-gold)',
                   color: 'var(--gold-light)',
-                  fontSize: 16,
                   fontWeight: 700,
-                  letterSpacing: 4,
-                  textAlign: 'center'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                Mật khẩu mới muốn tạo
-              </label>
-              <input
-                type="password"
-                required
-                disabled={submitting}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Tạo mật khẩu mới..."
-                style={{
-                  width: '100%',
-                  padding: '9px 12px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-primary)',
-                  fontSize: 14
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                Xác nhận mật khẩu mới
-              </label>
-              <input
-                type="password"
-                required
-                disabled={submitting}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Nhập lại mật khẩu mới..."
-                style={{
-                  width: '100%',
-                  padding: '9px 12px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-primary)',
-                  fontSize: 14
-                }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button
-                type="button"
-                disabled={submitting}
-                onClick={() => setAuthMode('forgot')}
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'var(--bg-base)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  minHeight: 42
-                }}
-              >
-                Gửi lại mã
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  flex: 1.5,
-                  padding: '10px 14px',
-                  borderRadius: 'var(--r-sm)',
-                  background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
-                  border: 'none',
-                  color: '#000',
-                  fontWeight: 700,
+                  fontSize: 14,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 6,
-                  minHeight: 42
+                  gap: 8,
+                  boxShadow: 'var(--shadow-gold-glow)',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                {submitting ? (
-                  <Icon name="sparkles" size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                {bioSubmitting ? (
+                  <Icon name="sparkles" size={18} style={{ animation: 'spin 1s linear infinite' }} />
                 ) : (
                   <>
-                    <Icon name="check-circle" size={16} /> Đặt Mật Khẩu Mới
+                    <Icon name="shield-check" size={18} style={{ color: 'var(--gold)' }} />
+                    Đăng Nhập bằng FaceID / TouchID
                   </>
                 )}
               </button>
+              <div style={{ textAlign: 'center', margin: '12px 0 8px', fontSize: 11, color: 'var(--text-muted)' }}>
+                ─── Hoặc nhập tài khoản ───
+              </div>
             </div>
-          </form>
-        )}
+          )}
+
+          {isBioAvailable && !hasBioRegistered && (
+            <div style={{ marginBottom: 14, textAlign: 'center' }}>
+              <button
+                type="button"
+                disabled={bioSubmitting}
+                onClick={handleRegisterBiometric}
+                style={{
+                  background: 'rgba(201,146,58,0.12)',
+                  border: '1px solid var(--border-gold)',
+                  color: 'var(--gold-mid)',
+                  padding: '6px 12px',
+                  borderRadius: 'var(--r-sm)',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Icon name="sparkles" size={13} />
+                {bioSubmitting ? 'Đang kích hoạt...' : '🔑 Kích hoạt FaceID / TouchID cho máy này'}
+              </button>
+            </div>
+          )}
+
+          {/* Username Input */}
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 6 }}>
+              Tên tài khoản
+            </label>
+            <input
+              type="text"
+              required
+              disabled={submitting}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Nhập tên đăng nhập (VD: admin)..."
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 'var(--r-sm)',
+                background: 'var(--bg-base)',
+                border: '1px solid var(--border-gold)',
+                color: 'var(--text-primary)',
+                fontSize: 14,
+                outline: 'none'
+              }}
+            />
+          </div>
+
+          {/* Password Input */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 6 }}>
+              Mật khẩu
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                autoFocus
+                disabled={submitting}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Nhập mật khẩu..."
+                style={{
+                  width: '100%',
+                  padding: '10px 40px 10px 14px',
+                  borderRadius: 'var(--r-sm)',
+                  background: 'var(--bg-base)',
+                  border: '1px solid var(--border-gold)',
+                  color: 'var(--text-primary)',
+                  fontSize: 14,
+                  outline: 'none'
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer'
+                }}
+              >
+                <Icon name={showPassword ? 'eye-off' : 'eye'} size={16} />
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: '10px 14px',
+                borderRadius: 'var(--r-sm)',
+                background: 'var(--bg-base)',
+                border: '1px solid var(--border-glass)',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                minHeight: 42
+              }}
+            >
+              Đóng
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                flex: 1.5,
+                padding: '10px 14px',
+                borderRadius: 'var(--r-sm)',
+                background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
+                border: 'none',
+                color: '#000',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                minHeight: 42
+              }}
+            >
+              {submitting ? (
+                <Icon name="sparkles" size={16} style={{ animation: 'spin 1s linear infinite' }} />
+              ) : (
+                <>
+                  <Icon name="shield-check" size={16} /> Đăng Nhập
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
