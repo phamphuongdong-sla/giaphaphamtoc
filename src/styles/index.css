@@ -1035,18 +1035,6 @@ main {
   flex-direction: column;
 }
 
-.tree-card-accent-line {
-  position: absolute;
-  top: 0;
-  left: 12px;
-  right: 12px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #eab308 50%, transparent);
-  border-radius: 2px;
-  opacity: 0.8;
-  pointer-events: none;
-}
-
 /* ── Deceased Diagonal Black Mourning Ribbon Wrapper & Banner ── */
 .deceased-ribbon-wrapper {
   position: absolute;
@@ -1092,20 +1080,9 @@ main {
   box-shadow: 0 12px 30px rgba(212, 175, 55, 0.25), 0 0 0 1px rgba(234, 179, 8, 0.4);
 }
 
-.tree-card.root-node .tree-card-accent-line {
-  height: 3px;
-  left: 0;
-  right: 0;
-  background: linear-gradient(90deg, #b8860b, #fef08a, #b8860b);
-}
-
 /* Branch Node Styling */
 .tree-card.branch {
   border-color: rgba(52, 211, 153, 0.3);
-}
-
-.tree-card.branch .tree-card-accent-line {
-  background: linear-gradient(90deg, transparent, #34d399 50%, transparent);
 }
 
 /* Inner Layout */

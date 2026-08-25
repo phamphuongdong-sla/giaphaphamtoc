@@ -75,9 +75,6 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
           </div>
         )}
 
-        {/* Thanh accent màu nổi trên đầu thẻ */}
-        <div className="tree-card-accent-line" />
-
         <div className="tree-card-inner">
           {/* Header row: Badge Đời & Vai vế xếp sát nhau */}
           <div className="tree-card-header">
