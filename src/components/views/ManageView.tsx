@@ -2952,35 +2952,46 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
         </div>
       )}
 
-      {/* User Management Modal Form */}
+      {/* User Management Modal Form (Mobile & Desktop Optimized) */}
       {showUserModal && editingUser && (
         <div className="modal-backdrop" onClick={() => !userSaving && setShowUserModal(false)}>
           <div
             className="modal"
-            style={{ maxWidth: 500, width: '92%' }}
+            style={{
+              maxWidth: 520,
+              width: isMobile ? '100%' : '92%',
+              maxHeight: isMobile ? '92vh' : '88vh',
+              borderRadius: isMobile ? 'var(--r-lg) var(--r-lg) 0 0' : 'var(--r-lg)',
+              margin: isMobile ? 'auto 0 0 0' : 'auto',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-head" style={{ borderBottom: '1px solid var(--border-gold)', paddingBottom: 12 }}>
+            {/* Modal Header */}
+            <div className="modal-head" style={{ borderBottom: '1px solid var(--border-gold)', padding: '14px 20px', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{
-                    width: 36, height: 36, borderRadius: 10,
+                    width: 38, height: 38, borderRadius: 10,
                     background: 'rgba(201,146,58,0.2)', color: 'var(--gold-light)',
-                    display: 'grid', placeItems: 'center'
+                    display: 'grid', placeItems: 'center',
+                    border: '1px solid var(--border-gold)'
                   }}>
-                    <Icon name="shield-check" size={18} />
+                    <Icon name="shield-check" size={20} />
                   </div>
                   <div>
-                    <h2 className="font-display" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
+                    <h2 className="font-display" style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
                       {editingUser.id ? `Sửa Tài Khoản: @${editingUser.username}` : 'Thêm Tài Khoản Mới'}
                     </h2>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                      Phân quyền quản trị và biên tập gia phả
+                      Phân quyền quản trị & biên tập gia phả
                     </div>
                   </div>
                 </div>
 
                 <button
+                  type="button"
                   disabled={userSaving}
                   onClick={() => setShowUserModal(false)}
                   style={{
@@ -2988,38 +2999,58 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     border: 'none',
                     color: 'var(--text-muted)',
                     cursor: 'pointer',
-                    padding: 4
+                    padding: 6,
+                    display: 'flex',
+                    alignItems: 'center'
                   }}
+                  title="Đóng"
                 >
                   <Icon name="x" size={20} />
                 </button>
               </div>
             </div>
 
-            {userFormError && (
-              <div style={{
-                margin: '12px 20px 0',
-                padding: '10px 12px',
-                borderRadius: 'var(--r-sm)',
-                background: 'rgba(239,68,68,0.15)',
-                border: '1px solid rgba(239,68,68,0.3)',
-                color: '#f87171',
-                fontSize: 12,
+            {/* Scrollable Form Content */}
+            <form
+              onSubmit={handleSaveUser}
+              style={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: 8
+                flexDirection: 'column',
+                flex: 1,
+                minHeight: 0,
+                overflow: 'hidden'
+              }}
+            >
+              <div style={{
+                flex: 1,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                padding: '16px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14
               }}>
-                <Icon name="alert-triangle" size={15} style={{ flexShrink: 0 }} />
-                <div>{userFormError}</div>
-              </div>
-            )}
+                {userFormError && (
+                  <div style={{
+                    padding: '10px 12px',
+                    borderRadius: 'var(--r-sm)',
+                    background: 'rgba(239,68,68,0.15)',
+                    border: '1px solid rgba(239,68,68,0.3)',
+                    color: '#f87171',
+                    fontSize: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8
+                  }}>
+                    <Icon name="alert-triangle" size={15} style={{ flexShrink: 0 }} />
+                    <div>{userFormError}</div>
+                  </div>
+                )}
 
-            <form onSubmit={handleSaveUser} style={{ padding: '16px 20px 20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {/* Username */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                    Tên đăng nhập (Username) *
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 5 }}>
+                    Tên đăng nhập (Username) <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -3030,7 +3061,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     placeholder="VD: truongchi_1, phamhai..."
                     style={{
                       width: '100%',
-                      padding: '9px 12px',
+                      padding: '10px 12px',
                       borderRadius: 'var(--r-sm)',
                       background: 'var(--bg-base)',
                       border: '1px solid var(--border-glass)',
@@ -3039,12 +3070,17 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                       outline: 'none'
                     }}
                   />
+                  {editingUser.id && (
+                    <span style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2, display: 'block' }}>
+                      (Tên đăng nhập không thể thay đổi sau khi tạo)
+                    </span>
+                  )}
                 </div>
 
                 {/* Full name */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                    Họ và tên *
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 5 }}>
+                    Họ và tên người dùng <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -3055,7 +3091,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     placeholder="VD: Phạm Văn Hải (Trưởng Chi 2)"
                     style={{
                       width: '100%',
-                      padding: '9px 12px',
+                      padding: '10px 12px',
                       borderRadius: 'var(--r-sm)',
                       background: 'var(--bg-base)',
                       border: '1px solid var(--border-glass)',
@@ -3068,8 +3104,8 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
 
                 {/* Role */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                    Vai trò & Quyền hạn *
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 5 }}>
+                    Vai trò & Quyền hạn <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <select
                     value={editingUser.role || 'editor'}
@@ -3077,7 +3113,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     onChange={e => setEditingUser(prev => ({ ...prev!, role: e.target.value as any }))}
                     style={{
                       width: '100%',
-                      padding: '9px 12px',
+                      padding: '10px 12px',
                       borderRadius: 'var(--r-sm)',
                       background: 'var(--bg-base)',
                       border: '1px solid var(--border-glass)',
@@ -3086,14 +3122,14 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                       outline: 'none'
                     }}
                   >
-                    <option value="editor">✍️ Trưởng Chi / Biên Tập (Thêm & Sửa, KHÔNG được Xóa)</option>
+                    <option value="editor">✍️ Trưởng Chi / Biên Tập (Thêm & Sửa thành viên, KHÔNG được Xóa)</option>
                     <option value="super_admin">👑 Trưởng Tộc (Toàn quyền Thêm, Sửa, Xóa & Quản lý User)</option>
                   </select>
                 </div>
 
                 {/* Branch */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 5 }}>
                     Chi nhánh phụ trách
                   </label>
                   <input
@@ -3101,10 +3137,10 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     disabled={userSaving}
                     value={editingUser.branch || ''}
                     onChange={e => setEditingUser(prev => ({ ...prev!, branch: e.target.value }))}
-                    placeholder="VD: Chi 2, Nhánh Giáp (để trống nếu toàn bộ dòng họ)..."
+                    placeholder="VD: Chi 2, Nhánh Giáp (để trống nếu quản lý toàn họ)..."
                     style={{
                       width: '100%',
-                      padding: '9px 12px',
+                      padding: '10px 12px',
                       borderRadius: 'var(--r-sm)',
                       background: 'var(--bg-base)',
                       border: '1px solid var(--border-glass)',
@@ -3117,8 +3153,8 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
 
                 {/* Phone */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                    Số điện thoại
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 5 }}>
+                    Số điện thoại liên hệ
                   </label>
                   <input
                     type="tel"
@@ -3128,7 +3164,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     placeholder="VD: 0912345678"
                     style={{
                       width: '100%',
-                      padding: '9px 12px',
+                      padding: '10px 12px',
                       borderRadius: 'var(--r-sm)',
                       background: 'var(--bg-base)',
                       border: '1px solid var(--border-glass)',
@@ -3141,8 +3177,8 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
 
                 {/* Password */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
-                    {editingUser.id ? 'Đổi mật khẩu mới (để trống nếu không đổi)' : 'Mật khẩu đăng nhập *'}
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 5 }}>
+                    {editingUser.id ? 'Đổi mật khẩu mới (để trống nếu giữ nguyên)' : 'Mật khẩu đăng nhập *'}
                   </label>
                   <input
                     type="password"
@@ -3150,10 +3186,10 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     disabled={userSaving}
                     value={editingUser.password || ''}
                     onChange={e => setEditingUser(prev => ({ ...prev!, password: e.target.value }))}
-                    placeholder={editingUser.id ? 'Nhập mật khẩu mới...' : 'Nhập mật khẩu cho tài khoản...'}
+                    placeholder={editingUser.id ? 'Nhập mật khẩu mới nếu muốn đổi...' : 'Nhập mật khẩu (tối thiểu 4 ký tự)...'}
                     style={{
                       width: '100%',
-                      padding: '9px 12px',
+                      padding: '10px 12px',
                       borderRadius: 'var(--r-sm)',
                       background: 'var(--bg-base)',
                       border: '1px solid var(--border-glass)',
@@ -3166,7 +3202,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
 
                 {/* Status */}
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 4 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 5 }}>
                     Trạng thái tài khoản
                   </label>
                   <select
@@ -3175,7 +3211,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     onChange={e => setEditingUser(prev => ({ ...prev!, status: e.target.value as any }))}
                     style={{
                       width: '100%',
-                      padding: '9px 12px',
+                      padding: '10px 12px',
                       borderRadius: 'var(--r-sm)',
                       background: 'var(--bg-base)',
                       border: '1px solid var(--border-glass)',
@@ -3185,24 +3221,35 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                     }}
                   >
                     <option value="active">🟢 Đang hoạt động (Cho phép đăng nhập)</option>
-                    <option value="locked">🔴 Khóa tài khoản (Chặn đăng nhập)</option>
+                    <option value="locked">🔴 Đã khóa (Chặn đăng nhập)</option>
                   </select>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+              {/* Pinned Sticky Footer Actions */}
+              <div style={{
+                padding: '12px 20px',
+                borderTop: '1px solid var(--border-gold)',
+                background: 'var(--bg-card)',
+                display: 'flex',
+                gap: 10,
+                alignItems: 'center',
+                flexShrink: 0
+              }}>
                 <button
                   type="button"
                   disabled={userSaving}
                   onClick={() => setShowUserModal(false)}
                   style={{
                     flex: 1,
-                    padding: '10px',
+                    padding: '11px',
                     borderRadius: 'var(--r-sm)',
                     background: 'var(--bg-base)',
                     border: '1px solid var(--border-glass)',
                     color: 'var(--text-muted)',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    fontWeight: 600
                   }}
                 >
                   Hủy
@@ -3212,18 +3259,20 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                   type="submit"
                   disabled={userSaving}
                   style={{
-                    flex: 1.5,
-                    padding: '10px',
+                    flex: 1.8,
+                    padding: '11px',
                     borderRadius: 'var(--r-sm)',
                     background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
                     border: 'none',
                     color: '#000',
                     fontWeight: 700,
+                    fontSize: 13,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 6
+                    gap: 6,
+                    boxShadow: 'var(--shadow-gold-glow)'
                   }}
                 >
                   {userSaving ? (
