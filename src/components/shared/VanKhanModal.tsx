@@ -405,7 +405,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
       style={{ padding: '8px 4px' }}
     >
       <div 
-        className="modal" 
+        className="modal vankhan-modal" 
         onClick={(e) => e.stopPropagation()} 
         style={{ 
           width: isFullscreen ? '98%' : '100%', 
