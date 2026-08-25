@@ -4,7 +4,7 @@ import { cleanName, getNameRole, buildShareText, buildVietnameseRelation, checkI
 import { formatBirthDisplay, formatDeathDisplay } from '@/utils/dateUtils';
 import { Icon } from '@/components/ui/Icon';
 import { Toast } from '@/components/ui/Toast';
-import { exportPersonCardImage } from '@/utils/canvasExport';
+import { PersonQRModal } from './PersonQRModal';
 
 interface PersonDetailModalProps {
   person: MemberEntry | null;
@@ -18,6 +18,7 @@ const checkIfSpouse = (nameStr: string, isSpouseFlag?: boolean): boolean => {
 
 export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) => {
   const [showShare, setShowShare] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -103,24 +104,6 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
       }
     }
     setShowShare(true);
-  };
-
-  const handleExportImage = () => {
-    if (!calculatedData || !person) return;
-    exportPersonCardImage({
-      displayName: calculatedData.displayName,
-      displayGen: calculatedData.displayGen,
-      titleLabel: calculatedData.titleLabel,
-      branchLabel: calculatedData.branchLabel,
-      relation: calculatedData.relation,
-      birthText: formatBirthDisplay(person.data) || 'Chưa có thông tin',
-      deathText: person.data.deceased ? (formatDeathDisplay(person.data) || 'Chưa có thông tin') : undefined,
-      isDeceased: !!person.data.deceased,
-      lineagePath: person.pathNames ? person.pathNames.join(' › ') : calculatedData.displayName,
-      childrenNames: calculatedData.displayChildren.map(c => cleanName(c.name)),
-      bio: person.data.bio,
-    });
-    setToast('Đã xuất hình ảnh hồ sơ di sản thành công!');
   };
 
   if (!person || !calculatedData) return null;
@@ -330,8 +313,18 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
             <button className="share-btn" onClick={handleNativeShare}>
               <Icon name="share-2" size={13} /> Chia sẻ
             </button>
-            <button className="action-button" style={{ background: 'rgba(201,146,58,0.15)', color: 'var(--gold-mid)' }} onClick={handleExportImage}>
-              <Icon name="download" size={13} /> Xuất ảnh
+            <button
+              className="action-button"
+              style={{
+                background: 'linear-gradient(135deg, rgba(201,146,58,0.2), rgba(139,26,26,0.25))',
+                border: '1px solid var(--border-gold)',
+                color: 'var(--gold-light)',
+                fontWeight: 600
+              }}
+              onClick={() => setShowQRModal(true)}
+              title="Xem và tải mã QR gia phả"
+            >
+              <Icon name="qr-code" size={13} /> Mã QR
             </button>
             <button className="action-button modal-close" style={{ flex: 1, justifyContent: 'center' }} onClick={onClose}>
               <Icon name="x" size={13} /> Đóng
@@ -339,6 +332,23 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
           </div>
         </div>
       </div>
+
+      {/* QR Code Modal */}
+      {showQRModal && (
+        <PersonQRModal
+          data={{
+            id: data.id,
+            name: data.name,
+            displayGen,
+            branch: branchLabel,
+            relation,
+            birth: formatBirthDisplay(data),
+            death: data.deceased ? formatDeathDisplay(data) : undefined,
+            isDead: data.deceased
+          }}
+          onClose={() => setShowQRModal(false)}
+        />
+      )}
 
       {/* Share sheet */}
       {showShare && (

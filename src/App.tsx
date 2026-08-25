@@ -100,9 +100,30 @@ function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Auto open reminder modal if there are upcoming reminders
+  // Handle QR code scanning URL param (?person=...)
   useEffect(() => {
-    if (reminders.length > 0) {
+    if (memberEntries.length > 0 && typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const personParam = params.get('person');
+      if (personParam) {
+        const decoded = decodeURIComponent(personParam).trim().toLowerCase();
+        const found = memberEntries.find(m => 
+          (m.data.id && m.data.id.toLowerCase() === decoded) ||
+          m.data.name.toLowerCase() === decoded ||
+          m.data.name.toLowerCase().includes(decoded)
+        );
+        if (found) {
+          setSelectedPerson(found);
+          setSplash(false);
+        }
+      }
+    }
+  }, [memberEntries]);
+
+  // Auto open reminder modal if there are upcoming reminders (unless personParam is active)
+  useEffect(() => {
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    if (reminders.length > 0 && (!params || !params.get('person'))) {
       setShowReminderModal(true);
     }
   }, [reminders]);

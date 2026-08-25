@@ -74,6 +74,7 @@ const iconMap: Record<string, IconType> = {
   'user-plus': LuIcons.LuUserPlus,
   'calculator': LuIcons.LuCalculator,
   'git-fork': LuIcons.LuGitFork,
+  'qr-code': LuIcons.LuQrCode,
 };
 
 interface IconProps extends React.SVGAttributes<SVGSVGElement> {
