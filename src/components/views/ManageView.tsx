@@ -833,6 +833,26 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
     downloadAnchor.remove();
   };
 
+  const formatAuditLogUserName = (rawName?: string) => {
+    if (!rawName) return 'Quản trị viên (Admin)';
+    return rawName
+      .replace(/\(Trưởng\s*Tộc\)/gi, '(Admin)')
+      .replace(/\(Trưởng\s*Chi\s*\/\s*Biên\s*Tập\)/gi, '(Editor)')
+      .replace(/\(Trưởng\s*Chi\)/gi, '(Editor)')
+      .replace(/Trưởng\s*Tộc/gi, 'Admin')
+      .replace(/Trưởng\s*Chi/gi, 'Editor');
+  };
+
+  const formatAuditLogDetails = (rawDetails?: string) => {
+    if (!rawDetails) return '';
+    return rawDetails
+      .replace(/Trưởng\s*Tộc\s*\(Super\s*Admin\)/gi, 'Quản trị viên (Admin)')
+      .replace(/Trưởng\s*Tộc/gi, 'Quản trị viên (Admin)')
+      .replace(/Trưởng\s*Chi\s*\/\s*Ban\s*Biên\s*Tập\s*\(Editor\)/gi, 'Biên tập viên (Editor)')
+      .replace(/Trưởng\s*Chi\s*\/\s*Biên\s*Tập/gi, 'Biên tập viên (Editor)')
+      .replace(/Trưởng\s*Chi/gi, 'Biên tập viên (Editor)');
+  };
+
   // Filtered Audit Logs
   const filteredLogs = useMemo(() => {
     return auditLogs.filter(log => {
@@ -842,7 +862,9 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
       }
       if (logSearch.trim()) {
         const q = logSearch.toLowerCase();
-        const text = `${log.user_name} ${log.target_name} ${log.details} ${log.action}`.toLowerCase();
+        const formattedUser = formatAuditLogUserName(log.user_name);
+        const formattedDetails = formatAuditLogDetails(log.details);
+        const text = `${formattedUser} ${log.target_name} ${formattedDetails} ${log.action}`.toLowerCase();
         return text.includes(q);
       }
       return true;
@@ -1975,7 +1997,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                             {actionTitle}
                           </span>
                           <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>
-                            {log.user_name || 'Quản trị viên'}
+                            {formatAuditLogUserName(log.user_name)}
                           </strong>
                         </div>
 
@@ -1985,7 +2007,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
                       </div>
 
                       <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, wordBreak: 'break-word' }}>
-                        {log.details}
+                        {formatAuditLogDetails(log.details)}
                       </div>
                     </div>
                   </div>

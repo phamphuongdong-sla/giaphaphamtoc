@@ -170,7 +170,7 @@ export default {
           authUser = {
             id: 'USR001',
             username: 'admin',
-            full_name: 'Phạm Phương Đông (Trưởng Tộc)',
+            full_name: 'Phạm Phương Đông (Admin)',
             role: 'super_admin',
             branch: 'Trực hệ',
             phone: '0912345678',
@@ -190,7 +190,7 @@ export default {
           action: 'LOGIN',
           targetId: authUser.id,
           targetName: authUser.username,
-          details: `Đăng nhập thành công với vai trò: ${authUser.role === 'super_admin' ? 'Trưởng Tộc (Super Admin)' : 'Trưởng Chi / Ban Biên Tập (Editor)'}`
+          details: `Đăng nhập thành công với vai trò: ${authUser.role === 'super_admin' ? 'Quản trị viên (Admin)' : 'Biên tập viên (Editor)'}`
         });
 
         const { password_hash, ...safeUser } = authUser;
@@ -242,7 +242,7 @@ export default {
             action: 'CREATE_USER',
             targetId: id,
             targetName: u.full_name,
-            details: `Tạo tài khoản mới: ${u.username} (Vai trò: ${u.role === 'super_admin' ? 'Trưởng Tộc' : 'Trưởng Chi / Biên Tập'})`
+            details: `Tạo tài khoản mới: ${u.username} (Vai trò: ${u.role === 'super_admin' ? 'Quản trị viên (Admin)' : 'Biên tập viên (Editor)'})`
           });
 
           return new Response(JSON.stringify({ success: true, message: 'Tạo tài khoản thành công', id }), {
