@@ -284,6 +284,24 @@ export async function deleteMemberFromCloudflare(id: string, authUser?: AuthUser
   }
 }
 
+export async function restoreDatabaseToCloudflare(
+  members: SheetRow[], 
+  mode: 'replace' | 'merge' = 'replace', 
+  authUser?: AuthUser | null
+): Promise<{ success: boolean; message: string; count?: number }> {
+  if (!CLOUDFLARE_API_URL) return { success: false, message: 'Chưa cấu hình VITE_CLOUDFLARE_API_URL' };
+  try {
+    const res = await fetch(`${CLOUDFLARE_API_URL}/api/members/restore`, {
+      method: 'POST',
+      headers: getUserHeaders(authUser),
+      body: JSON.stringify({ members, mode }),
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, message: err.message || 'Lỗi kết nối Cloudflare' };
+  }
+}
+
 export async function registerPushToCloudflare(subscription: PushSubscription): Promise<boolean> {
   if (!CLOUDFLARE_API_URL) return false;
   try {

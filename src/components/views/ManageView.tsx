@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
+import Papa from 'papaparse';
 import { SheetRow, fetchRawSheetRows, addMemberToSheet, updateMemberInSheet, deleteMemberFromSheet } from '@/services/googleSheets';
 import { 
   fetchRawCloudflareRows, 
   addMemberToCloudflare, 
   updateMemberInCloudflare, 
   deleteMemberFromCloudflare, 
+  restoreDatabaseToCloudflare,
   fetchAuditLogs,
   fetchUsers,
   createUser,
@@ -94,8 +96,16 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
   const [memberToDelete, setMemberToDelete] = useState<SheetRow | null>(null);
   const [deleting, setDeleting] = useState<boolean>(false);
 
-  // Export / Backup modal state
+  // Export / Backup & Restore modal state
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [backupRestoreTab, setBackupRestoreTab] = useState<'export' | 'restore'>('export');
+  const [restoreFile, setRestoreFile] = useState<File | null>(null);
+  const [restoreFileName, setRestoreFileName] = useState<string>('');
+  const [restoreMembers, setRestoreMembers] = useState<SheetRow[]>([]);
+  const [restoreMode, setRestoreMode] = useState<'replace' | 'merge'>('replace');
+  const [restoreLoading, setRestoreLoading] = useState<boolean>(false);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
+  const [restoreSuccess, setRestoreSuccess] = useState<string | null>(null);
 
   // Solar to Lunar Converter helper state inside form
   const [_solarDateInput, setSolarDateInput] = useState<string>('');
@@ -833,6 +843,138 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
     downloadAnchor.remove();
   };
 
+  const handleRestoreFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setRestoreFile(file);
+    setRestoreFileName(file.name);
+    setRestoreError(null);
+    setRestoreSuccess(null);
+    setRestoreMembers([]);
+
+    const reader = new FileReader();
+    const ext = file.name.split('.').pop()?.toLowerCase();
+
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        if (!content) throw new Error('Tệp tin rỗng');
+
+        let parsedList: SheetRow[] = [];
+
+        if (ext === 'json') {
+          const json = JSON.parse(content);
+          if (Array.isArray(json)) {
+            parsedList = json.map((item: any) => ({
+              id: String(item.id || item.ID || `M${Date.now().toString(36)}`),
+              parentId: item.parentId || item.ParentId || item['ID Bố/Mẹ'] || '',
+              name: item.name || item.Name || item['Họ và tên'] || 'Chưa rõ',
+              gender: item.gender || item.Gender || item['Giới tính'] || 'Nam',
+              birth: item.birth || item.Birth || item['Ngày sinh'] || '',
+              death: item.death || item.Death || item['Ngày mất'] || '',
+              isDead: item.isDead || item.IsDead || item['Đã mất'] || '',
+              bio: item.bio || item.Bio || item['Tiểu sử / Ghi chú'] || item['Tiểu sử'] || '',
+              title: item.title || item.Title || item['Vai vế / Danh xưng'] || item['Vai vế'] || '',
+              branch: item.branch || item.Branch || item['Chi nhánh'] || '',
+            }));
+          } else {
+            throw new Error('Định dạng JSON không phải là danh sách mảng hợp lệ');
+          }
+        } else if (ext === 'csv') {
+          const result = Papa.parse(content, { header: true, skipEmptyLines: true });
+          if (result.data && Array.isArray(result.data)) {
+            parsedList = (result.data as any[]).map(row => ({
+              id: String(row['Mã ID'] || row.id || row.ID || `M${Date.now().toString(36)}`),
+              parentId: row['ID Bố/Mẹ'] || row.parentId || row.ParentId || '',
+              name: row['Họ và tên'] || row.name || row.Name || 'Chưa rõ',
+              gender: row['Giới tính'] || row.gender || row.Gender || 'Nam',
+              birth: row['Ngày sinh'] || row.birth || row.Birth || '',
+              death: row['Ngày mất'] || row.death || row.Death || '',
+              isDead: row['Đã mất'] || row.isDead || row.IsDead || '',
+              bio: row['Tiểu sử / Ghi chú'] || row['Tiểu sử'] || row.bio || row.Bio || '',
+              title: row['Vai vế / Danh xưng'] || row['Vai vế'] || row.title || row.Title || '',
+              branch: row['Chi nhánh'] || row.branch || row.Branch || '',
+            })).filter(r => r.name && r.name !== 'Chưa rõ');
+          }
+        } else if (ext === 'sql') {
+          const insertRegex = /INSERT\s+INTO\s+members\s*\([^)]*\)\s*VALUES\s*\(([^)]+)\);/gi;
+          let match;
+          const extracted: SheetRow[] = [];
+          while ((match = insertRegex.exec(content)) !== null) {
+            const valuesStr = match[1];
+            const rawVals = valuesStr.match(/(?:'[^']*'|NULL|\d+)/g);
+            if (rawVals && rawVals.length >= 7) {
+              const cleanVal = (v: string) => {
+                if (!v || v === 'NULL') return '';
+                if (v.startsWith("'") && v.endsWith("'")) return v.slice(1, -1).replace(/''/g, "'");
+                return v;
+              };
+              extracted.push({
+                id: cleanVal(rawVals[0]),
+                parentId: cleanVal(rawVals[1]),
+                name: cleanVal(rawVals[2]),
+                gender: cleanVal(rawVals[3]),
+                birth: cleanVal(rawVals[4]),
+                death: cleanVal(rawVals[5]),
+                isDead: cleanVal(rawVals[6]) === '1' ? 'x' : '',
+                bio: cleanVal(rawVals[7] || ''),
+                title: cleanVal(rawVals[8] || ''),
+                branch: cleanVal(rawVals[9] || ''),
+              });
+            }
+          }
+          parsedList = extracted;
+        } else {
+          throw new Error('Định dạng tệp không được hỗ trợ. Vui lòng chọn tệp .json, .csv hoặc .sql');
+        }
+
+        if (parsedList.length === 0) {
+          throw new Error('Không tìm thấy bản ghi thành viên hợp lệ nào trong tệp tin');
+        }
+
+        setRestoreMembers(parsedList);
+      } catch (err: any) {
+        setRestoreError(err.message || 'Lỗi đọc tệp tin');
+      }
+    };
+
+    if (ext === 'json' || ext === 'csv' || ext === 'sql') {
+      reader.readAsText(file, 'UTF-8');
+    } else {
+      setRestoreError('Vui lòng chọn tệp tin .json, .csv hoặc .sql');
+    }
+  };
+
+  const handleExecuteRestore = async () => {
+    if (restoreMembers.length === 0) return;
+    setRestoreLoading(true);
+    setRestoreError(null);
+    setRestoreSuccess(null);
+
+    try {
+      const res = await restoreDatabaseToCloudflare(restoreMembers, restoreMode, authUser);
+      if (res.success) {
+        setRestoreSuccess(res.message || `Đã khôi phục thành công ${restoreMembers.length} thành viên!`);
+        await loadSheetRows();
+        if (onRefreshData) await onRefreshData();
+        await loadAuditLogs();
+        setTimeout(() => {
+          setShowExportModal(false);
+          setRestoreFile(null);
+          setRestoreMembers([]);
+          setRestoreSuccess(null);
+        }, 1800);
+      } else {
+        setRestoreError(res.message || 'Khôi phục dữ liệu thất bại.');
+      }
+    } catch (err: any) {
+      setRestoreError(err.message || 'Lỗi kết nối khi gửi dữ liệu khôi phục.');
+    } finally {
+      setRestoreLoading(false);
+    }
+  };
+
   const formatAuditLogUserName = (rawName?: string) => {
     if (!rawName) return 'Quản trị viên (Admin)';
     return rawName
@@ -1015,7 +1157,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
             }}
             title="Xuất dữ liệu / Sao lưu Database (SQL, Excel CSV, JSON)"
           >
-            <Icon name="download" size={14} /> Xuất Database
+            <Icon name="database" size={14} /> Sao Lưu & Khôi Phục
           </button>
 
           {onLogout && (
@@ -2818,152 +2960,430 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
         </div>
       )}
 
-      {/* Modal Xuất & Sao Lưu Database */}
+      {/* Modal Sao Lưu & Khôi Phục Database (Backup & Restore) */}
       {showExportModal && (
         <div className="modal-backdrop" onClick={() => setShowExportModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
-            <div className="modal-head">
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 560, width: '94%' }}>
+            <div className="modal-head" style={{ paddingBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
                 <div style={{
-                  width: 52, height: 52, borderRadius: 14,
+                  width: 48, height: 48, borderRadius: 14,
                   background: 'rgba(201,146,58,0.15)',
                   border: '1px solid var(--border-gold)',
                   display: 'grid', placeItems: 'center',
                 }}>
-                  <Icon name="download" size={26} style={{ color: 'var(--gold-mid)' }} />
+                  <Icon name="database" size={24} style={{ color: 'var(--gold-light)' }} />
                 </div>
               </div>
               <h2 className="font-display" style={{
-                fontSize: 22, fontWeight: 700,
+                fontSize: 20, fontWeight: 700,
                 color: 'var(--gold-light)', textAlign: 'center',
-                letterSpacing: '0.02em',
+                margin: 0
               }}>
-                Xuất & Sao Lưu Database
+                Sao Lưu & Khôi Phục Database
               </h2>
               <p style={{
-                marginTop: 6, fontSize: 12,
+                marginTop: 4, fontSize: 12,
                 color: 'var(--text-muted)', textAlign: 'center',
               }}>
-                Đang có tổng cộng <strong>{rows.length}</strong> thành viên trong Database
+                Cơ sở dữ liệu Cloudflare D1 · Hiện có <strong>{rows.length}</strong> thành viên
               </p>
-            </div>
 
-            <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {/* Option 1: SQL File */}
-              <div 
-                onClick={() => {
-                  handleExportSQL();
-                  setShowExportModal(false);
-                }}
-                style={{
-                  background: 'var(--bg-glass)',
-                  border: '1px solid var(--border-gold)',
-                  borderRadius: 12,
-                  padding: '14px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                className="hover-card"
-              >
-                <div style={{
-                  width: 44, height: 44, borderRadius: 10,
-                  background: 'rgba(201,146,58,0.2)',
-                  display: 'grid', placeItems: 'center', flexShrink: 0
-                }}>
-                  <Icon name="database" size={22} style={{ color: 'var(--gold-light)' }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h4 style={{ fontSize: 14, fontWeight: 600, color: 'var(--gold-light)', marginBottom: 2 }}>
-                    Xuất file SQL (.sql) - Cloudflare D1
-                  </h4>
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                    Bản sao lưu chuẩn SQL chứa lệnh tạo bảng và 100% dữ liệu để nạp lại vào Cloudflare D1.
-                  </p>
-                </div>
-                <Icon name="download" size={16} style={{ color: 'var(--gold-mid)' }} />
-              </div>
+              {/* Sub tabs: Export vs Restore */}
+              <div style={{
+                display: 'flex',
+                background: 'rgba(0,0,0,0.3)',
+                borderRadius: 'var(--r-sm)',
+                padding: 3,
+                marginTop: 12,
+                border: '1px solid var(--border-glass)'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBackupRestoreTab('export');
+                    setRestoreError(null);
+                    setRestoreSuccess(null);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: 'none',
+                    background: backupRestoreTab === 'export' ? 'linear-gradient(135deg, var(--gold), var(--gold-deep))' : 'transparent',
+                    color: backupRestoreTab === 'export' ? '#000' : 'var(--text-secondary)',
+                    fontWeight: backupRestoreTab === 'export' ? 700 : 500,
+                    fontSize: 13,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <Icon name="download" size={14} /> 💾 Xuất & Sao Lưu
+                </button>
 
-              {/* Option 2: Excel / CSV */}
-              <div 
-                onClick={() => {
-                  handleExportCSV();
-                  setShowExportModal(false);
-                }}
-                style={{
-                  background: 'var(--bg-glass)',
-                  border: '1px solid var(--border-glass)',
-                  borderRadius: 12,
-                  padding: '14px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                className="hover-card"
-              >
-                <div style={{
-                  width: 44, height: 44, borderRadius: 10,
-                  background: 'rgba(34,197,94,0.15)',
-                  display: 'grid', placeItems: 'center', flexShrink: 0
-                }}>
-                  <Icon name="file-text" size={22} style={{ color: '#4ade80' }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h4 style={{ fontSize: 14, fontWeight: 600, color: '#4ade80', marginBottom: 2 }}>
-                    Xuất file Excel (.csv)
-                  </h4>
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                    Định dạng bảng tính Excel tiếng Việt UTF-8 chuẩn, dễ dàng mở xem và in ấn.
-                  </p>
-                </div>
-                <Icon name="download" size={16} style={{ color: '#4ade80' }} />
-              </div>
-
-              {/* Option 3: JSON */}
-              <div 
-                onClick={() => {
-                  handleExportJSON();
-                  setShowExportModal(false);
-                }}
-                style={{
-                  background: 'var(--bg-glass)',
-                  border: '1px solid var(--border-glass)',
-                  borderRadius: 12,
-                  padding: '14px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                className="hover-card"
-              >
-                <div style={{
-                  width: 44, height: 44, borderRadius: 10,
-                  background: 'rgba(59,130,246,0.15)',
-                  display: 'grid', placeItems: 'center', flexShrink: 0
-                }}>
-                  <Icon name="file-code" size={22} style={{ color: '#60a5fa' }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h4 style={{ fontSize: 14, fontWeight: 600, color: '#60a5fa', marginBottom: 2 }}>
-                    Xuất file JSON (.json)
-                  </h4>
-                  <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                    Dữ liệu đối tượng JSON đầy đủ các trường thông tin.
-                  </p>
-                </div>
-                <Icon name="download" size={16} style={{ color: '#60a5fa' }} />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBackupRestoreTab('restore');
+                    setRestoreError(null);
+                    setRestoreSuccess(null);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: 'none',
+                    background: backupRestoreTab === 'restore' ? 'linear-gradient(135deg, var(--gold), var(--gold-deep))' : 'transparent',
+                    color: backupRestoreTab === 'restore' ? '#000' : 'var(--text-secondary)',
+                    fontWeight: backupRestoreTab === 'restore' ? 700 : 500,
+                    fontSize: 13,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <Icon name="upload" size={14} /> 📥 Khôi Phục Dữ Liệu
+                </button>
               </div>
             </div>
+
+            {/* TAB 1: EXPORT */}
+            {backupRestoreTab === 'export' && (
+              <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {/* Option 1: SQL File */}
+                <div 
+                  onClick={() => {
+                    handleExportSQL();
+                    setShowExportModal(false);
+                  }}
+                  style={{
+                    background: 'var(--bg-glass)',
+                    border: '1px solid var(--border-gold)',
+                    borderRadius: 12,
+                    padding: '12px 14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                  className="hover-card"
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10,
+                    background: 'rgba(201,146,58,0.2)',
+                    display: 'grid', placeItems: 'center', flexShrink: 0
+                  }}>
+                    <Icon name="database" size={20} style={{ color: 'var(--gold-light)' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--gold-light)', margin: '0 0 2px' }}>
+                      Xuất file SQL (.sql) - Cloudflare D1
+                    </h4>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, lineHeight: 1.3 }}>
+                      Bản sao lưu chuẩn SQL chứa lệnh tạo bảng và 100% dữ liệu để nạp lại vào Cloudflare D1.
+                    </p>
+                  </div>
+                  <Icon name="download" size={16} style={{ color: 'var(--gold-mid)' }} />
+                </div>
+
+                {/* Option 2: Excel / CSV */}
+                <div 
+                  onClick={() => {
+                    handleExportCSV();
+                    setShowExportModal(false);
+                  }}
+                  style={{
+                    background: 'var(--bg-glass)',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: 12,
+                    padding: '12px 14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                  className="hover-card"
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10,
+                    background: 'rgba(34,197,94,0.15)',
+                    display: 'grid', placeItems: 'center', flexShrink: 0
+                  }}>
+                    <Icon name="file-text" size={20} style={{ color: '#4ade80' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ fontSize: 13, fontWeight: 600, color: '#4ade80', margin: '0 0 2px' }}>
+                      Xuất file Excel (.csv)
+                    </h4>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, lineHeight: 1.3 }}>
+                      Định dạng bảng tính Excel tiếng Việt UTF-8 chuẩn, dễ dàng mở xem và in ấn.
+                    </p>
+                  </div>
+                  <Icon name="download" size={16} style={{ color: '#4ade80' }} />
+                </div>
+
+                {/* Option 3: JSON */}
+                <div 
+                  onClick={() => {
+                    handleExportJSON();
+                    setShowExportModal(false);
+                  }}
+                  style={{
+                    background: 'var(--bg-glass)',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: 12,
+                    padding: '12px 14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                  className="hover-card"
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10,
+                    background: 'rgba(59,130,246,0.15)',
+                    display: 'grid', placeItems: 'center', flexShrink: 0
+                  }}>
+                    <Icon name="file-code" size={20} style={{ color: '#60a5fa' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ fontSize: 13, fontWeight: 600, color: '#60a5fa', margin: '0 0 2px' }}>
+                      Xuất file JSON (.json)
+                    </h4>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, lineHeight: 1.3 }}>
+                      Dữ liệu đối tượng JSON đầy đủ các trường thông tin cho việc lập trình & khôi phục.
+                    </p>
+                  </div>
+                  <Icon name="download" size={16} style={{ color: '#60a5fa' }} />
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: RESTORE */}
+            {backupRestoreTab === 'restore' && (
+              <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {restoreError && (
+                  <div style={{
+                    padding: '10px 12px',
+                    borderRadius: 'var(--r-sm)',
+                    background: 'rgba(239,68,68,0.15)',
+                    border: '1px solid rgba(239,68,68,0.3)',
+                    color: '#f87171',
+                    fontSize: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8
+                  }}>
+                    <Icon name="alert-triangle" size={16} />
+                    <span>{restoreError}</span>
+                  </div>
+                )}
+
+                {restoreSuccess && (
+                  <div style={{
+                    padding: '10px 12px',
+                    borderRadius: 'var(--r-sm)',
+                    background: 'rgba(34,197,94,0.15)',
+                    border: '1px solid rgba(34,197,94,0.3)',
+                    color: '#4ade80',
+                    fontSize: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8
+                  }}>
+                    <Icon name="check-circle" size={16} />
+                    <span>{restoreSuccess}</span>
+                  </div>
+                )}
+
+                {/* File Upload Zone */}
+                <div style={{
+                  border: '2px dashed var(--border-gold)',
+                  borderRadius: 'var(--r-md)',
+                  padding: '20px 16px',
+                  textAlign: 'center',
+                  background: 'rgba(201,146,58,0.05)',
+                  cursor: 'pointer',
+                  position: 'relative'
+                }}>
+                  <input
+                    type="file"
+                    accept=".json,.csv,.sql"
+                    disabled={restoreLoading}
+                    onChange={handleRestoreFileSelect}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      opacity: 0,
+                      cursor: 'pointer',
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  />
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: 'rgba(201,146,58,0.15)',
+                    color: 'var(--gold-light)',
+                    display: 'grid', placeItems: 'center',
+                    margin: '0 auto 10px'
+                  }}>
+                    <Icon name="upload" size={22} />
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--gold-light)', marginBottom: 4 }}>
+                    {restoreFileName ? restoreFileName : 'Nhấn để chọn tệp sao lưu (.json, .csv, .sql)'}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                    Hỗ trợ tệp JSON, Excel CSV tiếng Việt UTF-8 hoặc tệp SQL xuất từ hệ thống.
+                  </div>
+                </div>
+
+                {/* File Parsed Preview & Options */}
+                {restoreMembers.length > 0 && (
+                  <div style={{
+                    background: 'var(--bg-glass)',
+                    border: '1px solid var(--border-glass)',
+                    borderRadius: 'var(--r-sm)',
+                    padding: '12px 14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 10
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                        Số thành viên hợp lệ tìm thấy:
+                      </span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#4ade80' }}>
+                        {restoreMembers.length} thành viên
+                      </span>
+                    </div>
+
+                    {/* Mode selection */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--gold-mid)', marginBottom: 6 }}>
+                        Phương thức khôi phục:
+                      </label>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <label style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          fontSize: 12,
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          padding: '6px 8px',
+                          borderRadius: 6,
+                          background: restoreMode === 'replace' ? 'rgba(201,146,58,0.15)' : 'transparent',
+                          border: `1px solid ${restoreMode === 'replace' ? 'var(--border-gold)' : 'transparent'}`
+                        }}>
+                          <input
+                            type="radio"
+                            name="restoreMode"
+                            value="replace"
+                            checked={restoreMode === 'replace'}
+                            onChange={() => setRestoreMode('replace')}
+                          />
+                          <span>
+                            <strong>Thay thế toàn bộ (Khuyên dùng):</strong> Xóa sạch dữ liệu cũ và nạp lại chính xác như tệp sao lưu.
+                          </span>
+                        </label>
+
+                        <label style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          fontSize: 12,
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          padding: '6px 8px',
+                          borderRadius: 6,
+                          background: restoreMode === 'merge' ? 'rgba(59,130,246,0.15)' : 'transparent',
+                          border: `1px solid ${restoreMode === 'merge' ? 'rgba(59,130,246,0.4)' : 'transparent'}`
+                        }}>
+                          <input
+                            type="radio"
+                            name="restoreMode"
+                            value="merge"
+                            checked={restoreMode === 'merge'}
+                            onChange={() => setRestoreMode('merge')}
+                          />
+                          <span>
+                            <strong>Gộp dữ liệu (Merge):</strong> Thêm mới và cập nhật thông tin theo mã ID mà không xóa các thành viên khác.
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div style={{
+                      padding: '8px 10px',
+                      borderRadius: 6,
+                      background: 'rgba(239,68,68,0.1)',
+                      border: '1px solid rgba(239,68,68,0.25)',
+                      fontSize: 11,
+                      color: '#fca5a5',
+                      lineHeight: 1.4
+                    }}>
+                      ⚠️ <strong>Cảnh báo:</strong> Quá trình khôi phục sẽ ghi đè trực tiếp lên cơ sở dữ liệu Cloudflare D1. Hãy đảm bảo bạn đã tải bản sao lưu hiện tại về máy trước khi bấm.
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={restoreLoading}
+                      onClick={handleExecuteRestore}
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        borderRadius: 'var(--r-sm)',
+                        background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                        border: 'none',
+                        color: '#fff',
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: restoreLoading ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        boxShadow: '0 4px 12px rgba(34,197,94,0.3)',
+                        marginTop: 4
+                      }}
+                    >
+                      {restoreLoading ? (
+                        <>
+                          <Icon name="sparkles" size={15} style={{ animation: 'spin 1s linear infinite' }} />
+                          Đang khôi phục {restoreMembers.length} thành viên lên Cloudflare D1...
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="upload" size={15} />
+                          🚀 Bắt Đầu Khôi Phục ({restoreMembers.length} thành viên)
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div style={{ padding: '12px 20px 16px', borderTop: '1px solid var(--border-glass)', textAlign: 'right' }}>
               <button
-                onClick={() => setShowExportModal(false)}
+                onClick={() => {
+                  setShowExportModal(false);
+                  setRestoreFile(null);
+                  setRestoreMembers([]);
+                  setRestoreError(null);
+                  setRestoreSuccess(null);
+                }}
                 className="action-button"
                 style={{ padding: '6px 18px', background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               >

@@ -454,6 +454,71 @@ export default {
         });
       }
 
+      // 10b. API MEMBERS: Khôi phục cơ sở dữ liệu (Restore)
+      if (url.pathname === '/api/members/restore' && request.method === 'POST') {
+        const { members, mode } = await request.json();
+        if (!Array.isArray(members) || members.length === 0) {
+          return new Response(JSON.stringify({ success: false, message: 'Dữ liệu khôi phục không hợp lệ hoặc rỗng' }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const statements = [];
+        if (mode !== 'merge') {
+          statements.push(env.DB.prepare('DELETE FROM members'));
+        }
+
+        for (const m of members) {
+          if (!m || !m.name) continue;
+          const id = m.id ? String(m.id).trim() : `M${Date.now().toString(36).toUpperCase()}`;
+          const isDeadVal = (m.isDead && String(m.isDead).trim() !== '' && String(m.isDead).trim() !== '0') || 
+                            (m.death && String(m.death).trim() !== '') ? 1 : 0;
+          
+          statements.push(
+            env.DB.prepare(`
+              INSERT OR REPLACE INTO members (id, parentId, name, gender, birth, death, isDead, bio, title, branch, updated_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            `).bind(
+              id,
+              m.parentId ? String(m.parentId).trim() : null,
+              m.name.trim(),
+              m.gender || 'male',
+              m.birth || null,
+              m.death || null,
+              isDeadVal,
+              m.bio || null,
+              m.title || null,
+              m.branch || null
+            )
+          );
+        }
+
+        // Execute batch in chunks of 100 statements
+        const CHUNK_SIZE = 100;
+        for (let i = 0; i < statements.length; i += CHUNK_SIZE) {
+          const chunk = statements.slice(i, i + CHUNK_SIZE);
+          await env.DB.batch(chunk);
+        }
+
+        await recordAuditLog(env, {
+          userId: actorId,
+          userName: actorName,
+          action: 'RESTORE_DATABASE',
+          targetId: 'ALL',
+          targetName: 'Cơ sở dữ liệu',
+          details: `Khôi phục cơ sở dữ liệu (${mode === 'merge' ? 'Chế độ gộp' : 'Chế độ thay thế toàn bộ'}): ${members.length} thành viên`
+        });
+
+        return new Response(JSON.stringify({ 
+          success: true, 
+          message: `Đã khôi phục thành công ${members.length} thành viên vào cơ sở dữ liệu Cloudflare D1`,
+          count: members.length 
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       // 11. API VAPID Key
       if (url.pathname === '/api/vapid-key' && request.method === 'GET') {
         return new Response(JSON.stringify({ 
