@@ -32,13 +32,13 @@ const VAN_KHAN_DATA: VanKhanItem[] = [
 - Con kính lạy Cụ Thủy tổ, Tiên tổ, Tằng tổ, Tổ khảo, Tổ tỷ, chư vị Hương linh nội ngoại dòng họ Phạm.
 
 Hôm nay là ngày ...... tháng ...... năm ...... (Âm lịch)
-Năm tròn ngày giỗ của: ........................................................
-Tín chủ (chúng) con là: ............................................................................
-Ngụ tại: ....................................................................................................
+Năm tròn ngày giỗ của: [Đọc vai vế & Tên người mất - Ví dụ: Cụ / Ông / Bà Phạm Văn A]
+Tín chủ (chúng) con là: [Đọc tên người cúng - Ví dụ: Con trưởng / Cháu đích tôn Phạm Văn B cùng toàn thể gia quyến]
+Ngụ tại: [Đọc địa chỉ nơi cúng - Ví dụ: Thôn..., Xã..., Tỉnh...]
 
 Cúi xin thành tâm sửa sang hương hoa, lễ vật, trà quả, thắp nén tâm hương dâng lên trước án. Nhớ ơn linh cữu tiền nhân, nghĩ tình dưỡng dục sinh thành, nay gặp ngày giỗ/tiên thường, con cháu nhất tâm bái lễ.
 
-Kính mời hương linh: ...............................................................................
+Kính mời hương linh: [Đọc lại danh tính người mất - Ví dụ: Cụ / Ông / Bà Phạm Văn A, hiệu..., mộ táng tại...]
 Cùng chư vị Tiên tổ nội ngoại dòng họ Phạm đồng lâm án tọa, thụ hưởng lễ vật, chứng giám lòng thành.
 
 Cúi xin phù hộ độ trì cho toàn thể con cháu trong dòng họ:
@@ -62,7 +62,7 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
 - Con kính lạy chư vị Hương linh Tiên tổ dòng họ Phạm đang an nghỉ tại khu mộ gia tộc.
 
 Hôm nay là ngày ...... tháng ...... năm ......
-Tín chủ con là: ........................................................................................
+Tín chủ con là: [Đọc tên người đứng lễ - Ví dụ: Đại diện con cháu dòng họ / chi tộc Phạm Văn C]
 Sắm sửa lễ vật, hương hoa, trầu cau, chén nước dâng lên trước phần mộ.
 
 Nhờ ơn trời đất, chư vị Tôn thần che chở, cùng linh khí Tiên tổ phù hộ, con cháu hôm nay hội tụ về đây, thành tâm dọn dẹp phần mộ thanh quang, thắp nén hương thơm tưởng nhớ cội nguồn.
@@ -86,7 +86,7 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
 - Con kính lạy Cụ Thủy tổ, Tiên tổ nội ngoại dòng họ Phạm.
 
 Hôm nay là ngày 30 tháng Chạp năm ......
-Tín chủ con là: ........................................................................................
+Tín chủ con là: [Đọc tên gia chủ - Ví dụ: Con / Cháu Phạm Văn D cùng toàn thể gia đình nội ngoại]
 
 Giờ khắc giao thừa sắp đến, năm cũ qua đi, năm mới sắp tới. Con cháu thành tâm sửa sang lễ vật, hương hoa trà quả, thắp nén tâm hương dâng lên trước án.
 
@@ -110,7 +110,7 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
 - Con kính lạy Gia tiên nội ngoại dòng họ Phạm.
 
 Hôm nay là ngày mùng 1 / ngày Rằm tháng ...... năm ......
-Tín chủ con là: ........................................................................................
+Tín chủ con là: [Đọc tên gia chủ - Ví dụ: Con / Cháu Phạm Văn E cùng các thành viên trong gia đình]
 
 Thành tâm dâng lễ hương hoa, trà quả, thắp nén tâm hương kính dâng trước án.
 Kính mời chư vị Tôn thần, Gia tiên dòng họ Phạm về chứng giám thụ hưởng.
@@ -145,12 +145,34 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
   }
 ];
 
-// Định dạng trực quan các vị trí điền thông tin cá nhân/ngày tháng
+// Định dạng trực quan các vị trí điền thông tin cá nhân/ngày tháng/gợi ý
 const renderFormattedContent = (content: string) => {
-  const parts = content.split(/(\.{3,}|ngày (?:Mùng \d+|mùng \d+|\d+|Rằm|30) tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày 30 tháng Chạp năm [^\n(]+(?:\([^\n)]+\))?)/g);
+  const parts = content.split(/(\[[^\]]+\]|\.{3,}|ngày (?:Mùng \d+|mùng \d+|\d+|Rằm|30) tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày 30 tháng Chạp năm [^\n(]+(?:\([^\n)]+\))?)/g);
   return (
     <>
       {parts.map((part, idx) => {
+        if (/^\[[^\]]+\]$/.test(part)) {
+          return (
+            <span
+              key={idx}
+              style={{
+                color: '#fef08a',
+                border: '1px dashed var(--gold)',
+                fontWeight: 600,
+                padding: '2px 8px',
+                margin: '2px 3px',
+                background: 'rgba(201, 146, 58, 0.24)',
+                borderRadius: '6px',
+                display: 'inline-block',
+                lineHeight: 1.45,
+                boxShadow: '0 0 10px rgba(201,146,58,0.25)',
+                fontStyle: 'italic'
+              }}
+            >
+              {part}
+            </span>
+          );
+        }
         if (/^\.{3,}$/.test(part) || /^ngày (?:Mùng|mùng|\d+|Rằm|30)/.test(part)) {
           const isFilledDate = /^ngày (?:Mùng|mùng|\d+|Rằm|30)/.test(part);
           return (
@@ -161,7 +183,7 @@ const renderFormattedContent = (content: string) => {
                 borderBottom: isFilledDate ? '2px solid var(--gold)' : '1.5px dashed var(--gold)',
                 fontWeight: 700,
                 padding: '2px 8px',
-                margin: '0 3px',
+                margin: '2px 3px',
                 background: isFilledDate ? 'rgba(201, 146, 58, 0.28)' : 'rgba(201, 146, 58, 0.18)',
                 borderRadius: '6px',
                 display: 'inline-block',
