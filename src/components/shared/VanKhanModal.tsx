@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@/components/ui/Icon';
 import { getLunarToday, getCanChiYear } from '@/utils/dateUtils';
 
@@ -182,16 +182,107 @@ const renderFormattedContent = (content: string) => {
 export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const [activeTab, setActiveTab] = useState<string>('gio');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [fontSize, setFontSize] = useState<number>(20);
+  const [fontSize, setFontSize] = useState<number>(22);
   const [autoFillDate, setAutoFillDate] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [fullscreenItemId, setFullscreenItemId] = useState<string | null>(null);
+
+  // Auto-scroll / Teleprompter State
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isAutoScrolling, setIsAutoScrolling] = useState<boolean>(false);
+  const [scrollSpeed, setScrollSpeed] = useState<number>(2); // 1, 2, 3, 4
+  const [isAtEnd, setIsAtEnd] = useState<boolean>(false);
+  const animFrameRef = useRef<number | null>(null);
+  const lastTimestampRef = useRef<number | null>(null);
+
+  const SPEED_CONFIG: Record<number, { px: number; label: string }> = {
+    1: { px: 20, label: '1x Chậm' },
+    2: { px: 36, label: '2x Vừa' },
+    3: { px: 58, label: '3x Nhanh' },
+    4: { px: 88, label: '4x Rất nhanh' }
+  };
+
+  // Sub-pixel smooth Auto-scroll animation loop
+  useEffect(() => {
+    if (!isFullscreen || !isAutoScrolling) {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
+      }
+      lastTimestampRef.current = null;
+      return;
+    }
+
+    const scrollEl = scrollContainerRef.current;
+    if (!scrollEl) return;
+
+    const scrollStep = (timestamp: number) => {
+      if (!lastTimestampRef.current) {
+        lastTimestampRef.current = timestamp;
+      }
+      const elapsed = (timestamp - lastTimestampRef.current) / 1000;
+      lastTimestampRef.current = timestamp;
+
+      const pxPerSec = SPEED_CONFIG[scrollSpeed]?.px || 36;
+      const distance = pxPerSec * elapsed;
+
+      if (scrollEl) {
+        const maxScroll = scrollEl.scrollHeight - scrollEl.clientHeight;
+        if (scrollEl.scrollTop >= maxScroll - 4) {
+          setIsAtEnd(true);
+          setIsAutoScrolling(false);
+          return;
+        } else {
+          setIsAtEnd(false);
+          scrollEl.scrollTop += distance;
+        }
+      }
+
+      animFrameRef.current = requestAnimationFrame(scrollStep);
+    };
+
+    animFrameRef.current = requestAnimationFrame(scrollStep);
+
+    return () => {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
+      }
+    };
+  }, [isFullscreen, isAutoScrolling, scrollSpeed]);
+
+  // Keyboard shortcuts when in Fullscreen Mode
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setIsAutoScrolling(prev => !prev);
+      } else if (e.code === 'KeyR') {
+        e.preventDefault();
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+          setIsAtEnd(false);
+        }
+      } else if (e.code === 'ArrowUp') {
+        e.preventDefault();
+        setScrollSpeed(prev => Math.max(1, prev - 1));
+      } else if (e.code === 'ArrowDown') {
+        e.preventDefault();
+        setScrollSpeed(prev => Math.min(4, prev + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
 
   // Lắng nghe sự kiện thoát Toàn màn hình từ phím ESC hoặc thao tác thiết bị
   useEffect(() => {
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement) {
         setIsFullscreen(false);
+        setIsAutoScrolling(false);
       }
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -201,6 +292,16 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const openFullscreen = (itemId: string) => {
     setFullscreenItemId(itemId);
     setIsFullscreen(true);
+    setIsAtEnd(false);
+
+    // Tự động kích hoạt chạy cuộn sau 500ms
+    setTimeout(() => {
+      setIsAutoScrolling(true);
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = 0;
+      }
+    }, 500);
+
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen().catch(() => {});
     }
@@ -212,8 +313,16 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const closeFullscreen = () => {
     setFullscreenItemId(null);
     setIsFullscreen(false);
+    setIsAutoScrolling(false);
     if (document.exitFullscreen && document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
+    }
+  };
+
+  const resetScrollToTop = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      setIsAtEnd(false);
     }
   };
 
@@ -232,7 +341,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   };
 
   const increaseFontSize = () => {
-    setFontSize((prev) => Math.min(prev + 2, 32));
+    setFontSize((prev) => Math.min(prev + 2, 36));
   };
 
   const decreaseFontSize = () => {
@@ -303,7 +412,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const filteredItems = VAN_KHAN_DATA.filter((item) => item.category === activeTab);
   const fullscreenItem = fullscreenItemId ? VAN_KHAN_DATA.find(i => i.id === fullscreenItemId) : null;
 
-  // ---- FULLSCREEN VIEW: chỉ hiển thị đúng bài được chọn ----
+  // ---- FULLSCREEN VIEW (TELEPROMPTER CHẾ ĐỘ CUỘN TỰ ĐỘNG) ----
   if (isFullscreen && fullscreenItem) {
     const processedContent = getProcessedContent(fullscreenItem.content);
     return (
@@ -314,85 +423,263 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           background: '#0a0806',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          userSelect: 'none'
         }}
       >
-        {/* Thanh tiêu đề nhỏ gọn khi fullscreen */}
+        {/* Thanh tiêu đề & Công cụ trên cùng */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '10px 16px',
-          background: 'rgba(10,8,6,0.95)',
-          borderBottom: '1px solid rgba(201,146,58,0.3)',
-          flexShrink: 0, gap: 10
+          padding: '10px 18px',
+          background: 'rgba(12, 9, 6, 0.96)',
+          borderBottom: '1px solid rgba(201, 146, 58, 0.3)',
+          backdropFilter: 'blur(12px)',
+          flexShrink: 0, gap: 12, zIndex: 10
         }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <span style={{
-              fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-              letterSpacing: '0.5px', color: 'var(--gold-mid)',
-              background: 'rgba(201,146,58,0.15)', padding: '2px 8px',
-              borderRadius: 4, border: '1px solid rgba(201,146,58,0.25)',
-              display: 'inline-block', marginBottom: 3
-            }}>{fullscreenItem.badge}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{
+                fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase',
+                letterSpacing: '0.5px', color: 'var(--gold-mid)',
+                background: 'rgba(201,146,58,0.15)', padding: '2px 8px',
+                borderRadius: 4, border: '1px solid rgba(201,146,58,0.25)',
+                display: 'inline-block'
+              }}>{fullscreenItem.badge}</span>
+
+              {isAutoScrolling ? (
+                <span style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: '#4ade80',
+                  background: 'rgba(34,197,94,0.15)',
+                  border: '1px solid rgba(34,197,94,0.3)',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80', display: 'inline-block', animation: 'pulse 1s infinite' }} />
+                  Đang chạy tự động
+                </span>
+              ) : (
+                <span style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'var(--text-muted)',
+                  background: 'rgba(255,255,255,0.06)',
+                  padding: '2px 8px',
+                  borderRadius: 12
+                }}>
+                  {isAtEnd ? 'Đã hết bài' : 'Tạm dừng cuộn'}
+                </span>
+              )}
+            </div>
             <div className="font-serif" style={{
-              fontSize: 15, fontWeight: 700, color: 'var(--gold-light)',
-              lineHeight: 1.25, overflow: 'hidden',
-              textOverflow: 'ellipsis', whiteSpace: 'nowrap'
-            }}>{fullscreenItem.title}</div>
+              fontSize: 16, fontWeight: 700, color: 'var(--gold-light)',
+              lineHeight: 1.3, overflow: 'hidden',
+              textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 3
+            }}>
+              {fullscreenItem.title}
+            </div>
           </div>
+
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            {/* Cỡ chữ nhanh */}
-            <button onClick={decreaseFontSize} disabled={fontSize <= 16} style={{
-              background: fontSize <= 16 ? 'rgba(255,255,255,0.04)' : 'rgba(201,146,58,0.2)',
-              border: '1px solid rgba(201,146,58,0.35)', borderRadius: 8,
-              color: fontSize <= 16 ? 'var(--text-muted)' : 'var(--gold-light)',
-              fontSize: 13, fontWeight: 800, cursor: fontSize <= 16 ? 'default' : 'pointer',
-              padding: '6px 12px', height: 36
-            }}>A-</button>
-            <span style={{ fontSize: 12, color: 'var(--gold-mid)', minWidth: 36, textAlign: 'center' }}>{fontSize}px</span>
-            <button onClick={increaseFontSize} disabled={fontSize >= 32} style={{
-              background: fontSize >= 32 ? 'rgba(255,255,255,0.04)' : 'rgba(201,146,58,0.25)',
-              border: '1px solid rgba(201,146,58,0.4)', borderRadius: 8,
-              color: fontSize >= 32 ? 'var(--text-muted)' : '#fff',
-              fontSize: 14, fontWeight: 800, cursor: fontSize >= 32 ? 'default' : 'pointer',
-              padding: '6px 12px', height: 36
-            }}>A+</button>
+            {/* Cỡ chữ */}
+            <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.4)', borderRadius: 8, border: '1px solid var(--border-glass)' }}>
+              <button 
+                onClick={decreaseFontSize} 
+                disabled={fontSize <= 16} 
+                title="Giảm cỡ chữ"
+                style={{
+                  background: 'transparent', border: 'none',
+                  color: fontSize <= 16 ? 'var(--text-muted)' : 'var(--gold-light)',
+                  fontSize: 12, fontWeight: 800, cursor: fontSize <= 16 ? 'default' : 'pointer',
+                  padding: '6px 10px', height: 34
+                }}
+              >A-</button>
+              <span style={{ fontSize: 11.5, color: 'var(--gold-mid)', minWidth: 32, textAlign: 'center', fontWeight: 600 }}>{fontSize}px</span>
+              <button 
+                onClick={increaseFontSize} 
+                disabled={fontSize >= 36} 
+                title="Tăng cỡ chữ"
+                style={{
+                  background: 'transparent', border: 'none',
+                  color: fontSize >= 36 ? 'var(--text-muted)' : '#fff',
+                  fontSize: 13, fontWeight: 800, cursor: fontSize >= 36 ? 'default' : 'pointer',
+                  padding: '6px 10px', height: 34
+                }}
+              >A+</button>
+            </div>
+
             {/* Nút thoát fullscreen */}
             <button
               onClick={closeFullscreen}
-              title="Thoát toàn màn hình"
+              title="Thoát toàn màn hình (ESC)"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '6px 12px', borderRadius: 8, height: 36,
-                fontSize: 12.5, fontWeight: 700,
-                background: 'rgba(201,146,58,0.3)',
-                border: '1px solid var(--border-gold)',
-                color: 'var(--gold-light)', cursor: 'pointer'
+                padding: '6px 12px', borderRadius: 8, height: 34,
+                fontSize: 12, fontWeight: 700,
+                background: 'rgba(239,68,68,0.15)',
+                border: '1px solid rgba(239,68,68,0.3)',
+                color: '#fca5a5', cursor: 'pointer'
               }}
             >
-              <Icon name="minimize" size={15} />
-              <span>Thu nhỏ</span>
+              <Icon name="minimize" size={14} />
+              <span>Đóng</span>
             </button>
           </div>
         </div>
 
-        {/* Nội dung văn khấn chiếm toàn bộ phần còn lại */}
+        {/* Khung nội dung văn khấn cuộn mượt mà */}
         <div
-          className="font-serif"
+          ref={scrollContainerRef}
+          className="font-serif teleprompter-scroll-view"
           style={{
-            flex: 1, overflowY: 'auto',
-            padding: '20px 24px',
+            flex: 1,
+            overflowY: 'auto',
+            padding: '30px 24px 170px',
             color: '#ffffff',
             fontSize: `${fontSize}px`,
-            lineHeight: 1.9,
+            lineHeight: 2.1,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            letterSpacing: '0.015em',
+            fontFamily: 'Georgia, "Playfair Display", "Times New Roman", serif',
+            letterSpacing: '0.018em',
             background: '#0a0806',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            position: 'relative'
           }}
         >
           {renderFormattedContent(processedContent)}
+
+          {/* Dấu hiệu kết thúc bài khấn */}
+          <div style={{
+            marginTop: 50,
+            padding: '24px 16px',
+            borderTop: '1px dashed rgba(201,146,58,0.4)',
+            textAlign: 'center',
+            color: 'var(--gold-mid)',
+            fontSize: Math.max(14, fontSize - 6)
+          }}>
+            <div style={{ fontSize: 22, marginBottom: 8 }}>❖ ❖ ❖</div>
+            <div style={{ fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>
+              ĐÃ HẾT BÀI VĂN KHẤN
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 6, fontStyle: 'italic' }}>
+              Lễ bạc tâm thành · Cúi xin chứng giám và phù hộ độ trì
+            </div>
+            <button
+              onClick={resetScrollToTop}
+              style={{
+                marginTop: 16,
+                padding: '8px 18px',
+                borderRadius: 'var(--r-sm)',
+                background: 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
+                border: 'none',
+                color: '#000',
+                fontWeight: 700,
+                fontSize: 13,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+            >
+              <Icon name="rotate-ccw" size={14} /> Cuộn lại từ đầu
+            </button>
+          </div>
+        </div>
+
+        {/* Thanh điều khiển Teleprompter nổi ở đáy màn hình */}
+        <div style={{
+          position: 'absolute',
+          bottom: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 50,
+          background: 'rgba(16, 12, 8, 0.94)',
+          border: '1px solid var(--border-gold)',
+          borderRadius: 24,
+          padding: '8px 14px',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.8), var(--shadow-gold-glow)',
+          backdropFilter: 'blur(16px)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          maxWidth: '94%',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}>
+          {/* Nút Play / Pause To Rõ */}
+          <button
+            onClick={() => setIsAutoScrolling(prev => !prev)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 18,
+              border: 'none',
+              background: isAutoScrolling 
+                ? 'linear-gradient(135deg, #ef4444, #dc2626)' 
+                : 'linear-gradient(135deg, var(--gold), var(--gold-deep))',
+              color: isAutoScrolling ? '#fff' : '#000',
+              fontWeight: 800,
+              fontSize: 13.5,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              boxShadow: isAutoScrolling ? '0 0 14px rgba(239,68,68,0.4)' : 'var(--shadow-gold-glow)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Icon name={isAutoScrolling ? 'pause' : 'play'} size={16} />
+            <span>{isAutoScrolling ? 'Tạm Dừng' : 'Bắt Đầu Chạy'}</span>
+          </button>
+
+          {/* Bộ chọn tốc độ (Speed selector pills) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.4)', padding: 3, borderRadius: 16, border: '1px solid var(--border-glass)' }}>
+            {[1, 2, 3, 4].map(spd => (
+              <button
+                key={spd}
+                onClick={() => setScrollSpeed(spd)}
+                style={{
+                  padding: '5px 10px',
+                  borderRadius: 12,
+                  border: 'none',
+                  background: scrollSpeed === spd ? 'rgba(201,146,58,0.3)' : 'transparent',
+                  color: scrollSpeed === spd ? 'var(--gold-light)' : 'var(--text-muted)',
+                  fontWeight: scrollSpeed === spd ? 700 : 500,
+                  fontSize: 11.5,
+                  cursor: 'pointer',
+                  borderBottom: scrollSpeed === spd ? '2px solid var(--gold)' : '2px solid transparent'
+                }}
+              >
+                {SPEED_CONFIG[spd].label}
+              </button>
+            ))}
+          </div>
+
+          {/* Nút Về Đầu Trang */}
+          <button
+            onClick={resetScrollToTop}
+            title="Cuộn lại từ đầu (Phím R)"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid var(--border-glass)',
+              borderRadius: 16,
+              color: 'var(--text-secondary)',
+              padding: '6px 12px',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6
+            }}
+          >
+            <Icon name="rotate-ccw" size={13} />
+            <span>Về đầu</span>
+          </button>
         </div>
       </div>
     );

@@ -77,6 +77,12 @@ const iconMap: Record<string, IconType> = {
   'qr-code': LuIcons.LuQrCode,
   'upload': LuIcons.LuUpload,
   'file-code': LuIcons.LuFileCode,
+  'play': LuIcons.LuPlay,
+  'pause': LuIcons.LuPause,
+  'rotate-ccw': LuIcons.LuRotateCcw,
+  'maximize': LuIcons.LuMaximize,
+  'minimize': LuIcons.LuMinimize,
+  'fast-forward': LuIcons.LuFastForward,
 };
 
 interface IconProps extends React.SVGAttributes<SVGSVGElement> {
