@@ -219,12 +219,13 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
     // Khởi tạo vị trí float ban đầu
     scrollFloatRef.current = scrollEl.scrollTop;
+    lastTimestampRef.current = null;
 
     const scrollStep = (timestamp: number) => {
       if (!lastTimestampRef.current) {
         lastTimestampRef.current = timestamp;
       }
-      const elapsed = Math.min((timestamp - lastTimestampRef.current) / 1000, 0.1); // Giới hạn max delta để tránh nhảy cóc
+      const elapsed = Math.min((timestamp - lastTimestampRef.current) / 1000, 0.1);
       lastTimestampRef.current = timestamp;
 
       const pxPerSec = SPEED_CONFIG[scrollSpeed]?.px || 40;
@@ -232,7 +233,9 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
       if (scrollEl) {
         const maxScroll = scrollEl.scrollHeight - scrollEl.clientHeight;
-        if (scrollEl.scrollTop >= maxScroll - 4) {
+        
+        // CHỈ DỪNG NẾU maxScroll ĐÃ ĐỦ LỚN (> 40px) VÀ ĐÃ CUỘN TỚI ĐÁY
+        if (maxScroll > 40 && scrollEl.scrollTop >= maxScroll - 6) {
           setIsAtEnd(true);
           setIsAutoScrolling(false);
           return;
@@ -284,15 +287,15 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     setIsFullscreen(true);
     setIsAtEnd(false);
     scrollFloatRef.current = 0;
+    setIsAutoScrolling(true);
 
-    // Tự động kích hoạt chạy cuộn sau 350ms
+    // Đảm bảo cuộn về đầu trang sau khi render xong
     setTimeout(() => {
-      setIsAutoScrolling(true);
       if (scrollContainerRef.current) {
         scrollContainerRef.current.scrollTop = 0;
         scrollFloatRef.current = 0;
       }
-    }, 350);
+    }, 100);
 
     // Kích hoạt Fullscreen API nếu thiết bị hỗ trợ (không gây lỗi trên iOS Safari)
     try {
