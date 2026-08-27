@@ -189,6 +189,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
   // Auto-scroll / Teleprompter State
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const scrollFloatRef = useRef<number>(0);
   const [isAutoScrolling, setIsAutoScrolling] = useState<boolean>(false);
   const [scrollSpeed, setScrollSpeed] = useState<number>(2); // 1, 2, 3, 4
   const [isAtEnd, setIsAtEnd] = useState<boolean>(false);
@@ -196,13 +197,13 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const lastTimestampRef = useRef<number | null>(null);
 
   const SPEED_CONFIG: Record<number, { px: number; label: string }> = {
-    1: { px: 20, label: '1x Chậm' },
-    2: { px: 36, label: '2x Vừa' },
-    3: { px: 58, label: '3x Nhanh' },
-    4: { px: 88, label: '4x Rất nhanh' }
+    1: { px: 22, label: '1x Chậm' },
+    2: { px: 40, label: '2x Vừa' },
+    3: { px: 65, label: '3x Nhanh' },
+    4: { px: 95, label: '4x Rất nhanh' }
   };
 
-  // Sub-pixel smooth Auto-scroll animation loop
+  // Sub-pixel smooth Auto-scroll animation loop (Mobile & Desktop optimized)
   useEffect(() => {
     if (!isFullscreen || !isAutoScrolling) {
       if (animFrameRef.current) {
@@ -216,14 +217,17 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     const scrollEl = scrollContainerRef.current;
     if (!scrollEl) return;
 
+    // Khởi tạo vị trí float ban đầu
+    scrollFloatRef.current = scrollEl.scrollTop;
+
     const scrollStep = (timestamp: number) => {
       if (!lastTimestampRef.current) {
         lastTimestampRef.current = timestamp;
       }
-      const elapsed = (timestamp - lastTimestampRef.current) / 1000;
+      const elapsed = Math.min((timestamp - lastTimestampRef.current) / 1000, 0.1); // Giới hạn max delta để tránh nhảy cóc
       lastTimestampRef.current = timestamp;
 
-      const pxPerSec = SPEED_CONFIG[scrollSpeed]?.px || 36;
+      const pxPerSec = SPEED_CONFIG[scrollSpeed]?.px || 40;
       const distance = pxPerSec * elapsed;
 
       if (scrollEl) {
@@ -234,7 +238,8 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           return;
         } else {
           setIsAtEnd(false);
-          scrollEl.scrollTop += distance;
+          scrollFloatRef.current += distance;
+          scrollEl.scrollTop = Math.floor(scrollFloatRef.current);
         }
       }
 
@@ -260,10 +265,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
         setIsAutoScrolling(prev => !prev);
       } else if (e.code === 'KeyR') {
         e.preventDefault();
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-          setIsAtEnd(false);
-        }
+        resetScrollToTop();
       } else if (e.code === 'ArrowUp') {
         e.preventDefault();
         setScrollSpeed(prev => Math.max(1, prev - 1));
@@ -277,36 +279,37 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFullscreen]);
 
-  // Lắng nghe sự kiện thoát Toàn màn hình từ phím ESC hoặc thao tác thiết bị
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      if (!document.fullscreenElement) {
-        setIsFullscreen(false);
-        setIsAutoScrolling(false);
-      }
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
   const openFullscreen = (itemId: string) => {
     setFullscreenItemId(itemId);
     setIsFullscreen(true);
     setIsAtEnd(false);
+    scrollFloatRef.current = 0;
 
-    // Tự động kích hoạt chạy cuộn sau 500ms
+    // Tự động kích hoạt chạy cuộn sau 350ms
     setTimeout(() => {
       setIsAutoScrolling(true);
       if (scrollContainerRef.current) {
         scrollContainerRef.current.scrollTop = 0;
+        scrollFloatRef.current = 0;
       }
-    }, 500);
+    }, 350);
 
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(() => {});
+    // Kích hoạt Fullscreen API nếu thiết bị hỗ trợ (không gây lỗi trên iOS Safari)
+    try {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    } catch {
+      // Ignored on unsupported devices
     }
-    if ('wakeLock' in navigator) {
-      (navigator as any).wakeLock.request('screen').catch(() => {});
+
+    // Giữ màn hình sáng suốt buổi lễ
+    try {
+      if ('wakeLock' in navigator) {
+        (navigator as any).wakeLock.request('screen').catch(() => {});
+      }
+    } catch {
+      // Ignored
     }
   };
 
@@ -314,12 +317,17 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     setFullscreenItemId(null);
     setIsFullscreen(false);
     setIsAutoScrolling(false);
-    if (document.exitFullscreen && document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
+    try {
+      if (document.exitFullscreen && document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    } catch {
+      // Ignored
     }
   };
 
   const resetScrollToTop = () => {
+    scrollFloatRef.current = 0;
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       setIsAtEnd(false);
@@ -534,14 +542,22 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
         {/* Khung nội dung văn khấn cuộn mượt mà */}
         <div
           ref={scrollContainerRef}
+          onScroll={() => {
+            const el = scrollContainerRef.current;
+            if (el && Math.abs(el.scrollTop - scrollFloatRef.current) > 8) {
+              scrollFloatRef.current = el.scrollTop;
+            }
+          }}
           className="font-serif teleprompter-scroll-view"
           style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '30px 24px 170px',
+            padding: '30px 20px 170px',
             color: '#ffffff',
             fontSize: `${fontSize}px`,
             lineHeight: 2.1,
+            textAlign: 'justify',
+            textJustify: 'inter-word',
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
             fontFamily: 'Georgia, "Playfair Display", "Times New Roman", serif',
@@ -957,6 +973,8 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                     color: '#ffffff',
                     fontSize: `${fontSize}px`,
                     lineHeight: 1.85,
+                    textAlign: 'justify',
+                    textJustify: 'inter-word',
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
                     fontFamily: 'Georgia, "Times New Roman", serif',
