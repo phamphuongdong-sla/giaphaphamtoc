@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmonic Lineage - Huyết Mạch Trường Lưu | Algorithmic Art</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --anthropic-dark: #141413;
+            --anthropic-light: #faf9f5;
+            --anthropic-mid-gray: #b0aea5;
+            --anthropic-light-gray: #e8e6dc;
+            --anthropic-orange: #d97757;
+            --anthropic-blue: #6a9bcc;
+            --anthropic-green: #788c5d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--anthropic-light) 0%, #f5f3ee 100%);
+            min-height: 100vh;
+            color: var(--anthropic-dark);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .sidebar {
+            width: 340px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(20, 20, 19, 0.1);
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: calc(100vh - 40px);
+        }
+
+        .sidebar h1 {
+            font-family: 'Lora', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--anthropic-dark);
+            margin-bottom: 6px;
+        }
+
+        .sidebar .subtitle {
+            color: var(--anthropic-mid-gray);
+            font-size: 13px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .control-section {
+            margin-bottom: 28px;
+        }
+
+        .control-section h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--anthropic-dark);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-section h3::before {
+            content: '•';
+            color: var(--anthropic-orange);
+            font-weight: bold;
+        }
+
+        .seed-input {
+            width: 100%;
+            background: var(--anthropic-light);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border: 1px solid var(--anthropic-light-gray);
+            text-align: center;
+        }
+
+        .seed-input:focus {
+            outline: none;
+            border-color: var(--anthropic-orange);
+            box-shadow: 0 0 0 2px rgba(217, 119, 87, 0.1);
+            background: white;
+        }
+
+        .seed-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 18px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--anthropic-dark);
+            margin-bottom: 6px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 4px;
+            background: var(--anthropic-light-gray);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--anthropic-orange);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #c86641;
+        }
+
+        .value-display {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--anthropic-mid-gray);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .color-group {
+            margin-bottom: 14px;
+        }
+
+        .color-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--anthropic-mid-gray);
+            margin-bottom: 4px;
+        }
+
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .color-picker-container input[type="color"] {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+        }
+
+        .color-value {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--anthropic-mid-gray);
+        }
+
+        .button {
+            background: var(--anthropic-orange);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .button:hover {
+            background: #c86641;
+            transform: translateY(-1px);
+        }
+
+        .button.secondary {
+            background: var(--anthropic-blue);
+        }
+
+        .button.secondary:hover {
+            background: #5a8bb8;
+        }
+
+        .button.tertiary {
+            background: var(--anthropic-green);
+        }
+
+        .button.tertiary:hover {
+            background: #6b7b52;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .button-row .button {
+            flex: 1;
+        }
+
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        #canvas-container {
+            width: 100%;
+            max-width: 900px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(20, 20, 19, 0.15);
+            background: #070707;
+            position: relative;
+        }
+
+        #canvas-container canvas {
+            display: block;
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        .loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--anthropic-mid-gray);
+            background: #070707;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Control Sidebar -->
+        <div class="sidebar">
+            <h1>Harmonic Lineage</h1>
+            <div class="subtitle">Huyết Mạch Trường Lưu · Cội Nguồn Gia Phả Phạm Tộc (Thủy Tổ 1891)</div>
+
+            <!-- Seed Section (FIXED) -->
+            <div class="control-section">
+                <h3>Seed Khởi Nguyên</h3>
+                <input type="number" id="seed-input" class="seed-input" value="1891" onchange="updateSeed()">
+                <div class="seed-controls">
+                    <button class="button secondary" onclick="previousSeed()">← Prev</button>
+                    <button class="button secondary" onclick="nextSeed()">Next →</button>
+                </div>
+                <button class="button tertiary" onclick="randomSeedAndUpdate()">↻ Ngẫu Nhiên</button>
+            </div>
+
+            <!-- Parameters Section (VARIABLE) -->
+            <div class="control-section">
+                <h3>Tham Số Thuật Toán</h3>
+                
+                <div class="control-group">
+                    <label>Số Hạt Linh Khí (Particles)</label>
+                    <div class="slider-container">
+                        <input type="range" id="particleCount" min="200" max="2500" step="50" value="800" oninput="updateParam('particleCount', this.value)">
+                        <span class="value-display" id="particleCount-value">800</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Tốc Độ Dòng Huyết Mạch (Flow Speed)</label>
+                    <div class="slider-container">
+                        <input type="range" id="flowSpeed" min="0.2" max="3.0" step="0.1" value="1.2" oninput="updateParam('flowSpeed', this.value)">
+                        <span class="value-display" id="flowSpeed-value">1.2</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Số Nhánh Cội Nguồn (Root Branches)</label>
+                    <div class="slider-container">
+                        <input type="range" id="branchCount" min="4" max="16" step="1" value="8" oninput="updateParam('branchCount', this.value)">
+                        <span class="value-display" id="branchCount-value">8</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Độ Uốn Lượn Hữu Cơ (Chaos / Noise)</label>
+                    <div class="slider-container">
+                        <input type="range" id="noiseScale" min="0.001" max="0.02" step="0.001" value="0.005" oninput="updateParam('noiseScale', this.value)">
+                        <span class="value-display" id="noiseScale-value">0.005</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Bán Kính Nhịp Thở Tâm Tổ (Core Pulse)</label>
+                    <div class="slider-container">
+                        <input type="range" id="pulseRadius" min="40" max="180" step="5" value="90" oninput="updateParam('pulseRadius', this.value)">
+                        <span class="value-display" id="pulseRadius-value">90</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colors Section (VARIABLE) -->
+            <div class="control-section">
+                <h3>Bảng Màu Huyết Mạch</h3>
+                
+                <div class="color-group">
+                    <label>Linh Khí Hoàng Kim (Core Gold)</label>
+                    <div class="color-picker-container">
+                        <input type="color" id="color1" value="#f0d090" onchange="updateColor('color1', this.value)">
+                        <span class="color-value" id="color1-value">#f0d090</span>
+                    </div>
+                </div>
+
+                <div class="color-group">
+                    <label>Hổ Phách Thân Cành (Amber Branch)</label>
+                    <div class="color-picker-container">
+                        <input type="color" id="color2" value="#c9923a" onchange="updateColor('color2', this.value)">
+                        <span class="color-value" id="color2-value">#c9923a</span>
+                    </div>
+                </div>
+
+                <div class="color-group">
+                    <label>Chu Sa Trầm Tích (Cinnabar Accent)</label>
+                    <div class="color-picker-container">
+                        <input type="color" id="color3" value="#8b1a1a" onchange="updateColor('color3', this.value)">
+                        <span class="color-value" id="color3-value">#8b1a1a</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Section (FIXED) -->
+            <div class="control-section">
+                <h3>Thao Tác</h3>
+                <div class="button-row">
+                    <button class="button" onclick="resetParameters()">Đặt Lại Mặc Định</button>
+                    <button class="button secondary" onclick="saveArtwork()">Lưu Ảnh PNG</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Canvas Area -->
+        <div class="canvas-area">
+            <div id="canvas-container">
+                <div class="loading" id="loading-overlay">Khởi tạo trường năng lượng Huyết Mạch...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Parameters
+        let params = {
+            seed: 1891,
+            particleCount: 800,
+            flowSpeed: 1.2,
+            branchCount: 8,
+            noiseScale: 0.005,
+            pulseRadius: 90,
+            colorPalette: ['#f0d090', '#c9923a', '#8b1a1a']
+        };
+
+        let defaultParams = JSON.parse(JSON.stringify(params));
+
+        // State
+        let particles = [];
+        let branches = [];
+        let time = 0;
+        let mouseInfluence = { x: 0, y: 0, active: false };
+
+        function setup() {
+            let canvas = createCanvas(1000, 1000);
+            canvas.parent('canvas-container');
+            colorMode(RGB, 255);
+            initializeSystem();
+            let loader = document.getElementById('loading-overlay');
+            if (loader) loader.style.display = 'none';
+        }
+
+        function initializeSystem() {
+            randomSeed(params.seed);
+            noiseSeed(params.seed);
+            time = 0;
+
+            // Generate Ancestral Branches radiating outward
+            branches = [];
+            let cx = width / 2;
+            let cy = height / 2;
+            let count = params.branchCount;
+
+            for (let i = 0; i < count; i++) {
+                let baseAngle = (TWO_PI / count) * i;
+                generateBranch(cx, cy, baseAngle, 260, 4, 1.0);
+            }
+
+            // Generate Spirit Particles
+            particles = [];
+            for (let i = 0; i < params.particleCount; i++) {
+                particles.push(new SpiritParticle());
+            }
+
+            background(7, 7, 7);
+        }
+
+        function generateBranch(x, y, angle, length, depth, weight) {
+            if (depth <= 0 || length < 15) return;
+
+            let endX = x + cos(angle) * length;
+            let endY = y + sin(angle) * length;
+
+            branches.push({
+                x1: x, y1: y,
+                x2: endX, y2: endY,
+                angle: angle,
+                depth: depth,
+                weight: weight
+            });
+
+            let subBranches = 2;
+            let spread = 0.45;
+            for (let b = 0; b < subBranches; b++) {
+                let nextAngle = angle + (b === 0 ? -spread : spread) + (noise(x * 0.01, y * 0.01) - 0.5) * 0.3;
+                let nextLength = length * 0.68;
+                generateBranch(endX, endY, nextAngle, nextLength, depth - 1, weight * 0.7);
+            }
+        }
+
+        class SpiritParticle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                let cx = width / 2;
+                let cy = height / 2;
+                let angle = random(TWO_PI);
+                let r = random(10, params.pulseRadius);
+                this.x = cx + cos(angle) * r;
+                this.y = cy + sin(angle) * r;
+                this.prevX = this.x;
+                this.prevY = this.y;
+                this.speed = random(0.8, 2.2) * params.flowSpeed;
+                this.life = random(120, 320);
+                this.maxLife = this.life;
+                this.colorIndex = floor(random(params.colorPalette.length));
+                this.size = random(1.2, 3.2);
+            }
+
+            update() {
+                this.prevX = this.x;
+                this.prevY = this.y;
+
+                let cx = width / 2;
+                let cy = height / 2;
+                let dx = this.x - cx;
+                let dy = this.y - cy;
+                let radDist = sqrt(dx * dx + dy * dy);
+
+                // Radial outward vector + multi-octave noise turbulence
+                let baseAngle = atan2(dy, dx);
+                let nVal = noise(this.x * params.noiseScale, this.y * params.noiseScale, time * 0.008);
+                let flowAngle = baseAngle + (nVal - 0.5) * 1.5;
+
+                // Mouse resonance
+                if (mouseInfluence.active) {
+                    let mdx = mouseInfluence.x - this.x;
+                    let mdy = mouseInfluence.y - this.y;
+                    let mdist = sqrt(mdx * mdx + mdy * mdy);
+                    if (mdist < 220 && mdist > 5) {
+                        flowAngle += atan2(mdy, mdx) * 0.25;
+                    }
+                }
+
+                this.x += cos(flowAngle) * this.speed;
+                this.y += sin(flowAngle) * this.speed;
+
+                this.life--;
+                if (this.life <= 0 || radDist > width * 0.65) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                let alpha = map(this.life, 0, this.maxLife, 0, 220);
+                let colHex = params.colorPalette[this.colorIndex];
+                let c = color(colHex);
+                c.setAlpha(alpha);
+
+                stroke(c);
+                strokeWeight(this.size);
+                line(this.prevX, this.prevY, this.x, this.y);
+            }
+        }
+
+        function draw() {
+            // Subtle trail fade for ethereal continuity
+            noStroke();
+            fill(7, 7, 7, 32);
+            rect(0, 0, width, height);
+
+            time += 0.05;
+            let cx = width / 2;
+            let cy = height / 2;
+
+            // Draw Pulsing Ancestral Core
+            let pulse = sin(time * 0.8) * 15;
+            let coreR = params.pulseRadius + pulse;
+
+            noFill();
+            // Golden concentric rings
+            stroke(201, 146, 58, 45);
+            strokeWeight(1);
+            ellipse(cx, cy, coreR * 2, coreR * 2);
+
+            stroke(240, 208, 144, 30);
+            ellipse(cx, cy, coreR * 3.2, coreR * 3.2);
+
+            stroke(240, 208, 144, 18);
+            ellipse(cx, cy, coreR * 4.6, coreR * 4.6);
+
+            // Draw Lineage Branches (Filaments)
+            for (let i = 0; i < branches.length; i++) {
+                let b = branches[i];
+                let branchAlpha = map(b.depth, 1, 4, 30, 80);
+                stroke(201, 146, 58, branchAlpha);
+                strokeWeight(b.weight);
+                line(b.x1, b.y1, b.x2, b.y2);
+            }
+
+            // Update & Draw Spirit Particles
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+
+            // Central Core Golden Radiance
+            fill(240, 208, 144, 18);
+            noStroke();
+            ellipse(cx, cy, coreR * 0.8, coreR * 0.8);
+            fill(255, 255, 255, 40);
+            ellipse(cx, cy, coreR * 0.35, coreR * 0.35);
+        }
+
+        function mouseMoved() {
+            let rect = document.getElementById('canvas-container').getBoundingClientRect();
+            let mx = (mouseX / width) * width;
+            let my = (mouseY / height) * height;
+            if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+                mouseInfluence.x = mouseX;
+                mouseInfluence.y = mouseY;
+                mouseInfluence.active = true;
+            } else {
+                mouseInfluence.active = false;
+            }
+        }
+
+        function mouseExited() {
+            mouseInfluence.active = false;
+        }
+
+        function updateParam(name, value) {
+            params[name] = parseFloat(value);
+            document.getElementById(name + '-value').textContent = value;
+            if (name === 'branchCount') {
+                initializeSystem();
+            } else if (name === 'particleCount') {
+                while (particles.length < params.particleCount) particles.push(new SpiritParticle());
+                if (particles.length > params.particleCount) particles.length = params.particleCount;
+            }
+        }
+
+        function updateColor(id, value) {
+            let idx = id === 'color1' ? 0 : id === 'color2' ? 1 : 2;
+            params.colorPalette[idx] = value;
+            document.getElementById(id + '-value').textContent = value;
+        }
+
+        function updateSeedDisplay() {
+            document.getElementById('seed-input').value = params.seed;
+        }
+
+        function updateSeed() {
+            let input = document.getElementById('seed-input');
+            let newSeed = parseInt(input.value);
+            if (newSeed && newSeed > 0) {
+                params.seed = newSeed;
+                initializeSystem();
+            } else {
+                updateSeedDisplay();
+            }
+        }
+
+        function previousSeed() {
+            params.seed = Math.max(1, params.seed - 1);
+            updateSeedDisplay();
+            initializeSystem();
+        }
+
+        function nextSeed() {
+            params.seed = params.seed + 1;
+            updateSeedDisplay();
+            initializeSystem();
+        }
+
+        function randomSeedAndUpdate() {
+            params.seed = Math.floor(Math.random() * 999999) + 1;
+            updateSeedDisplay();
+            initializeSystem();
+        }
+
+        function resetParameters() {
+            params = JSON.parse(JSON.stringify(defaultParams));
+            document.getElementById('particleCount').value = params.particleCount;
+            document.getElementById('particleCount-value').textContent = params.particleCount;
+            document.getElementById('flowSpeed').value = params.flowSpeed;
+            document.getElementById('flowSpeed-value').textContent = params.flowSpeed;
+            document.getElementById('branchCount').value = params.branchCount;
+            document.getElementById('branchCount-value').textContent = params.branchCount;
+            document.getElementById('noiseScale').value = params.noiseScale;
+            document.getElementById('noiseScale-value').textContent = params.noiseScale;
+            document.getElementById('pulseRadius').value = params.pulseRadius;
+            document.getElementById('pulseRadius-value').textContent = params.pulseRadius;
+
+            document.getElementById('color1').value = params.colorPalette[0];
+            document.getElementById('color1-value').textContent = params.colorPalette[0];
+            document.getElementById('color2').value = params.colorPalette[1];
+            document.getElementById('color2-value').textContent = params.colorPalette[1];
+            document.getElementById('color3').value = params.colorPalette[2];
+            document.getElementById('color3-value').textContent = params.colorPalette[2];
+
+            updateSeedDisplay();
+            initializeSystem();
+        }
+
+        function saveArtwork() {
+            saveCanvas('GiaPhaPhamToc-HarmonicLineage-Seed' + params.seed, 'png');
+        }
+    </script>
+</body>
+</html>
