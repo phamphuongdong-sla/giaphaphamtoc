@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@/components/ui/Icon';
 
 interface SplashScreenProps {
@@ -7,73 +7,303 @@ interface SplashScreenProps {
   onThemeChange?: (theme: 'dark' | 'light') => void;
 }
 
-// 🌿 Lineage Tree Pulse Network Component (Mạch Cội Nguồn Gia Tộc 3D)
-const LineageTreeNetwork = ({ isWhite = false }: { isWhite?: boolean }) => {
-  const primaryColor = isWhite ? 'rgba(201, 146, 58, 0.45)' : 'rgba(240, 208, 144, 0.55)';
-  const nodeGlow = isWhite ? '#c9923a' : '#f0d090';
+// 🌿 Harmonic Lineage Algorithmic Canvas Component (Mạch Cội Nguồn Sinh Khí Thuật Toán 60fps)
+const HarmonicLineageCanvas = ({ isWhite = false, exiting = false }: { isWhite?: boolean; exiting?: boolean }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const resize = () => {
+      if (!canvas) return;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildBranches();
+    };
+
+    // Pointer tracking for interactive resonance
+    const pointer = { x: width / 2, y: height * 0.42, active: false };
+    const onPointerMove = (e: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in e ? e.touches[0]?.clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0]?.clientY : e.clientY;
+      if (clientX !== undefined && clientY !== undefined) {
+        pointer.x = clientX;
+        pointer.y = clientY;
+        pointer.active = true;
+      }
+    };
+    const onPointerLeave = () => {
+      pointer.active = false;
+    };
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('mouseleave', onPointerLeave);
+
+    // Theme color palettes
+    const palette = isWhite
+      ? ['#c9923a', '#8a5e1c', '#e2b96f', '#b87c2b']
+      : ['#f0d090', '#ffffff', '#c9923a', '#e2b96f', '#8b1a1a'];
+    const primaryStroke = isWhite ? 'rgba(201, 146, 58, ' : 'rgba(240, 208, 144, ';
+
+    // Precompute Recursive Lineage Tree Branches (Nhánh Huyết Mạch Tỷ Lệ Vàng)
+    interface Branch {
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
+      cpx: number;
+      cpy: number;
+      weight: number;
+      alpha: number;
+    }
+
+    const branches: Branch[] = [];
+    const buildBranches = () => {
+      branches.length = 0;
+      const cx = width / 2;
+      const cy = height * 0.42;
+      const count = 10; // 10 sacred directions
+      const maxLen = Math.min(width, height) * 0.62;
+
+      const addBranch = (
+        x: number,
+        y: number,
+        angle: number,
+        len: number,
+        depth: number,
+        weight: number
+      ) => {
+        if (depth <= 0 || len < 16) return;
+        const midAngle = angle + Math.sin(depth * 1.5) * 0.16;
+        const cpx = x + Math.cos(midAngle) * (len * 0.5);
+        const cpy = y + Math.sin(midAngle) * (len * 0.5);
+        const endX = x + Math.cos(angle) * len;
+        const endY = y + Math.sin(angle) * len;
+
+        branches.push({
+          x1: x,
+          y1: y,
+          cpx,
+          cpy,
+          x2: endX,
+          y2: endY,
+          weight,
+          alpha: depth === 3 ? 0.35 : depth === 2 ? 0.22 : 0.12,
+        });
+
+        const spread = 0.38;
+        const lenRatio = 0.68; // Golden ratio decay
+        addBranch(endX, endY, angle - spread, len * lenRatio, depth - 1, weight * 0.68);
+        addBranch(endX, endY, angle + spread, len * lenRatio, depth - 1, weight * 0.68);
+      };
+
+      for (let i = 0; i < count; i++) {
+        const angle = ((Math.PI * 2) / count) * i;
+        addBranch(cx, cy, angle, maxLen * 0.45, 3, 1.4);
+      }
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Linh Khí Spirit Particles (Hạt Sinh Khí Hoàng Kim)
+    const PARTICLE_COUNT = 160;
+    class SpiritParticle {
+      x: number = 0;
+      y: number = 0;
+      prevX: number = 0;
+      prevY: number = 0;
+      speed: number = 1;
+      life: number = 100;
+      maxLife: number = 100;
+      size: number = 2;
+      color: string = palette[0];
+      angle: number = 0;
+      swirl: number = 0;
+
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(init = false) {
+        const cx = width / 2;
+        const cy = height * 0.42;
+        this.angle = Math.random() * Math.PI * 2;
+        const startR = init ? Math.random() * Math.min(width, height) * 0.48 : Math.random() * 50;
+        this.x = cx + Math.cos(this.angle) * startR;
+        this.y = cy + Math.sin(this.angle) * startR;
+        this.prevX = this.x;
+        this.prevY = this.y;
+        this.speed = 0.7 + Math.random() * 1.5;
+        this.life = 120 + Math.random() * 200;
+        this.maxLife = this.life;
+        this.size = 1.0 + Math.random() * 2.2;
+        this.color = palette[Math.floor(Math.random() * palette.length)];
+        this.swirl = (Math.random() - 0.5) * 0.08;
+      }
+
+      update(t: number, speedMultiplier: number) {
+        this.prevX = this.x;
+        this.prevY = this.y;
+
+        const cx = width / 2;
+        const cy = height * 0.42;
+        const dx = this.x - cx;
+        const dy = this.y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Vector flow field guided by harmonic waves
+        let flowAngle = Math.atan2(dy, dx);
+        flowAngle += Math.sin(this.x * 0.004 + t * 0.6) * 0.35 + Math.cos(this.y * 0.004 + t * 0.6) * 0.35;
+        flowAngle += this.swirl;
+
+        // Pointer resonance
+        if (pointer.active) {
+          const pdx = pointer.x - this.x;
+          const pdy = pointer.y - this.y;
+          const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+          if (pdist < 220 && pdist > 10) {
+            const pull = (1 - pdist / 220) * 0.25;
+            flowAngle += Math.atan2(pdy, pdx) * pull;
+          }
+        }
+
+        const currentSpeed = this.speed * speedMultiplier;
+        this.x += Math.cos(flowAngle) * currentSpeed;
+        this.y += Math.sin(flowAngle) * currentSpeed;
+
+        this.life -= speedMultiplier;
+        if (this.life <= 0 || dist > Math.max(width, height) * 0.8) {
+          this.reset();
+        }
+      }
+
+      draw(ctx: CanvasRenderingContext2D) {
+        const progress = this.life / this.maxLife;
+        const alpha = Math.sin(progress * Math.PI) * (isWhite ? 0.75 : 0.85);
+
+        ctx.strokeStyle = this.color;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = this.size;
+        ctx.beginPath();
+        ctx.moveTo(this.prevX, this.prevY);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+
+        // Glowing core head
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 0.9, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const particles: SpiritParticle[] = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(new SpiritParticle());
+    }
+
+    let time = 0;
+    const render = () => {
+      time += 0.016;
+      ctx.clearRect(0, 0, width, height);
+
+      const cx = width / 2;
+      const cy = height * 0.42;
+      const speedMultiplier = exiting ? 4.5 : 1.0;
+
+      // 1. Draw Lineage Tree Branches
+      ctx.lineCap = 'round';
+      for (let i = 0; i < branches.length; i++) {
+        const b = branches[i];
+        ctx.lineWidth = b.weight;
+        ctx.strokeStyle = `${primaryStroke}${b.alpha})`;
+        ctx.beginPath();
+        ctx.moveTo(b.x1, b.y1);
+        ctx.quadraticCurveTo(b.cpx, b.cpy, b.x2, b.y2);
+        ctx.stroke();
+      }
+
+      // 2. Draw Pulsing Harmonic Rings (Vòng Sóng Nhịp Thở Cội Nguồn)
+      const basePulse = Math.sin(time * 1.1) * 14;
+      const rings = [
+        { r: 85 + basePulse, dash: [4, 6], alpha: isWhite ? 0.4 : 0.55, width: 1.2 },
+        { r: 160 + basePulse * 0.6, dash: [2, 8], alpha: isWhite ? 0.25 : 0.35, width: 0.8 },
+        { r: 250 + basePulse * 0.3, dash: [], alpha: isWhite ? 0.15 : 0.22, width: 0.6 },
+        { r: 360 + basePulse * 0.15, dash: [3, 10], alpha: isWhite ? 0.08 : 0.14, width: 0.5 },
+      ];
+
+      for (const ring of rings) {
+        ctx.strokeStyle = `${primaryStroke}${ring.alpha})`;
+        ctx.lineWidth = ring.width;
+        ctx.setLineDash(ring.dash);
+        ctx.lineDashOffset = -time * 8;
+        ctx.beginPath();
+        ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]); // Reset dash
+
+      // 3. Draw Spirit Particles (Linh Khí Chạy Dọc Mạch)
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(time, speedMultiplier);
+        particles[i].draw(ctx);
+      }
+      ctx.globalAlpha = 1.0;
+
+      // 4. Pointer Aura on interaction
+      if (pointer.active && !exiting) {
+        const rad = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 75);
+        rad.addColorStop(0, isWhite ? 'rgba(201, 146, 58, 0.16)' : 'rgba(240, 208, 144, 0.18)');
+        rad.addColorStop(1, 'transparent');
+        ctx.fillStyle = rad;
+        ctx.beginPath();
+        ctx.arc(pointer.x, pointer.y, 75, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', onPointerMove);
+      window.removeEventListener('touchmove', onPointerMove);
+      window.removeEventListener('mouseleave', onPointerLeave);
+    };
+  }, [isWhite, exiting]);
 
   return (
-    <div
+    <canvas
+      ref={canvasRef}
       style={{
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
         zIndex: 2,
-        overflow: 'hidden',
+        width: '100%',
+        height: '100%',
+        transition: exiting ? 'opacity 0.7s ease' : 'none',
+        opacity: exiting ? 0 : 1,
       }}
-    >
-      <svg
-        viewBox="0 0 800 800"
-        fill="none"
-        style={{
-          width: '100%',
-          height: '100%',
-          opacity: 0.88,
-          filter: isWhite ? 'drop-shadow(0 0 10px rgba(201,146,58,0.25))' : 'drop-shadow(0 0 14px rgba(240,208,144,0.35))',
-        }}
-      >
-        {/* Central Ancestral Lineage Pulse Rings */}
-        <circle cx="400" cy="400" r="90" stroke={primaryColor} strokeWidth="1" strokeDasharray="4 6" className="pulse-ring-slow" />
-        <circle cx="400" cy="400" r="160" stroke={primaryColor} strokeWidth="0.75" opacity="0.5" />
-        <circle cx="400" cy="400" r="240" stroke={primaryColor} strokeWidth="0.5" strokeDasharray="2 8" opacity="0.35" />
-
-        {/* Curved Tree Lineage Branches (Mạch Cội Nguồn Tỏa Rạng) */}
-        <path d="M400 360 C 350 260, 260 180, 140 100 C 90 60, 40 40, 0 20" stroke={primaryColor} strokeWidth="1.5" />
-        <path d="M260 180 C 200 140, 150 80, 90 20" stroke={primaryColor} strokeWidth="1" opacity="0.6" />
-
-        <path d="M400 360 C 450 260, 540 180, 660 100 C 710 60, 760 40, 800 20" stroke={primaryColor} strokeWidth="1.5" />
-        <path d="M540 180 C 600 140, 650 80, 710 20" stroke={primaryColor} strokeWidth="1" opacity="0.6" />
-
-        <path d="M400 440 C 340 540, 240 620, 120 700 C 60 740, 30 760, 0 780" stroke={primaryColor} strokeWidth="1.5" />
-        <path d="M240 620 C 180 660, 120 720, 60 780" stroke={primaryColor} strokeWidth="1" opacity="0.6" />
-
-        <path d="M400 440 C 460 540, 560 620, 680 700 C 740 740, 770 760, 800 780" stroke={primaryColor} strokeWidth="1.5" />
-        <path d="M560 620 C 620 660, 680 720, 740 780" stroke={primaryColor} strokeWidth="1" opacity="0.6" />
-
-        <path d="M350 400 C 250 400, 150 360, 0 320" stroke={primaryColor} strokeWidth="1.2" opacity="0.65" />
-        <path d="M450 400 C 550 400, 650 440, 800 480" stroke={primaryColor} strokeWidth="1.2" opacity="0.65" />
-
-        {/* Glowing Energy Pulse Particles (Hạt Ánh Sáng Chạy Dọc Mạch) */}
-        <circle cx="0" cy="0" r="4.5" fill="#ffffff" filter={`drop-shadow(0 0 10px ${nodeGlow})`}>
-          <animateMotion path="M400 360 C 350 260, 260 180, 140 100 C 90 60, 40 40, 0 20" dur="6.5s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="0" cy="0" r="4.5" fill="#ffffff" filter={`drop-shadow(0 0 10px ${nodeGlow})`}>
-          <animateMotion path="M400 360 C 450 260, 540 180, 660 100 C 710 60, 760 40, 800 20" dur="8s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="0" cy="0" r="4" fill={nodeGlow} filter={`drop-shadow(0 0 8px ${nodeGlow})`}>
-          <animateMotion path="M400 440 C 340 540, 240 620, 120 700 C 60 740, 30 760, 0 780" dur="8.5s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="0" cy="0" r="4" fill={nodeGlow} filter={`drop-shadow(0 0 8px ${nodeGlow})`}>
-          <animateMotion path="M400 440 C 460 540, 560 620, 680 700 C 740 740, 770 760, 800 780" dur="7s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="0" cy="0" r="3.5" fill="#ffffff" filter={`drop-shadow(0 0 6px ${nodeGlow})`}>
-          <animateMotion path="M350 400 C 250 400, 150 360, 0 320" dur="9.5s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="0" cy="0" r="3.5" fill="#ffffff" filter={`drop-shadow(0 0 6px ${nodeGlow})`}>
-          <animateMotion path="M450 400 C 550 400, 650 440, 800 480" dur="10s" repeatCount="indefinite" />
-        </circle>
-      </svg>
-    </div>
+    />
   );
 };
 
@@ -219,8 +449,8 @@ export const SplashScreen = ({ onEnter, currentTheme = 'light', onThemeChange }:
         ))}
       </div>
 
-      {/* ── LAYER 3: 3D LINEAGE TREE PULSE NETWORK (Mạch Cội Nguồn Gia Tộc 3D) ── */}
-      <LineageTreeNetwork isWhite={isWhiteTheme} />
+      {/* ── LAYER 3: HARMONIC LINEAGE ALGORITHMIC CANVAS (Huyết Mạch Cội Nguồn Thuật Toán 60fps) ── */}
+      <HarmonicLineageCanvas isWhite={isWhiteTheme} exiting={exiting} />
 
       {/* Ambient center background glow */}
       <div style={{

@@ -243,7 +243,7 @@ def main():
 
     p_b_desc = doc.add_paragraph()
     p_b_desc.paragraph_format.space_after = Pt(4)
-    r = p_b_desc.add_run("Hệ thống cho phép bạn đồng bộ trực tiếp các ngày giỗ, sinh nhật quan trọng vào ứng dụng Lịch mặc định trên điện thoại của mình. Khi đã đồng bộ, điện thoại sẽ báo thức nhắc nhở bạn tự động (trước 7 ngày, 3 ngày, 1 ngày và đúng 08:00 sáng ngày diễn ra).")
+    r = p_b_desc.add_run("Hệ thống cho phép các thành viên đồng bộ trực tiếp các ngày giỗ, sinh nhật quan trọng vào ứng dụng Lịch mặc định trên điện thoại của mình. Khi đã đồng bộ, điện thoại sẽ báo thức nhắc nhở mọi người tự động (trước 7 ngày, 3 ngày, 1 ngày và đúng 08:00 sáng ngày diễn ra).")
     r.font.name = 'Arial'
     r.font.size = Pt(11)
 
@@ -271,7 +271,7 @@ def main():
     p_rem = doc.add_paragraph()
     p_rem.paragraph_format.space_before = Pt(4)
     p_rem.paragraph_format.space_after = Pt(4)
-    r_t2 = p_rem.add_run("Đặc biệt: Bạn có thể bấm trực tiếp vào tên người trong danh sách lịch giỗ để mở xem ngay tiểu sử chi tiết.")
+    r_t2 = p_rem.add_run("Đặc biệt: Mọi người có thể bấm trực tiếp vào tên người trong danh sách lịch giỗ để mở xem ngay tiểu sử chi tiết.")
     r_t2.font.name = 'Arial'
     r_t2.bold = True
     r_t2.font.color.rgb = RGBColor(0, 100, 0)
@@ -398,10 +398,58 @@ def main():
     r = p_stat.add_run("Cung cấp biểu đồ trực quan về tổng số thành viên, tỷ lệ Nam/Nữ, số lượng theo từng Đời và độ tuổi. ")
     r.font.name = 'Arial'
     
-    r_t2 = p_stat.add_run("Đặc biệt: Ở dưới các danh sách mới cập nhật, bạn có thể bấm vào tên người để xem chi tiết.")
+    r_t2 = p_stat.add_run("Đặc biệt: Ở dưới các danh sách mới cập nhật, mọi người có thể bấm vào tên người để xem chi tiết.")
     r_t2.font.name = 'Arial'
     r_t2.bold = True
     r_t2.font.color.rgb = RGBColor(0, 100, 0)
+
+
+    # 2.7 Van Khan
+    h2 = doc.add_heading(level=2)
+    h2.paragraph_format.space_before = Pt(12)
+    h2.paragraph_format.space_after = Pt(4)
+    r = h2.add_run("📜 2.7. Đọc Văn Khấn Trực Tuyến")
+    r.font.name = 'Arial'
+    r.font.size = Pt(12)
+    r.bold = True
+    r.font.color.rgb = RGBColor(180, 100, 20)
+
+    vk_feats = [
+        ("Nội dung đầy đủ: ", "Ứng dụng cung cấp sẵn các bài văn khấn truyền thống cho các dịp lễ, tết, giỗ chạp."),
+        ("Cuộn tự động (Teleprompter): ", "Tính năng tự động cuộn trang giúp ông bà, cô chú và anh chị em rảnh tay khi đọc khấn."),
+        ("Hiển thị trực quan: ", "Các thông tin cần khấn được gợi ý rõ ràng thay cho dấu chấm lửng (....), giúp đọc mạch lạc.")
+    ]
+    for b, text in vk_feats:
+        p = doc.add_paragraph(style='List Bullet')
+        p.paragraph_format.space_after = Pt(3)
+        r_b = p.add_run(b)
+        r_b.bold = True
+        r_b.font.name = 'Arial'
+        r_t = p.add_run(text)
+        r_t.font.name = 'Arial'
+
+    # 2.8 QR Code
+    h2 = doc.add_heading(level=2)
+    h2.paragraph_format.space_before = Pt(12)
+    h2.paragraph_format.space_after = Pt(4)
+    r = h2.add_run("📱 2.8. Mã QR Gia Phả Cá Nhân")
+    r.font.name = 'Arial'
+    r.font.size = Pt(12)
+    r.bold = True
+    r.font.color.rgb = RGBColor(180, 100, 20)
+
+    qr_feats = [
+        ("Mã QR riêng biệt: ", "Tích hợp mã QR gia phả riêng biệt cho từng thành viên."),
+        ("Chia sẻ nhanh chóng: ", "Mọi người có thể quét mã này để truy cập cực kỳ nhanh vào hồ sơ, dễ dàng chia sẻ cho con cháu trong nhà.")
+    ]
+    for b, text in qr_feats:
+        p = doc.add_paragraph(style='List Bullet')
+        p.paragraph_format.space_after = Pt(3)
+        r_b = p.add_run(b)
+        r_b.bold = True
+        r_b.font.name = 'Arial'
+        r_t = p.add_run(text)
+        r_t.font.name = 'Arial'
 
     # --- PHẦN 3 ---
     h1 = doc.add_heading(level=1)
@@ -414,9 +462,9 @@ def main():
     r.font.color.rgb = RGBColor(139, 26, 26)
 
     faqs = [
-        ("1. Tôi có cần đăng ký tài khoản hay đăng nhập không?", "Không cần. Tất cả thành viên trong dòng họ đều có thể truy cập ngay lập tức thông qua đường link."),
-        ("2. Tại sao tôi không nhận được thông báo ngày giỗ?", "Hãy kiểm tra 2 điều: (1) Bạn đã Bật thông báo trong biểu tượng Cài đặt ⚙️ chưa; (2) Điện thoại/Trình duyệt của bạn có đang chặn quyền thông báo của trang web hay không."),
-        ("3. Ứng dụng có bị mất dữ liệu khi tôi đổi điện thoại không?", "Không. Dữ liệu gia phả được lưu trữ tập trung trên hệ thống trực tuyến, bạn chỉ cần mở link trên thiết bị mới là xem được đầy đủ dữ liệu mới nhất.")
+        ("1. Có cần đăng ký tài khoản hay đăng nhập không?", "Không cần. Tất cả thành viên trong dòng họ đều có thể truy cập ngay lập tức thông qua đường link."),
+        ("2. Tại sao không nhận được thông báo ngày giỗ?", "Hãy kiểm tra 2 điều: (1) Mọi người đã Bật thông báo trong biểu tượng Cài đặt ⚙️ chưa; (2) Điện thoại/Trình duyệt có đang chặn quyền thông báo của trang web hay không."),
+        ("3. Ứng dụng có bị mất dữ liệu khi đổi điện thoại không?", "Không. Dữ liệu gia phả được lưu trữ tập trung trên hệ thống trực tuyến, mọi người chỉ cần mở link trên thiết bị mới là xem được đầy đủ dữ liệu mới nhất.")
     ]
 
     for q, a in faqs:

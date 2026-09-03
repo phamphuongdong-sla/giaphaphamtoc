@@ -42,7 +42,7 @@
 ### 1.3. Cài đặt trên Máy tính (PC / Laptop Windows & Mac)
 
 * **Bước 1:** Mở link trên trình duyệt **Google Chrome** hoặc **Microsoft Edge**.
-* **Bước 2:** Nhìn lên thanh địa chỉ trang web (thanh URL) ở góc phải, bạn sẽ thấy biểu tượng **Tải xuống / Cài đặt ứng dụng** 💻 (hoặc bấm dấu 3 chấm góc trên phải -> chọn *Cài đặt Gia Phả Phạm Tộc...*).
+* **Bước 2:** Nhìn lên thanh địa chỉ trang web (thanh URL) ở góc phải, mọi người sẽ thấy biểu tượng **Tải xuống / Cài đặt ứng dụng** 💻 (hoặc bấm dấu 3 chấm góc trên phải -> chọn *Cài đặt Gia Phả Phạm Tộc...*).
 * **Bước 3:** Nhấn **"Cài đặt"** (Install).
 * **Kết quả:** Ứng dụng sẽ tự động tạo lối tắt (shortcut) trên màn hình Desktop và mở ra dưới dạng cửa sổ độc lập mượt mà như phần mềm máy tính.
 
@@ -54,7 +54,7 @@
 
 ### 🔔 2.1. Tích Hợp Lịch Giỗ Vào Lịch Điện Thoại (Google Calendar, Apple Calendar)
 
-Hệ thống cho phép bạn đồng bộ trực tiếp các ngày giỗ, sinh nhật quan trọng vào ứng dụng Lịch mặc định trên điện thoại của mình. Khi đã đồng bộ, điện thoại sẽ báo thức nhắc nhở bạn tự động (trước 7 ngày, 3 ngày, 1 ngày và đúng 08:00 sáng ngày diễn ra).
+Hệ thống cho phép các thành viên đồng bộ trực tiếp các ngày giỗ, sinh nhật quan trọng vào ứng dụng Lịch mặc định trên điện thoại của mình. Khi đã đồng bộ, điện thoại sẽ báo thức nhắc nhở mọi người tự động (trước 7 ngày, 3 ngày, 1 ngày và đúng 08:00 sáng ngày diễn ra).
 
 #### Các bước thực hiện:
 1. Mở sang Tab **"Lịch giỗ"**.
@@ -64,7 +64,7 @@ Hệ thống cho phép bạn đồng bộ trực tiếp các ngày giỗ, sinh n
 5. **Mở tệp vừa tải về**, điện thoại sẽ tự động mở ứng dụng Lịch (Apple Calendar trên iPhone hoặc Google Calendar trên Android).
 6. Nhấn **"Thêm" (Add)** để lưu sự kiện vào lịch điện thoại.
 
-*Đặc biệt: Bạn có thể bấm trực tiếp vào tên người trong danh sách lịch giỗ để mở xem ngay tiểu sử chi tiết.*
+*Đặc biệt: Mọi người có thể bấm trực tiếp vào tên người trong danh sách lịch giỗ để mở xem ngay tiểu sử chi tiết.*
 
 ---
 
@@ -112,24 +112,42 @@ Hệ thống cho phép bạn đồng bộ trực tiếp các ngày giỗ, sinh n
 ### 📊 2.6. Thống Kê Dòng Họ (Tab "Thống kê")
 
 * Xem số liệu tổng quan về dòng họ: Tổng số thành viên, tỷ lệ Nam/Nữ, phân bố theo từng đời và biểu đồ độ tuổi.
-* **Đặc biệt:** Ở dưới các danh sách vừa được cập nhật thêm, bạn có thể bấm vào tên người để xem chi tiết.
+* **Đặc biệt:** Ở dưới các danh sách vừa được cập nhật thêm, mọi người có thể bấm vào tên người để xem chi tiết.
   * Số lượng thành viên theo từng Đời / Thế hệ.
   * Thống kê độ tuổi và độ thọ.
 
 ---
 
+
+---
+
+### 📜 2.7. Đọc Văn Khấn Trực Tuyến
+
+* Ứng dụng cung cấp sẵn các bài văn khấn truyền thống cho các dịp lễ, tết, giỗ chạp.
+* **Chế độ cuộn tự động (Teleprompter):** Hỗ trợ tính năng tự động cuộn trang (Auto-Scroll), giúp ông bà, cô chú và anh chị em rảnh tay khi đọc văn khấn mà không cần vuốt màn hình.
+* **Hiển thị trực quan:** Các thông tin cần khấn (tên tuổi, ngày tháng, địa chỉ...) được bôi đậm và gợi ý rõ ràng thay vì để các dấu chấm lửng (....), giúp việc đọc khấn mạch lạc và chính xác.
+
+---
+
+### 📱 2.8. Mã QR Gia Phả Cá Nhân
+
+* Tích hợp mã QR gia phả riêng biệt cho từng thành viên.
+* **Tính năng:** Trong trang thông tin chi tiết của mỗi người, sẽ có một mã QR. Mọi người có thể lưu lại hoặc quét mã này để truy cập cực kỳ nhanh chóng vào hồ sơ của thành viên đó, chia sẻ dễ dàng cho con cháu trong nhà.
+
+---
+
 ## ❓ PHẦN 3: CÂU HỎI THƯỜNG GẶP (FAQ)
 
-1. **Tôi có cần đăng ký tài khoản hay đăng nhập không?**
+1. **Có cần đăng ký tài khoản hay đăng nhập không?**
    * *Trả lời:* Không cần. Tất cả thành viên trong dòng họ đều có thể truy cập ngay lập tức thông qua đường link.
 
-2. **Tại sao tôi không nhận được thông báo ngày giỗ?**
+2. **Tại sao không nhận được thông báo ngày giỗ?**
    * *Trả lời:* Hãy kiểm tra 2 điều:
-     1. Bạn đã bấm **"Bật thông báo"** trong phần **Cài đặt ⚙️** chưa.
-     2. Điện thoại/Trình duyệt của bạn có đang chặn quyền thông báo của trang web không (vào Cài đặt điện thoại -> Trình duyệt Chrome/Safari -> Cấp quyền Thông báo).
+     1. Mọi người đã bấm **"Bật thông báo"** trong phần **Cài đặt ⚙️** chưa.
+     2. Điện thoại/Trình duyệt có đang chặn quyền thông báo của trang web không (vào Cài đặt điện thoại -> Trình duyệt Chrome/Safari -> Cấp quyền Thông báo).
 
-3. **Ứng dụng có bị mất dữ liệu khi tôi đổi điện thoại không?**
-   * *Trả lời:* Không. Dữ liệu gia phả được lưu trữ tập trung trên hệ thống trực tuyến, bạn chỉ cần mở link trên máy mới là xem được đầy đủ dữ liệu mới nhất.
+3. **Ứng dụng có bị mất dữ liệu khi đổi điện thoại không?**
+   * *Trả lời:* Không. Dữ liệu gia phả được lưu trữ tập trung trên hệ thống trực tuyến, mọi người chỉ cần mở link trên máy mới là xem được đầy đủ dữ liệu mới nhất.
 
 ---
 
