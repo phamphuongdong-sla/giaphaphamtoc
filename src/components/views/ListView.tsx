@@ -123,8 +123,11 @@ export const ListView = ({ treeData, memberEntries, onSelectPerson }: ListViewPr
             <Icon name="calendar" size={12} />
             <span>Lần cập nhật gia phả gần nhất: <strong>{GIA_PHA_LAST_UPDATED}</strong></span>
           </div>
-          <div style={{ fontSize: '10.5px', opacity: 0.75, fontStyle: 'italic' }}>
-            Phụng sự lưu truyền huyết mạch · Đồng tâm gìn giữ cội nguồn gia tộc
+          <div style={{ fontSize: '11px', color: 'var(--gold-light)', fontStyle: 'italic', fontFamily: 'Georgia, serif', letterSpacing: '0.02em' }}>
+            « Mộc xuất thiên chi do hữu bản · Thủy lưu vạn phái tổng đồng nguyên »
+          </div>
+          <div style={{ fontSize: '10px', opacity: 0.7, fontStyle: 'italic' }}>
+            (Cây muôn nhánh bởi do có gốc · Nước vạn dòng chung một nguồn khơi)
           </div>
         </div>
 
