@@ -3,6 +3,7 @@ import { PersonNode, MemberEntry } from '@/types';
 import { MemberItem } from '@/components/members/MemberItem';
 import { SearchPanel } from '@/components/members/SearchPanel';
 import { Icon } from '@/components/ui/Icon';
+import { GIA_PHA_LAST_UPDATED } from '@/utils/dateUtils';
 
 interface ListViewProps {
   treeData: PersonNode;
@@ -103,6 +104,28 @@ export const ListView = ({ treeData, memberEntries, onSelectPerson }: ListViewPr
             pathNodes={[]}
             index={0}
           />
+        </div>
+
+        {/* Footer ghi nhận cập nhật gia phả */}
+        <div style={{
+          marginTop: 36,
+          padding: '16px 12px 24px',
+          borderTop: '1px dashed var(--border-gold-md)',
+          textAlign: 'center',
+          color: 'var(--text-muted)',
+          fontSize: '11.5px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 4
+        }}>
+          <div style={{ color: 'var(--gold-mid)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <Icon name="calendar" size={12} />
+            <span>Lần cập nhật gia phả gần nhất: <strong>{GIA_PHA_LAST_UPDATED}</strong></span>
+          </div>
+          <div style={{ fontSize: '10.5px', opacity: 0.75, fontStyle: 'italic' }}>
+            Phụng sự lưu truyền huyết mạch · Đồng tâm gìn giữ cội nguồn gia tộc
+          </div>
         </div>
 
       </div>

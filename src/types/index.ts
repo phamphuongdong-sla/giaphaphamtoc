@@ -1,4 +1,5 @@
 export interface PersonNode {
+  id?: string;
   name: string;
   birth?: string;
   death?: string;

@@ -133,7 +133,15 @@ export const MemberItem = ({
                   <Icon name="venus" size={11} />
                 </span>
               ) : null}
-              <span className="gen-badge">Đời {currentGen}</span>
+              <span 
+                className="gen-badge"
+                style={{
+                  borderColor: `${genColor}60`,
+                  color: genColor
+                }}
+              >
+                Đời {currentGen}
+              </span>
               {badge && <span className="member-role-badge">{badge}</span>}
               <span className={`member-name ${genderClass} ${isAncestor ? 'root ancestor' : ''}`}>
                 {cleanName(data.name)}

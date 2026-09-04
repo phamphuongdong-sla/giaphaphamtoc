@@ -99,7 +99,7 @@ export const ManageView = ({ authUser, onRefreshData, onLogout }: ManageViewProp
   // Export / Backup & Restore modal state
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [backupRestoreTab, setBackupRestoreTab] = useState<'export' | 'restore'>('export');
-  const [restoreFile, setRestoreFile] = useState<File | null>(null);
+  const [_restoreFile, setRestoreFile] = useState<File | null>(null);
   const [restoreFileName, setRestoreFileName] = useState<string>('');
   const [restoreMembers, setRestoreMembers] = useState<SheetRow[]>([]);
   const [restoreMode, setRestoreMode] = useState<'replace' | 'merge'>('replace');

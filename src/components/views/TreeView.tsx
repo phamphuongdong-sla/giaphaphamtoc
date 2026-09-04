@@ -12,6 +12,8 @@ import {
   Position,
   ReactFlowProvider,
   useReactFlow,
+  Panel,
+  Controls,
 } from '@xyflow/react';
 import dagre from '@dagrejs/dagre';
 import '@xyflow/react/dist/style.css';
@@ -292,6 +294,7 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 // INNER TREE COMPONENT
 // ==========================================
 const TreeViewInner = ({ treeData, onSelectPerson }: TreeViewProps) => {
+  const { fitView } = useReactFlow();
   const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -349,7 +352,6 @@ const TreeViewInner = ({ treeData, onSelectPerson }: TreeViewProps) => {
       handleToggleExpand,
       onSelectPerson
     );
-    
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(rawNodes, rawEdges);
     
     setNodes(layoutedNodes);
@@ -378,6 +380,51 @@ const TreeViewInner = ({ treeData, onSelectPerson }: TreeViewProps) => {
           variant={BackgroundVariant.Dots}
           style={{ opacity: 0.5 }}
         />
+        <Panel position="top-right" className="tree-floating-panel">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'var(--bg-glass-md)',
+            border: '1px solid var(--border-gold)',
+            borderRadius: 'var(--r-md)',
+            padding: '4px 6px',
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.3)'
+          }}>
+            <button
+              onClick={handleExpandAll}
+              className="action-button"
+              style={{ padding: '6px 10px', fontSize: 11, height: 32, gap: 4 }}
+              title="Mở rộng toàn bộ các nhánh gia phả"
+              aria-label="Mở rộng toàn bộ cây gia phả"
+            >
+              <Icon name="chevrons-down" size={13} />
+              <span>Mở rộng hết</span>
+            </button>
+            <button
+              onClick={handleCollapseAll}
+              className="action-button"
+              style={{ padding: '6px 10px', fontSize: 11, height: 32, gap: 4 }}
+              title="Thu gọn về người khởi tổ"
+              aria-label="Thu gọn cây gia phả"
+            >
+              <Icon name="chevrons-up" size={13} />
+              <span>Thu gọn</span>
+            </button>
+            <button
+              onClick={() => fitView({ padding: 0.2, duration: 400 })}
+              className="action-button"
+              style={{ padding: '6px 10px', fontSize: 11, height: 32, gap: 4 }}
+              title="Căn chỉnh vừa màn hình"
+              aria-label="Căn giữa màn hình"
+            >
+              <Icon name="maximize" size={13} />
+              <span>Vừa khung</span>
+            </button>
+          </div>
+        </Panel>
+        <Controls showInteractive={false} className="tree-canvas-controls" />
       </ReactFlow>
     </div>
   );

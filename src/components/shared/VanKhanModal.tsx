@@ -21,30 +21,32 @@ const VAN_KHAN_DATA: VanKhanItem[] = [
     id: 'gio-chinh',
     category: 'gio',
     categoryLabel: 'Cúng Giỗ',
-    title: 'Bài Văn Khấn Cúng Giỗ (Tiên Thường & Chính Giỗ)',
-    subtitle: 'Dùng vào chiều ngày trước giỗ (Tiên thường) hoặc sáng ngày chính giỗ tại Từ đường / Tại gia',
-    badge: 'Cúng Giỗ',
+    title: 'Văn Khấn Cúng Giỗ Tiên Tổ (Tiên Thường & Chính Kỵ)',
+    subtitle: 'Nghi thức phụng cúng ngày Tiên thường (chiều trước giỗ) hoặc Chính giỗ tại Từ đường / Gia từ',
+    badge: 'Chính Kỵ',
     content: `Nam mô A Di Đà Phật! (3 lần, 3 lạy)
 
-- Con lạy chín phương Trời, mười phương Chư Phật, Chư Phật mười phương.
-- Con kính lạy Hoàng thiên, Hậu thổ, chư vị Tôn thần.
-- Con kính lạy ngài Bản cảnh Thành hoàng, ngài Bản xứ Thổ địa, ngài Bản gia Táo quân cùng chư vị Tôn thần.
-- Con kính lạy Cụ Thủy tổ, Tiên tổ, Tằng tổ, Tổ khảo, Tổ tỷ, chư vị Hương linh nội ngoại dòng họ Phạm.
+- Con kính lạy chín phương Trời, mười phương Chư Phật, Chư Phật mười phương.
+- Con kính lạy Hoàng thiên Hậu thổ chư vị Tôn thần.
+- Con kính lạy ngài Đông trù Tư mệnh Táo phủ Thần quân.
+- Con kính lạy ngài Bản cảnh Thành hoàng Chư vị Đại Vương, ngài Bản xứ Thần linh Thổ địa, Long mạch Tôn thần cùng chư vị Tôn thần cai quản trong xứ này.
+
+- Con kính lạy Cao Tằng Tổ Khảo, Cao Tằng Tổ Tỷ, Cụ Thủy tổ, Tiên tổ nội ngoại dòng họ Phạm.
 
 Hôm nay là ngày ...... tháng ...... năm ...... (Âm lịch)
-Năm tròn ngày giỗ của: [Đọc vai vế & Tên người mất - Ví dụ: Cụ / Ông / Bà Phạm Văn A]
-Tín chủ (chúng) con là: [Đọc tên người cúng - Ví dụ: Con trưởng / Cháu đích tôn Phạm Văn B cùng toàn thể gia quyến]
-Ngụ tại: [Đọc địa chỉ nơi cúng - Ví dụ: Thôn..., Xã..., Tỉnh...]
+Chính ngày Kỵ nhật của: [Hương linh: Cụ / Ông / Bà ...]
+Tín chủ con là: [Họ tên chủ lễ ...] cùng toàn thể gia quyến.
+Ngụ cư tại: [Địa chỉ phụng thờ / Nơi cử hành tang lễ ...]
 
-Cúi xin thành tâm sửa sang hương hoa, lễ vật, trà quả, thắp nén tâm hương dâng lên trước án. Nhớ ơn linh cữu tiền nhân, nghĩ tình dưỡng dục sinh thành, nay gặp ngày giỗ/tiên thường, con cháu nhất tâm bái lễ.
+Thiết nghĩ: Cây có gốc mới nở ngành xanh ngọn, nước có nguồn mới biển rộng sông sâu. Nhớ đức cù lao dưỡng dục khôn xiết, nghĩ ơn sinh thành tạo đoan như non cao bể rộng. Nay gặp tiết Kỵ nhật, con cháu nhất tâm tề tựu, thành kính sửa sang hương đăng quả phẩm, kim ngân hoa lễ, dâng nén tâm hương thơm ngát trước linh toạ.
 
-Kính mời hương linh: [Đọc lại danh tính người mất - Ví dụ: Cụ / Ông / Bà Phạm Văn A, hiệu..., mộ táng tại...]
-Cùng chư vị Tiên tổ nội ngoại dòng họ Phạm đồng lâm án tọa, thụ hưởng lễ vật, chứng giám lòng thành.
+Kính cẩn thỉnh mời: [Hương linh: Cụ / Ông / Bà ...], tôn hiệu [tôn hiệu ...], phần mộ an táng tại [nơi an táng ...]
+Cùng chư vị Tiên linh phụ thờ Tả ban Hữu dực, chư vị Hương hồn nội ngoại dòng họ Phạm đồng lai giáng phó án tiền, thụ hưởng lễ vật, chứng giám tấc dạ lòng thành.
 
-Cúi xin phù hộ độ trì cho toàn thể con cháu trong dòng họ:
-Nhiều sức khỏe, gia đạo bình an, công danh phát đạt, học hành tiến tới, tình đồng tộc ngày càng bền chặt.
+Kính lạy chư vị Thần linh bản xứ, Tiên tổ linh thiêng, cúi xin phù hộ độ trì khuông phù đồng tộc:
+Bốn mùa thanh cát, tám tiết an khang, gia đạo hưng long, tử tôn hiếu thuận, học hành đỗ đạt, xuất nhập bình an, phúc lộc trường tồn, tình nghĩa đồng tộc muôn thuở keo sơn gắn bó.
 
-Chúng con lễ bạc tâm thành, trước án kính lễ, cúi xin được chứng giám và phù hộ độ trì.
+Chúng con lễ bạc tâm thành, trước án kính lễ, cúi xin chứng giám tấc dạ, phù hộ độ trì.
 
 Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
   },
@@ -52,24 +54,27 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
     id: 'tao-mo',
     category: 'taomo',
     categoryLabel: 'Tảo Mộ',
-    title: 'Bài Văn Khấn Lễ Tảo Mộ (Dịp Tết / Tiết Thanh Minh / Rằm T7)',
-    subtitle: 'Dùng khi con cháu ra khu mộ gia tộc / nghĩa trang họ dọn dẹp, thắp hương tảo mộ',
+    title: 'Văn Khấn Lễ Tảo Mộ, Chạp Mộ & Thanh Minh',
+    subtitle: 'Nghi thức dâng hương bồi đắp, dọn dẹp thanh minh phần mộ Tiên tổ nơi Nghĩa trang Gia tộc',
     badge: 'Tảo Mộ',
     content: `Nam mô A Di Đà Phật! (3 lần, 3 lạy)
 
-- Con kính lạy ngài Kim Niên Đương niên Hành khiển Tôn thần.
-- Con kính lạy ngài Bản cảnh Thổ địa, Ngũ phương Ngũ thổ Long mạch Tôn thần.
-- Con kính lạy chư vị Hương linh Tiên tổ dòng họ Phạm đang an nghỉ tại khu mộ gia tộc.
+- Con kính lạy ngài Kim Niên Đương cai Thái Tuế Chí đức Tôn thần.
+- Con kính lạy ngài Bản cảnh Thành hoàng, Ngũ phương Ngũ thổ Long mạch Tôn thần, Thần linh Bản xứ cai quản nghĩa trang gia tộc.
+- Con kính lạy chư vị Tiên linh phụ mẫu, bá thúc huynh đệ, cô di tỷ muội dòng họ Phạm an nghỉ nơi linh địa.
 
-Hôm nay là ngày ...... tháng ...... năm ......
-Tín chủ con là: [Đọc tên người đứng lễ - Ví dụ: Đại diện con cháu dòng họ / chi tộc Phạm Văn C]
-Sắm sửa lễ vật, hương hoa, trầu cau, chén nước dâng lên trước phần mộ.
+Hôm nay là tiết: [Dịp Tiết Thanh Minh / Tiết Lễ Tảo Mộ cuối năm]
+Ngày ...... tháng ...... năm ...... (Âm lịch)
+Tín chủ con là: [Họ tên đại diện con cháu dòng tộc ...]
+Ngụ tại: [Địa chỉ gia tộc ...]
 
-Nhờ ơn trời đất, chư vị Tôn thần che chở, cùng linh khí Tiên tổ phù hộ, con cháu hôm nay hội tụ về đây, thành tâm dọn dẹp phần mộ thanh quang, thắp nén hương thơm tưởng nhớ cội nguồn.
+Kính cẩn tâu trình: Nhờ ơn trời đất che chở, linh khí non sông bồi tụ, phúc ấm Tiên tổ lưu truyền muôn đời. Nay con cháu hướng về cội nguồn huyết thống, dâng nén tâm hương, cơi trầu chén nước, sửa sang phần mộ phong quang sạch đẹp, đắp đất bồi cỏ cho phần mộ các bậc tiền nhân được ấm êm muôn thuở.
 
-Kính mời chư vị Hương linh Gia tiên dòng họ Phạm an nghỉ nơi đây về thụ hưởng lễ vật, chứng giám lòng thành.
+Kính thỉnh Chư vị Tôn thần bản thổ cho phép Gia tiên tiền tổ họ Phạm an nghỉ nơi đây:
+Được giáng lâm hiển linh thụ hưởng lễ vật, phù hộ khuông phù cho dòng họ:
+Huyết mạch lưu thông, nhân khang vật thịnh, con cháu đời đời phát phúc phát tài, rạng danh gia phong tông tộc.
 
-Cúi xin chư vị độ trì cho gia quyến khang thái, con cháu làm ăn phát đạt, học hành đỗ đạt, dòng họ ngày càng hưng vượng.
+Chúng con lễ bạc tâm thành, trước linh vị cúi đầu kính bái.
 
 Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
   },
@@ -77,22 +82,26 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
     id: 'giao-thua',
     category: 'tet',
     categoryLabel: 'Lễ Tết',
-    title: 'Bài Văn Khấn Tất Niên & Đêm Giao Thừa',
-    subtitle: 'Dùng ngày 30 Tết Âm lịch khấn rước Gia Tiên về ăn Tết cùng con cháu',
+    title: 'Văn Khấn Rước Tiên Tổ & Lễ Tết Cổ Truyền (30 Tết, Mùng 1, 2, 3, 4 Tạ Lễ)',
+    subtitle: 'Nghi thức cung thỉnh Tổ tiên về ngự tại Từ đường / Gia từ mừng Xuân đón Tết sum vầy cùng cháu con',
     badge: 'Lễ Tết',
     content: `Nam mô A Di Đà Phật! (3 lần, 3 lạy)
 
-- Con kính lạy Ngũ phương, Ngũ thổ, Long mạch, Táo quân, chư vị Tôn thần.
-- Con kính lạy Cụ Thủy tổ, Tiên tổ nội ngoại dòng họ Phạm.
+- Con kính lạy chín phương Trời, mười phương Chư Phật, Chư Phật mười phương.
+- Con kính lạy ngài Kim Niên Đương cai Thái Tuế Chí đức Tôn thần tiền nhiệm và đương nhiệm.
+- Con kính lạy Bản gia Đông trù Tư mệnh Định phúc Táo quân.
+- Con kính lạy Liệt vị Tiên tổ, Cụ Thủy tổ, Tổ khảo, Tổ tỷ dòng họ Phạm.
 
-Hôm nay là ngày 30 tháng Chạp năm ......
-Tín chủ con là: [Đọc tên gia chủ - Ví dụ: Con / Cháu Phạm Văn D cùng toàn thể gia đình nội ngoại]
+[Thời khắc lễ Tết: Hôm nay là ...]
+Tín chủ con là: [Họ tên gia chủ ...] cùng toàn thể con cháu gia quyến.
+Ngụ tại: [Địa chỉ gia đạo ...]
 
-Giờ khắc giao thừa sắp đến, năm cũ qua đi, năm mới sắp tới. Con cháu thành tâm sửa sang lễ vật, hương hoa trà quả, thắp nén tâm hương dâng lên trước án.
+[Lời khấn nguyện tiết Xuân: ...]
 
-Kính mời Cụ Thủy tổ, các vị Tiên tổ nội ngoại dòng họ Phạm giáng lâm trước án, thụ hưởng lễ vật, rước Xuân đón Tết cùng con cháu.
+Kính cẩn cung thỉnh: Cụ Thủy tổ, Tiên tổ khảo, Tiên tổ tỷ cùng chư vị Chân linh nội ngoại dòng họ Phạm giáng lâm trước án, thụ hưởng lễ vật, ngự tại gia từ đón mừng năm mới, chung vui hòa khí cùng con cháu xuân thì.
 
-Cúi xin Tiên tổ phù hộ độ trì cho con cháu bước sang năm mới: Gia đạo vạn sự như ý, sức khỏe dồi dào, an khang thịnh vượng, tình nghĩa đồng tộc muôn đời bền vững.
+Cúi xin Tiên linh che chở:
+Sang năm mới vạn sự hanh thông, công thành danh toại, phúc thọ tăng long, gia đạo hòa thuận khang ninh, dòng họ trường thịnh thiên thu.
 
 Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
   },
@@ -100,22 +109,28 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
     id: 'mung-1-ram',
     category: 'ram',
     categoryLabel: 'Mùng 1 & Rằm',
-    title: 'Bài Văn Khấn Mùng Một (01) & Ngày Rằm (15)',
-    subtitle: 'Dùng thắp hương thường nhật ngày Mùng 1 và Rằm hàng tháng',
-    badge: 'Mùng 1 & Rằm',
+    title: 'Văn Khấn Thường Nhật Tiết Sóc Vọng (Mùng Một & Rằm)',
+    subtitle: 'Nghi lễ sóc vọng tuần tiết hàng tháng bái yết Thần linh Gia tiên tại ban thờ từ đường',
+    badge: 'Sóc Vọng',
     content: `Nam mô A Di Đà Phật! (3 lần, 3 lạy)
 
 - Con kính lạy Hoàng thiên Hậu thổ chư vị Tôn thần.
-- Con kính lạy ngài Đông Trù Tư mệnh Táo phủ Tôn thần.
-- Con kính lạy Gia tiên nội ngoại dòng họ Phạm.
+- Con kính lạy ngài Đông trù Tư mệnh Táo phủ Thần quân.
+- Con kính lạy ngài Bản gia Thổ địa Long mạch Tôn thần.
+- Con kính lạy Chư vị Thần linh cai quản trong xứ này.
+- Con kính lạy Liệt vị Tiên tổ nội ngoại dòng họ Phạm.
 
-Hôm nay là ngày mùng 1 / ngày Rằm tháng ...... năm ......
-Tín chủ con là: [Đọc tên gia chủ - Ví dụ: Con / Cháu Phạm Văn E cùng các thành viên trong gia đình]
+Hôm nay là ngày: [Tiết Sóc Vọng: ...]
+Tín chủ con là: [Họ tên chủ tế / Trưởng tộc ...]
+Ngụ tại: [Địa chỉ gia từ / Từ đường ...]
 
-Thành tâm dâng lễ hương hoa, trà quả, thắp nén tâm hương kính dâng trước án.
-Kính mời chư vị Tôn thần, Gia tiên dòng họ Phạm về chứng giám thụ hưởng.
+Nay nhân ngày tuần tiết, con cháu lòng thành kính cẩn, lau dọn phong quang ban thờ gia tiên, kính cẩn dâng nén tâm hương, chén trà thanh thủy, hương hoa quả thực trước linh sàng.
 
-Cúi xin phù hộ cho gia đạo an yên, bốn mùa không biến động, tám tiết hưởng bình an, vạn sự tốt lành.
+Cúi xin chư vị Tôn thần, Gia tiên tiền tổ giáng lâm trước án, chứng minh tấc lòng thành kính.
+Phù hộ độ trì cho toàn gia đẳng:
+Bốn mùa không tật ách, tám tiết thái bình an khang, mọi sự hanh thông sở cầu như ý, gia môn thịnh vượng ấm no.
+
+Dãi tấm lòng thành, cúi xin chứng giám.
 
 Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
   },
@@ -123,72 +138,68 @@ Nam mô A Di Đà Phật! (3 lần, 3 lạy)`
     id: 'quy-trinh',
     category: 'quychinh',
     categoryLabel: 'Quy Trình Lễ',
-    title: 'Hướng Dẫn Quy Trình & Lễ Vật Cúng Giỗ Chuẩn Phong Tục',
-    subtitle: 'Nghi thức chuẩn bị mâm cỗ, thứ tự thắp hương và nghi lễ Tiên Thường - Chính Giỗ',
-    badge: 'Quy Trình Lễ',
-    content: `📌 1. QUY TRÌNH 2 NGÀY CÚNG GIỖ
-• Ngày Tiên Thường (Chiều ngày trước giỗ):
-  - Chiều (từ 14h - 16h): Lau dọn bàn thờ thanh tịnh.
-  - Cúng Tiên Thường: Dâng mâm cỗ nhẹ để xin phép Thổ công và mời Gia tiên về dự giỗ ngày hôm sau.
-• Ngày Chính Giỗ (Sáng ngày giỗ chính):
-  - Sáng (từ 9h - 11h): Bày mâm cỗ mặn/chay chính giỗ.
-  - Gia chủ thắp hương khấn bái. Sau khi nén hương cháy được khoảng 2/3, khấn xin hạ lễ và thụ lộc giỗ.
+    title: 'Nghi Thức Lễ Kỵ Cổ Truyền & Bày Biện Án Gian Gia Tộc',
+    subtitle: 'Quy thức tuần tiết, phép tắc bái vọng và nghi lễ chuẩn truyền thống người Việt',
+    badge: 'Nghi Thức',
+    content: `❖ 1. QUY THỨC TUẦN LỄ GIỖ TIÊN TỔ (LỄ KỴ NHẬT)
+• Lễ Tiên Thường (Chiều ngày hôm trước giỗ chính):
+  - Thời khắc thích hợp: Từ 14h00 đến 16h30 chiều.
+  - Ý nghĩa: Cáo yết Thần linh Thổ địa sở tại, khai mở phụng tự và kính thỉnh Tiên tổ giáng lâm ngự tại linh tọa để chuẩn bị cho ngày Chính kỵ.
+  - Lễ vật: Mâm cơm thanh đạm hoặc hoa quả, cơi trầu, chén rượu, trà hương.
 
-📌 2. NGUYÊN TẮC BÀY BÀN THỜ ("ĐÔNG BÌNH TÂY QUẢ")
-• Đông Bình (Bên phải bàn thờ từ ngoài nhìn vào): Đặt bình hoa tươi.
-• Tây Quả (Bên trái bàn thờ từ ngoài nhìn vào): Đặt mâm ngũ quả/trái cây.
-• Mâm cỗ mặn/chay: Đặt trên bàn phụ phía trước bàn thờ (thấp hơn bát hương).
+• Lễ Chính Kỵ (Sáng ngày giỗ chính):
+  - Thời khắc thích hợp: Từ 09h00 đến 11h30 trưa (trước giờ Ngọ).
+  - Nghi thức: Gia chủ chỉnh túc y phục, thắp tam tuần hương (3 nén hương), rót tam tuần rượu (3 lần rượu: sơ hiến, á hiến, chung hiến).
+  - Tạ lễ: Đợi tuần hương tàn quá nửa, bái 3 lạy tạ Tiên tổ, sau đó mới hóa vàng và thụ lộc.
 
-📌 3. THỨ TỰ THẮP HƯƠNG & XƯNG HÔ
-• Trưởng tộc / Người cao tuổi nhất / Gia chủ thắp hương & đọc văn khấn trước.
-• Sau đó con cháu lần lượt thắp hương theo thứ tự vai vế (Anh em, con cháu).`
+❖ 2. QUY NGUYÊN BÀY ÁN GIAN ("ĐÔNG BÌNH TÂY QUẢ")
+• Đông Bình: Đặt bình hoa tươi bên tay TẢ của người đứng bái (hướng Đông - mặt trời mọc, tượng trưng mùa Xuân sinh sôi).
+• Tây Quả: Đặt mâm ngũ quả bên tay HỮU của người đứng bái (hướng Tây - tượng trưng mùa Thu kết trái đơm hoa viên mãn).
+• Lư hương / Bát hương: Tọa vị trung tâm án gian, tuyệt đối không xê dịch tùy tiện.
+• Bàn phụ hạ án: Đặt mâm cỗ mặn hoặc chay thấp hơn mặt ban thờ chính một bậc để giữ tính tôn nghiêm.
+
+❖ 3. NGUYÊN TẮC XƯNG DANH & THỨ BẬC TRONG GIA TỘC
+• Người chủ lễ: Trưởng tộc, Trưởng chi hoặc con cháu đích tôn đứng giữa đọc văn tế/khấn.
+• Phép khấn: Đọc chậm rãi, âm giọng trang nghiêm, thanh tịnh.
+• Thứ tự bái lạy: Tiên tổ tôn kính trước, con cháu thứ bậc theo sau; nam nữ tề chỉnh túc y.`
   }
 ];
 
-// Định dạng trực quan các vị trí điền thông tin cá nhân/ngày tháng/gợi ý
+// Định dạng trực quan các vị trí điền thông tin: mầu chữ, mầu nền giống nhau, in đậm chuẩn phong cách
 const renderFormattedContent = (content: string) => {
-  const parts = content.split(/(\[[^\]]+\]|\.{3,}|ngày (?:Mùng \d+|mùng \d+|\d+|Rằm|30) tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày 30 tháng Chạp năm [^\n(]+(?:\([^\n)]+\))?)/g);
+  const parts = content.split(/(\[[^\]]+\]|\.{3,}|Ngày \d+ tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày (?:Mùng \d+|mùng \d+|\d+|Rằm|30) tháng \d+ năm [^\n(]+(?:\([^\n)]+\))?|ngày 30 tháng Chạp năm [^\n(]+(?:\([^\n)]+\))?)/g);
   return (
     <>
       {parts.map((part, idx) => {
         if (/^\[[^\]]+\]$/.test(part)) {
+          const innerText = part.slice(1, -1);
           return (
             <span
               key={idx}
+              className="font-serif font-bold"
               style={{
-                color: '#fef08a',
-                border: '1px dashed var(--gold)',
-                fontWeight: 600,
-                padding: '2px 8px',
-                margin: '2px 3px',
-                background: 'rgba(201, 146, 58, 0.24)',
-                borderRadius: '6px',
-                display: 'inline-block',
-                lineHeight: 1.45,
-                boxShadow: '0 0 10px rgba(201,146,58,0.25)',
-                fontStyle: 'italic'
+                color: 'inherit',
+                fontWeight: 700,
+                padding: '0 2px',
+                display: 'inline'
               }}
             >
-              {part}
+              {innerText}
             </span>
           );
         }
-        if (/^\.{3,}$/.test(part) || /^ngày (?:Mùng|mùng|\d+|Rằm|30)/.test(part)) {
-          const isFilledDate = /^ngày (?:Mùng|mùng|\d+|Rằm|30)/.test(part);
+        if (/^\.{3,}$/.test(part) || /^(?:Ngày|ngày) (?:Mùng|mùng|\d+|Rằm|30)/.test(part)) {
+          const isFilledDate = /^(?:Ngày|ngày) (?:Mùng|mùng|\d+|Rằm|30)/.test(part);
           return (
             <span
               key={idx}
+              className="font-serif font-bold"
               style={{
-                color: isFilledDate ? '#fef08a' : 'var(--gold-light)',
-                borderBottom: isFilledDate ? '2px solid var(--gold)' : '1.5px dashed var(--gold)',
+                color: 'inherit',
                 fontWeight: 700,
-                padding: '2px 8px',
-                margin: '2px 3px',
-                background: isFilledDate ? 'rgba(201, 146, 58, 0.28)' : 'rgba(201, 146, 58, 0.18)',
-                borderRadius: '6px',
-                display: 'inline-block',
-                lineHeight: 1.35,
-                boxShadow: isFilledDate ? '0 0 8px rgba(201,146,58,0.25)' : 'none'
+                borderBottom: isFilledDate ? 'none' : '1px dashed currentColor',
+                padding: '0 2px',
+                display: 'inline'
               }}
             >
               {part}
@@ -208,6 +219,37 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
   const [autoFillDate, setAutoFillDate] = useState<boolean>(true);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [fullscreenItemId, setFullscreenItemId] = useState<string | null>(null);
+
+  // Form điền thông tin linh hoạt cho gia chủ
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const [hostName, setHostName] = useState<string>(() => {
+    return localStorage.getItem('vankhan_host_name') || '';
+  });
+  const [hostAddress, setHostAddress] = useState<string>(() => {
+    return localStorage.getItem('vankhan_host_addr') || '';
+  });
+  const [deceasedName, setDeceasedName] = useState<string>(() => {
+    return localStorage.getItem('vankhan_deceased_name') || '';
+  });
+  const [deceasedTitle, setDeceasedTitle] = useState<string>(() => {
+    return localStorage.getItem('vankhan_deceased_title') || '';
+  });
+  const [burialLocation, setBurialLocation] = useState<string>(() => {
+    return localStorage.getItem('vankhan_burial_loc') || '';
+  });
+
+  const handleSaveHostInfo = (name: string, addr: string, dec: string, title: string = deceasedTitle, burial: string = burialLocation) => {
+    setHostName(name);
+    setHostAddress(addr);
+    setDeceasedName(dec);
+    setDeceasedTitle(title);
+    setBurialLocation(burial);
+    localStorage.setItem('vankhan_host_name', name);
+    localStorage.setItem('vankhan_host_addr', addr);
+    localStorage.setItem('vankhan_deceased_name', dec);
+    localStorage.setItem('vankhan_deceased_title', title);
+    localStorage.setItem('vankhan_burial_loc', burial);
+  };
 
   // Auto-scroll / Teleprompter State
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -367,7 +409,9 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
   const handleCopy = (id: string, rawContent: string, category?: string) => {
     const finalContent = getProcessedContent(rawContent, category);
-    navigator.clipboard.writeText(finalContent).then(() => {
+    // Loại bỏ các ngoặc vuông đánh dấu khi copy ra ngoài
+    const cleanContentForClipboard = finalContent.replace(/\[([^\]]+)\]/g, '$1');
+    navigator.clipboard.writeText(cleanContentForClipboard).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2500);
     });
@@ -403,41 +447,132 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     return false;
   };
 
-  // Tự động gán ngày Âm lịch vào bài văn khấn theo danh mục
+  // Tự động gán ngày Âm lịch & thông tin tín chủ vào bài văn khấn theo yêu cầu phong tục
   const getProcessedContent = (content: string, category?: string) => {
-    if (!autoFillDate) return content;
+    let result = content;
 
-    // Bài Rằm/Mùng 1: chỉ điền khi đúng ngày
-    if (category === 'ram' && !isMung1Today && !isRamToday) return content;
-    // Bài Tết: chỉ điền khi đúng dịp
-    if (category === 'tet' && !isTetToday) return content;
-    
-    const getLunarDayPhrase = (d: number) => {
-      if (d === 1) return 'ngày Mùng 1';
-      if (d === 15) return 'ngày Rằm (15)';
-      if (d <= 10) return `ngày mùng ${String(d).padStart(2, '0')}`;
-      return `ngày ${String(d).padStart(2, '0')}`;
-    };
+    // 1. Tự động thay thế thông tin tín chủ nếu người dùng đã nhập
+    // Đặt trong cặp ngoặc vuông [...] để renderFormattedContent tự động định dạng chữ đậm (font-bold)
+    if (hostName.trim()) {
+      result = result.replace(
+        /\[Họ tên chủ lễ \.\.\.\]|\[Họ tên gia chủ \.\.\.\]|\[Họ tên chủ tế \/ Trưởng tộc \.\.\.\]|\[Họ tên đại diện con cháu dòng tộc \.\.\.\]/g,
+        `[${hostName.trim()}]`
+      );
+    }
+    if (hostAddress.trim()) {
+      result = result.replace(
+        /\[Địa chỉ phụng thờ \/ Nơi cử hành tang lễ \.\.\.\]|\[Địa chỉ gia tộc \.\.\.\]|\[Địa chỉ gia đạo \.\.\.\]|\[Địa chỉ gia từ \/ Từ đường \.\.\.\]/g,
+        `[${hostAddress.trim()}]`
+      );
+    }
+    if (deceasedName.trim()) {
+      result = result.replace(
+        /\[Hương linh: Cụ \/ Ông \/ Bà \.\.\.\]/g,
+        `[${deceasedName.trim()}]`
+      );
+    }
+    if (deceasedTitle.trim()) {
+      result = result.replace(
+        /\[tôn hiệu \.\.\.\]/g,
+        `[${deceasedTitle.trim()}]`
+      );
+    } else {
+      result = result.replace(/\[tôn hiệu \.\.\.\]/g, '......');
+    }
+    if (burialLocation.trim()) {
+      result = result.replace(
+        /\[nơi an táng \.\.\.\]/g,
+        `[${burialLocation.trim()}]`
+      );
+    } else {
+      result = result.replace(/\[nơi an táng \.\.\.\]/g, '......');
+    }
 
-    const currentDayPhrase = getLunarDayPhrase(todayLunarObj.d);
+    // 2. Xử lý bài Rằm & Mùng 1:
+    // "1. ngày rằm mùng và mùng một (đến ngày đó nội dung tự chèn vào) bình thường để trống không hiện gì"
+    if (category === 'ram') {
+      if (autoFillDate && (isMung1Today || isRamToday)) {
+        const ramMung1Text = isMung1Today
+          ? `ngày Mùng Một (Sóc nhật) tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+          : `ngày Rằm (Vọng nhật) tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
+        result = result.replace(/\[Tiết Sóc Vọng: \.\.\.\]/g, ramMung1Text);
+      } else {
+        // Bình thường không phải Mùng 1 hay Rằm (hoặc tắt tự điền): để trống dấu chấm lửng
+        result = result.replace(/\[Tiết Sóc Vọng: \.\.\.\]/g, '......');
+      }
+    }
 
-    // 1. Dạng Cúng Giỗ & Tảo Mộ
-    let result = content.replace(
-      /Hôm nay là ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
-      `Hôm nay là ${currentDayPhrase} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
-    );
+    // 3. Xử lý bài Lễ Tết:
+    // "2. ngày lễ tết ngày 30 1,2,3,4 hiện đến ngày nào hiện nội dung ngày đó đúng theo phong tục chuẩn việt nam"
+    if (category === 'tet') {
+      let tetTimeText = 'ngày ...... tháng ...... năm ......';
+      let tetWishText = 'Năm cũ tống cựu, năm mới nghinh tân. Đất trời chuyển vận tam dương khai thái, xuân tiết trùng phùng vạn vật sinh sôi.\nNhớ đức Tiên tổ dày công vun đắp cội đức, mở mang cơ nghiệp cho hậu thế hôm nay. Giờ phút thiêng liêng mừng đón Xuân mới, con cháu một dạ chí thành, sửa biện hương hoa kim ngân trần thiết, cỗ bàn tinh khiết dâng lên trước án.';
 
-    // 2. Dạng Đêm Giao Thừa & Tất Niên
-    result = result.replace(
-      /Hôm nay là ngày 30 tháng Chạp năm \.{3,}/g,
-      `Hôm nay là ngày 30 tháng Chạp năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
-    );
+      if (autoFillDate) {
+        if (lm === 12 && (ld === 29 || ld === 30)) {
+          // Ngày 30 (hoặc 29 tháng thiếu): Chiều Tất niên / Đêm Giao thừa
+          tetTimeText = `giờ trừ tịch cát nhật, ngày ${ld} tháng Chạp năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
+          tetWishText = 'Năm cũ tống cựu, năm mới nghinh tân. Giờ khắc thiêng liêng đất trời chuyển vận, tiễn năm cũ qua đi, cung nghinh năm mới sắp tới.\nNhớ đức Tiên tổ dày công vun đắp cội đức, con cháu một dạ chí thành, sửa sang lễ vật, hương hoa trà quả, thắp nén tâm hương dâng lên trước án, cung thỉnh Tiên tổ về ngự tại từ đường rước Xuân đón Tết cùng con cháu.';
+        } else if (lm === 1 && ld === 1) {
+          // Mùng 1 Tết: Sáng Nguyên Đán bái yết Gia Tiên đầu năm
+          tetTimeText = `sáng ngày Mùng 1 Tết Nguyên Đán năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
+          tetWishText = 'Nay tiết đầu xuân, nhân tiết Nguyên đán cát nhật, đất trời tinh khôi, tam dương khai thái.\nCon cháu muôn phương một dạ hướng về nguồn cội, kính cẩn dâng mâm cỗ cúng đầu năm, kính chúc Tiên tổ an ngự linh tọa, phù hộ cháu con bước sang năm mới vạn sự như ý, gia đạo an khang thịnh vượng.';
+        } else if (lm === 1 && ld === 2) {
+          // Mùng 2 Tết: Cúng kính ngày Tết thứ hai
+          tetTimeText = `ngày Mùng 2 Tết Nguyên Đán năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
+          tetWishText = 'Nay nhân tiết Mùng 2 Tết Nguyên Đán, con cháu lại thành kính sửa sang mâm cơm trà tửu, kính dâng trước án.\nKính thỉnh Tiên tổ ngự tại bản gia vui Tết sum vầy, phù trì cho con cháu xuất hành cát tường, bốn phương thuận buồm xuôi gió.';
+        } else if (lm === 1 && ld === 3) {
+          // Mùng 3 Tết: Lễ Tạ Năm Mới / Hóa Vàng đầu năm
+          tetTimeText = `ngày Mùng 3 Tết Nguyên Đán năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
+          tetWishText = 'Nay ngày Mùng 3 Tết, xuân tiết đượm nhuần. Con cháu dâng mâm cỗ tạ lễ, kính bái Tiên linh tiền tổ.\nCúi xin Tiên tổ chứng giám lòng thành, phù hộ toàn gia khai xuân đón lộc, công việc hanh thông, vạn sự tốt lành.';
+        } else if (lm === 1 && ld === 4) {
+          // Mùng 4 Tết: Lễ Tạ Tết / Khởi sự năm mới
+          tetTimeText = `ngày Mùng 4 Tết Nguyên Đán năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
+          tetWishText = 'Tiết xuân rực rỡ, ngày lành khởi đầu. Con cháu thành kính dâng lễ phụng tạ Gia tiên sau những ngày Tết đầm ấm.\nKính thỉnh Tiên tổ hồi loan linh vị, tiếp tục khuông phù độ trì cho dòng tộc bền vững trường tồn, làm ăn phát đạt quanh năm.';
+        } else {
+          tetTimeText = `tiết Lễ Tết năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`;
+        }
+      }
 
-    // 3. Dạng Mùng 1 & Rằm
-    result = result.replace(
-      /Hôm nay là ngày mùng 1 \/ ngày Rằm tháng \.{3,} năm \.{3,}/g,
-      `Hôm nay là ${currentDayPhrase} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
-    );
+      result = result.replace(/\[Thời khắc lễ Tết: Hôm nay là \.\.\.\]/g, `Hôm nay là ${tetTimeText}`);
+      result = result.replace(/\[Lời khấn nguyện tiết Xuân: \.\.\.\]/g, tetWishText);
+    }
+
+    // 4. Xử lý bài Tảo Mộ:
+    // "3. tảo mộ bấm nút tự điền ngày cũng tự thêm vào Ngày ...... tháng ...... năm ...... (Âm lịch) 
+    // Hôm nay là tiết: Dịp Tiết Thanh Minh / Tiết Lễ Tảo Mộ cuối năm (giống trên)"
+    if (category === 'taomo') {
+      if (autoFillDate) {
+        // Tiết lễ tảo mộ: Tháng Chạp (cuối năm) hoặc Tiết Thanh Minh (tháng 2-3 AL) hoặc tháng 7 AL
+        const isCuoiNam = lm === 12 || lm === 11;
+        const isThanhMinh = lm === 2 || lm === 3;
+        const tietLaoMo = isCuoiNam 
+          ? 'Tiết Lễ Tảo Mộ Chạp Mộ cuối năm' 
+          : (isThanhMinh ? 'Tiết Thanh Minh tảo mộ gia tộc' : 'Tiết Lễ Tảo Mộ truyền thống gia tộc');
+
+        result = result.replace(
+          /\[Dịp Tiết Thanh Minh \/ Tiết Lễ Tảo Mộ cuối năm\]/g,
+          tietLaoMo
+        );
+        result = result.replace(
+          /Ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
+          `Ngày ${lunarDayStr} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+        );
+      } else {
+        result = result.replace(
+          /\[Dịp Tiết Thanh Minh \/ Tiết Lễ Tảo Mộ cuối năm\]/g,
+          '......'
+        );
+      }
+    }
+
+    // 5. Xử lý bài Cúng Giỗ (gio):
+    if (category === 'gio' && autoFillDate) {
+      result = result.replace(
+        /Hôm nay là ngày \.{3,} tháng \.{3,} năm \.{3,}(?: \(Âm lịch\))?/g,
+        `Hôm nay là ngày ${lunarDayStr} tháng ${lunarMonthStr} năm ${canChiYear} (${todayLunarObj.y} Âm lịch)`
+      );
+    }
 
     return result;
   };
@@ -447,7 +582,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
 
   // ---- FULLSCREEN VIEW (TELEPROMPTER CHẾ ĐỘ CUỘN TỰ ĐỘNG) ----
   if (isFullscreen && fullscreenItem) {
-    const processedContent = getProcessedContent(fullscreenItem.content);
+    const processedContent = getProcessedContent(fullscreenItem.content, fullscreenItem.category);
     return (
       <div
         style={{
@@ -564,7 +699,7 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           </div>
         </div>
 
-        {/* Khung nội dung văn khấn cuộn mượt mà */}
+        {/* Khung nội dung văn khấn cuộn mượt mà phong cách Cuốn Thư Cổ Hoàng Gia */}
         <div
           ref={scrollContainerRef}
           onScroll={() => {
@@ -577,19 +712,20 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
           style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '30px 20px 170px',
-            color: '#ffffff',
+            padding: '36px clamp(16px, 4vw, 36px) 180px',
+            color: '#fff8eb',
             fontSize: `${fontSize}px`,
-            lineHeight: 2.1,
+            lineHeight: 2.15,
             textAlign: 'justify',
             textJustify: 'inter-word',
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
             fontFamily: 'Georgia, "Playfair Display", "Times New Roman", serif',
-            letterSpacing: '0.018em',
-            background: '#0a0806',
+            letterSpacing: '0.02em',
+            background: 'radial-gradient(ellipse at center, #1b1610 0%, #100c08 65%, #080605 100%)',
             WebkitOverflowScrolling: 'touch',
-            position: 'relative'
+            position: 'relative',
+            textShadow: '0 1px 3px rgba(0,0,0,0.8)'
           }}
         >
           {renderFormattedContent(processedContent)}
@@ -758,8 +894,8 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
             flexShrink: 0
           }}
         >
-          {/* Hàng 1: Tiêu đề & Nút Đóng */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+          {/* Hàng 1: Tiêu đề & Cụm Nút Công Cụ */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{
                 width: 34, height: 34, borderRadius: 10,
@@ -777,51 +913,184 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
               </div>
             </div>
 
-            <button 
-              className="detail-close" 
-              onClick={onClose}
-              aria-label="Đóng tủ sách"
-              title="Đóng cửa sổ"
-              style={{ 
-                background: 'rgba(255,255,255,0.08)', 
-                border: '1px solid rgba(255,255,255,0.15)', 
-                color: 'var(--gold-light)', 
-                cursor: 'pointer', 
-                width: 36, height: 36,
-                borderRadius: 10,
-                display: 'grid', placeItems: 'center', flexShrink: 0
-              }}
-            >
-              <Icon name="x" size={20} />
-            </button>
+            {/* Cụm nút: Nút Điền thông tin tín chủ nổi bật + Nút Đóng */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                onClick={() => setShowForm(prev => !prev)}
+                className="action-button"
+                style={{
+                  background: showForm ? 'linear-gradient(135deg, var(--gold), var(--gold-deep))' : 'rgba(201,146,58,0.22)',
+                  border: '1px solid var(--gold)',
+                  borderRadius: 8,
+                  color: showForm ? '#000' : 'var(--gold-light)',
+                  padding: '6px 12px',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  boxShadow: showForm ? '0 0 12px rgba(201,146,58,0.4)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+                title="Nhập họ tên gia chủ, địa chỉ, người được cúng để tự động điền vào toàn bộ bài văn khấn"
+              >
+                <Icon name="user-check" size={14} />
+                <span>{showForm ? 'Đang mở form điền' : '✍ Điền tên gia chủ / Người mất'}</span>
+              </button>
+
+              <button 
+                className="detail-close" 
+                onClick={onClose}
+                aria-label="Đóng tủ sách"
+                title="Đóng cửa sổ"
+                style={{ 
+                  background: 'rgba(255,255,255,0.08)', 
+                  border: '1px solid rgba(255,255,255,0.15)', 
+                  color: 'var(--gold-light)', 
+                  cursor: 'pointer', 
+                  width: 36, height: 36,
+                  borderRadius: 10,
+                  display: 'grid', placeItems: 'center', flexShrink: 0
+                }}
+              >
+                <Icon name="x" size={20} />
+              </button>
+            </div>
           </div>
 
-          {/* Hàng 2: Tự động gán ngày Âm lịch */}
+          {/* Hàng 2: Tự động gán ngày Âm lịch & Trạng thái điền khuyết */}
           <div 
-            className="vankhan-date-notice"
             style={{
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: 'rgba(201, 146, 58, 0.12)',
-              border: '1px solid rgba(201, 146, 58, 0.3)',
-              borderRadius: 8,
-              padding: '6px 10px',
-              marginBottom: 8,
-              fontSize: 12
+              flexDirection: 'column',
+              gap: 8,
+              marginBottom: 8
             }}
           >
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--gold-light)', width: '100%' }}>
-              <input
-                type="checkbox"
-                checked={autoFillDate}
-                onChange={(e) => setAutoFillDate(e.target.checked)}
-                style={{ accentColor: 'var(--gold)', width: 15, height: 15, cursor: 'pointer' }}
-              />
-              <span>
-                Tự động điền ngày Âm lịch hôm nay cho <strong>TẤT CẢ</strong> bài khấn: <strong className="vankhan-lunar-highlight" style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong>
-              </span>
-            </label>
+            <div
+              className="vankhan-date-notice"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '6px 10px',
+                fontSize: 12,
+                flexWrap: 'wrap',
+                gap: 6
+              }}
+            >
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: 'var(--gold-light)' }}>
+                <input
+                  type="checkbox"
+                  checked={autoFillDate}
+                  onChange={(e) => setAutoFillDate(e.target.checked)}
+                  style={{ accentColor: 'var(--gold)', width: 15, height: 15, cursor: 'pointer' }}
+                />
+                <span>
+                  Tự động điền ngày hôm nay: <strong className="vankhan-lunar-highlight" style={{ color: '#fef08a' }}>{lunarDayStr}/{lunarMonthStr} năm {canChiYear}</strong>
+                </span>
+              </label>
+
+              {(hostName || hostAddress || deceasedName || deceasedTitle || burialLocation) && (
+                <div style={{ fontSize: 11.5, color: '#fef08a', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <Icon name="check-circle-2" size={13} style={{ color: '#4ade80' }} />
+                  <span>Đã áp dụng thông tin: <strong>{[hostName, deceasedName, deceasedTitle, burialLocation].filter(Boolean).join(' · ')}</strong></span>
+                </div>
+              )}
+            </div>
+
+            {/* Form điền thông tin nhanh cho gia chủ */}
+            {showForm && (
+              <div className="vankhan-personalize-panel">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(201,146,58,0.2)', paddingBottom: 6 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--gold-light)', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Icon name="pen-tool" size={12} />
+                    Điền nhanh thông tin vào bài khấn (Tự động lưu)
+                  </span>
+                  {(hostName || hostAddress || deceasedName || deceasedTitle || burialLocation) && (
+                    <button
+                      onClick={() => handleSaveHostInfo('', '', '', '', '')}
+                      style={{ background: 'transparent', border: 'none', color: '#fca5a5', fontSize: 11, cursor: 'pointer', textDecoration: 'underline' }}
+                    >
+                      Xóa trắng
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10.5, color: 'var(--text-muted)', marginBottom: 2 }}>
+                      Người đứng cúng (Tín chủ):
+                    </label>
+                    <input
+                      type="text"
+                      className="vankhan-input-field"
+                      style={{ width: '100%', boxSizing: 'border-box' }}
+                      placeholder="VD: Con trưởng Phạm Văn Long..."
+                      value={hostName}
+                      onChange={(e) => handleSaveHostInfo(e.target.value, hostAddress, deceasedName, deceasedTitle, burialLocation)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10.5, color: 'var(--text-muted)', marginBottom: 2 }}>
+                      Địa chỉ nơi cúng:
+                    </label>
+                    <input
+                      type="text"
+                      className="vankhan-input-field"
+                      style={{ width: '100%', boxSizing: 'border-box' }}
+                      placeholder="VD: Xã ..., Huyện ..., Tỉnh ..."
+                      value={hostAddress}
+                      onChange={(e) => handleSaveHostInfo(hostName, e.target.value, deceasedName, deceasedTitle, burialLocation)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10.5, color: 'var(--text-muted)', marginBottom: 2 }}>
+                      Người được cúng (Hương linh):
+                    </label>
+                    <input
+                      type="text"
+                      className="vankhan-input-field"
+                      style={{ width: '100%', boxSizing: 'border-box' }}
+                      placeholder="VD: Cụ ông Phạm Văn An..."
+                      value={deceasedName}
+                      onChange={(e) => handleSaveHostInfo(hostName, hostAddress, e.target.value, deceasedTitle, burialLocation)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10.5, color: 'var(--text-muted)', marginBottom: 2 }}>
+                      Tôn hiệu:
+                    </label>
+                    <input
+                      type="text"
+                      className="vankhan-input-field"
+                      style={{ width: '100%', boxSizing: 'border-box' }}
+                      placeholder="VD: Hiệu Phúc Đức, Thuần Chính..."
+                      value={deceasedTitle}
+                      onChange={(e) => handleSaveHostInfo(hostName, hostAddress, deceasedName, e.target.value, burialLocation)}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10.5, color: 'var(--text-muted)', marginBottom: 2 }}>
+                      Phần mộ an táng tại:
+                    </label>
+                    <input
+                      type="text"
+                      className="vankhan-input-field"
+                      style={{ width: '100%', boxSizing: 'border-box' }}
+                      placeholder="VD: Nghĩa trang gia tộc thôn..."
+                      value={burialLocation}
+                      onChange={(e) => handleSaveHostInfo(hostName, hostAddress, deceasedName, deceasedTitle, e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Hàng 3: Danh mục văn khấn */}
@@ -930,6 +1199,26 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                     </span>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                      {/* Nút Điền thông tin nhanh cho bài khấn này */}
+                      <button
+                        onClick={() => setShowForm(prev => !prev)}
+                        title="Điền họ tên gia chủ, địa chỉ, người mất, tôn hiệu, phần mộ vào bài khấn này"
+                        className="vankhan-action-btn"
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 5,
+                          padding: '5px 11px', borderRadius: 8, height: 32,
+                          fontSize: 12, fontWeight: 700,
+                          background: (hostName || hostAddress || deceasedName || deceasedTitle || burialLocation) ? 'rgba(34,197,94,0.15)' : 'rgba(201,146,58,0.25)',
+                          border: '1px solid ' + ((hostName || hostAddress || deceasedName || deceasedTitle || burialLocation) ? '#4ade80' : 'var(--border-gold)'),
+                          color: (hostName || hostAddress || deceasedName || deceasedTitle || burialLocation) ? '#86efac' : 'var(--gold-light)',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <Icon name="pen-tool" size={12} />
+                        {(hostName || hostAddress || deceasedName || deceasedTitle || burialLocation) ? 'Sửa thông tin' : 'Điền thông tin'}
+                      </button>
+
                       {/* Nút Toàn màn hình từng bài */}
                       <button
                         onClick={() => openFullscreen(item.id)}
@@ -986,28 +1275,30 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
                   </p>
                 </div>
 
-                {/* Khung văn khấn hiển thị cực lớn & dễ đọc */}
+                {/* Khung văn khấn hiển thị cực lớn & dễ đọc với họa tiết cuốn thư */}
                 <div
                   className="font-serif vankhan-text-box"
                   style={{
                     margin: 0,
-                    padding: isFullscreen ? '20px 22px' : '16px 16px',
-                    borderRadius: 12,
-                    background: 'rgba(8, 7, 5, 0.75)',
-                    border: '1px solid rgba(201,146,58,0.25)',
-                    color: '#ffffff',
+                    padding: isFullscreen ? '22px 24px' : '18px 20px',
                     fontSize: `${fontSize}px`,
-                    lineHeight: 1.85,
+                    lineHeight: 1.9,
                     textAlign: 'justify',
                     textJustify: 'inter-word',
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
-                    fontFamily: 'Georgia, "Times New Roman", serif',
-                    letterSpacing: '0.015em',
-                    boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)',
+                    fontFamily: 'Georgia, "Playfair Display", "Times New Roman", serif',
+                    letterSpacing: '0.018em',
+                    position: 'relative',
                     flex: isFullscreen ? 1 : undefined
                   }}
                 >
+                  {/* 4 góc triện hoa văn hoàng gia */}
+                  <div className="vankhan-scroll-corner vankhan-corner-tl" />
+                  <div className="vankhan-scroll-corner vankhan-corner-tr" />
+                  <div className="vankhan-scroll-corner vankhan-corner-bl" />
+                  <div className="vankhan-scroll-corner vankhan-corner-br" />
+
                   {renderFormattedContent(processedContent)}
                 </div>
               </div>

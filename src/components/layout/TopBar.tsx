@@ -1,4 +1,5 @@
 import { Icon } from '@/components/ui/Icon';
+import { GIA_PHA_LAST_UPDATED } from '@/utils/dateUtils';
 
 interface TopBarProps {
   viewMode: 'list' | 'tree' | 'lich' | 'stats' | 'manage';
@@ -32,7 +33,7 @@ export const TopBar = ({ viewMode, onViewChange, lunarLabel, solarLabel, theme, 
             alt="Gia Phả Phạm Tộc"
             className="crest-img"
             // @ts-ignore
-            fetchPriority="high"
+            fetchpriority="high"
           />
         </div>
         <div className="brand-text">
@@ -53,6 +54,10 @@ export const TopBar = ({ viewMode, onViewChange, lunarLabel, solarLabel, theme, 
             {solarDate}
             <span style={{ margin: '0 6px', opacity: 0.3 }}>·</span>
             {lunarLabel}
+            <span style={{ margin: '0 6px', opacity: 0.3 }}>·</span>
+            <span title="Thời điểm cập nhật dữ liệu gia phả gần nhất" style={{ color: theme === 'light' ? '#b45309' : 'var(--gold-light)', fontWeight: 600 }}>
+              Cập nhật: {GIA_PHA_LAST_UPDATED}
+            </span>
           </p>
         </div>
       </div>

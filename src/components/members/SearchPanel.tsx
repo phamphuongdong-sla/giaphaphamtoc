@@ -29,19 +29,12 @@ export const SearchPanel = ({ query, onQueryChange, results, total, onSelect }: 
           className="search-input"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="Tìm theo tên, danh hiệu, ngày sinh, cội nguồn... (⌘K / Ctrl+K)"
+          placeholder="Tìm theo tên, danh hiệu, ngày sinh, cội nguồn..."
           autoComplete="off"
           spellCheck={false}
         />
         {!query && (
-          <span style={{
-            position: 'absolute', right: 12,
-            padding: '2px 8px', borderRadius: '6px',
-            background: 'var(--bg-glass-md)', border: '1px solid var(--border-gold)',
-            fontSize: '10px', fontWeight: 700, color: 'var(--gold-mid)',
-            pointerEvents: 'none', letterSpacing: '0.05em',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-          }}>
+          <span className="search-shortcut-badge">
             ⌘K
           </span>
         )}

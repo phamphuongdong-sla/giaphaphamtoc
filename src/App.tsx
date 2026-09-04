@@ -108,6 +108,7 @@ function App() {
       if (personParam) {
         const decoded = decodeURIComponent(personParam).trim().toLowerCase();
         const found = memberEntries.find(m => 
+          (m.id && m.id.toLowerCase() === decoded) ||
           (m.data.id && m.data.id.toLowerCase() === decoded) ||
           m.data.name.toLowerCase() === decoded ||
           m.data.name.toLowerCase().includes(decoded)
@@ -169,7 +170,7 @@ function App() {
                 renotify: false,
                 requireInteraction: true,
                 data: { url: '/giaphaphamtoc/', fullName: reminder.fullName }
-              });
+              } as NotificationOptions & { renotify?: boolean });
             }
           }
         } catch (e) {

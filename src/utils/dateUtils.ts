@@ -13,6 +13,9 @@ export const getCanChiYear = (year: number): string => {
   return `${can} ${chi}`;
 };
 
+// Thời điểm cập nhật dữ liệu gia phả gần nhất
+export const GIA_PHA_LAST_UPDATED = '04/09/2026';
+
 const VN_TIMEZONE = 7;
 
 // ===== PUBLIC LUNAR FUNCTIONS (dùng @baostudio/viet-lunar - chuẩn múi giờ Việt Nam) =====

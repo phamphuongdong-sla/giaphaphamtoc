@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { MemberEntry } from '@/types';
 import { Icon } from '@/components/ui/Icon';
 import { formatBranchName, checkIsSpouseNode } from '@/utils/genealogyUtils';
+import { GIA_PHA_LAST_UPDATED } from '@/utils/dateUtils';
 import {
   PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
@@ -848,6 +849,16 @@ export const DashboardView = ({ memberEntries = [], onSelectPerson }: DashboardV
               <div className="fact-label">Thành viên thế hệ đông nhất</div>
               <div className="fact-value">
                 {stats.peakGenName} (với {stats.peakGenCount} thành viên)
+              </div>
+            </div>
+          </div>
+
+          <div className="fact-row">
+            <div className="fact-icon"><Icon name="calendar" size={16} style={{ color: 'var(--gold)' }} /></div>
+            <div className="fact-content">
+              <div className="fact-label">Lần cập nhật gia phả gần nhất</div>
+              <div className="fact-value" style={{ color: 'var(--gold-light)', fontWeight: 700 }}>
+                Ngày {GIA_PHA_LAST_UPDATED} (Hệ thống dữ liệu gia tộc đồng bộ hoàn tất)
               </div>
             </div>
           </div>
