@@ -670,15 +670,15 @@ export const SplashScreen = ({ onEnter, currentTheme = 'light', onThemeChange }:
             fontFamily: 'Georgia, serif', lineHeight: 1,
           }}>"</span>
           <p style={{
-            fontSize: '14px',
+            fontSize: '14.5px',
             fontStyle: 'italic',
-            color: isWhiteTheme ? 'rgba(43,33,24,0.78)' : 'rgba(242,237,216,0.65)',
+            color: isWhiteTheme ? 'rgba(43,33,24,0.85)' : 'rgba(242,237,216,0.85)',
             lineHeight: 1.8,
             margin: 0,
             letterSpacing: '0.3px',
             fontFamily: "'Playfair Display', 'Noto Serif', serif",
           }}>
-            Tổ tiên là cội nguồn, con cháu là nhánh lá,<br />phúc đức là hoa trái.
+            Mộc xuất thiên chi do hữu bản<br />Thủy lưu vạn phái tổng đồng nguyên
           </p>
         </div>
 
