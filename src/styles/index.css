@@ -3790,3 +3790,75 @@ dialog.modal::backdrop {
   color: #78350f;
 }
 
+/* ── Age Pill & Longevity Badges ── */
+.age-pill {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 5px;
+  padding: 1px 6px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.age-pill.living {
+  background: rgba(201, 146, 58, 0.18);
+  color: #fef08a;
+  border: 1px solid rgba(201, 146, 58, 0.35);
+}
+
+[data-theme="light"] .age-pill.living {
+  background: #fef3c7;
+  color: #78350f;
+  border: 1px solid rgba(202, 138, 4, 0.4);
+}
+
+.age-pill.deceased {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+[data-theme="light"] .age-pill.deceased {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.member-age-pill {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.member-age-pill.living {
+  background: rgba(201, 146, 58, 0.18);
+  color: var(--gold-mid);
+  border: 1px solid rgba(201, 146, 58, 0.3);
+}
+
+[data-theme="light"] .member-age-pill.living {
+  background: #fef3c7;
+  color: #78350f;
+  border: 1px solid rgba(202, 138, 4, 0.4);
+}
+
+.member-age-pill.deceased {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+[data-theme="light"] .member-age-pill.deceased {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+

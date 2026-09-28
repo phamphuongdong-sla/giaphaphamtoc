@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { PersonNode, MemberEntry } from '@/types';
 import { cleanName, getNameRole, checkIsSpouseNode } from '@/utils/genealogyUtils';
-import { formatBirthDisplay, formatDeathDisplay } from '@/utils/dateUtils';
+import { formatBirthDisplay, formatDeathDisplay, calculateAgeInfo } from '@/utils/dateUtils';
 import { Icon } from '@/components/ui/Icon';
 
 interface MemberItemProps {
@@ -153,6 +153,12 @@ export const MemberItem = ({
                 <Icon name="sun" size={10} style={{ marginRight: 4, verticalAlign: -1, opacity: 0.75 }} />
                 <span style={{ opacity: 0.85, marginRight: 3, fontWeight: 600, fontSize: '11px' }}>Sinh:</span>
                 {birthText}
+                {!data.deceased && (() => {
+                  const ageInfo = calculateAgeInfo(data);
+                  return ageInfo ? (
+                    <span className="member-age-pill living" title="Tuổi âm lịch hiện tại">{ageInfo.label}</span>
+                  ) : null;
+                })()}
               </span>
             )}
             {hasDeath && (
@@ -160,6 +166,12 @@ export const MemberItem = ({
                 <Icon name="moon" size={10} style={{ marginRight: 4, verticalAlign: -1, color: '#f87171', opacity: 0.85 }} />
                 <span style={{ opacity: 0.85, marginRight: 3, fontWeight: 600, fontSize: '11px', color: '#f87171' }}>Mất:</span>
                 {deathText}
+                {(() => {
+                  const ageInfo = calculateAgeInfo(data);
+                  return ageInfo ? (
+                    <span className="member-age-pill deceased" title="Thọ tuế khi qua đời">{ageInfo.label}</span>
+                  ) : null;
+                })()}
               </span>
             )}
           </div>

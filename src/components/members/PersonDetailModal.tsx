@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { MemberEntry, PersonNode } from '@/types';
 import { cleanName, getNameRole, buildShareText, buildVietnameseRelation, checkIsSpouseNode, getSpouseLineageLabel, getFullBranchLabel } from '@/utils/genealogyUtils';
-import { formatBirthDisplay, formatDeathDisplay } from '@/utils/dateUtils';
+import { formatBirthDisplay, formatDeathDisplay, calculateAgeInfo } from '@/utils/dateUtils';
 import { Icon } from '@/components/ui/Icon';
 import { Toast } from '@/components/ui/Toast';
 import { PersonQRModal } from './PersonQRModal';
@@ -235,6 +235,25 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
                   </p>
                 </div>
               )}
+              {(() => {
+                const ageInfo = calculateAgeInfo(data);
+                if (!ageInfo) return null;
+                return (
+                  <div className="detail-field">
+                    <p className="detail-label">
+                      <Icon name={data.deceased ? "moon" : "cake"} size={11} /> {data.deceased ? "Thọ tuế (Tuổi tạ thế)" : "Tuổi âm lịch hiện tại"}
+                    </p>
+                    <p className="detail-value" style={{ color: data.deceased ? '#f87171' : 'var(--gold-mid)', fontWeight: 700 }}>
+                      {ageInfo.label}
+                      {ageInfo.isLongevityYear && (
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#ca8a04', marginLeft: 6 }}>
+                          🎉 (Năm nay mừng thọ)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Lineage path */}

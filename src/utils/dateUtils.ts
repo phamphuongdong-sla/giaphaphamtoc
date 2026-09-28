@@ -166,3 +166,99 @@ export const getDaysUntilLunarAnniversary = (lunarDay: number, lunarMonth: numbe
   const diffTime = targetSolarDate.getTime() - today.getTime();
   return Math.round(diffTime / (1000 * 60 * 60 * 24));
 };
+
+// ===== HÀM TÍNH TUỔI VÀ DANH XƯNG TRANG TRỌNG (HƯỞNG THỌ / HƯỞNG DƯƠNG / MỪNG THỌ) =====
+export interface AgeInfo {
+  age: number | null;
+  label: string;
+  honorificType: 'living' | 'huong_tho' | 'huong_duong' | 'thuong_tho' | 'dai_tho' | 'mat_som' | null;
+  isLongevityYear?: boolean;
+}
+
+export const calculateAgeInfo = (data: {
+  birthSolar?: DateInfo | null;
+  deathSolar?: DateInfo | null;
+  deceased?: boolean;
+  birthNote?: string;
+  deathNote?: string;
+}): AgeInfo | null => {
+  const currentYear = new Date().getFullYear();
+
+  let birthYear = data.birthSolar?.y;
+  let deathYear = data.deathSolar?.y;
+
+  if (!birthYear && data.birthNote) {
+    const m = data.birthNote.match(/\b(18|19|20)\d{2}\b/);
+    if (m) birthYear = parseInt(m[0], 10);
+  }
+
+  if (!deathYear && data.deathNote) {
+    const m = data.deathNote.match(/\b(18|19|20)\d{2}\b/);
+    if (m) deathYear = parseInt(m[0], 10);
+  }
+
+  if (!birthYear) return null;
+
+  // Trường hợp người đã mất
+  if (data.deceased) {
+    if (!deathYear) return null;
+    const ageAtDeath = deathYear - birthYear + 1; // Tuổi mụ khi tạ thế
+    if (ageAtDeath <= 0) return { age: null, label: 'Mất sớm', honorificType: 'mat_som' };
+
+    if (ageAtDeath >= 80) {
+      return {
+        age: ageAtDeath,
+        label: `Thượng thọ ${ageAtDeath} tuổi`,
+        honorificType: 'thuong_tho'
+      };
+    } else if (ageAtDeath >= 60) {
+      return {
+        age: ageAtDeath,
+        label: `Hưởng thọ ${ageAtDeath} tuổi`,
+        honorificType: 'huong_tho'
+      };
+    } else {
+      return {
+        age: ageAtDeath,
+        label: `Hưởng dương ${ageAtDeath} tuổi`,
+        honorificType: 'huong_duong'
+      };
+    }
+  }
+
+  // Trường hợp thành viên còn sống (Tuổi mụ)
+  const livingAge = currentYear - birthYear + 1;
+  if (livingAge <= 0 || livingAge > 120) return null;
+
+  const isLongevityYear = livingAge % 10 === 0 && livingAge >= 60;
+
+  if (livingAge >= 90) {
+    return {
+      age: livingAge,
+      label: `Đại thọ ${livingAge} tuổi`,
+      honorificType: 'dai_tho',
+      isLongevityYear
+    };
+  } else if (livingAge >= 80) {
+    return {
+      age: livingAge,
+      label: `Thượng thọ ${livingAge} tuổi`,
+      honorificType: 'thuong_tho',
+      isLongevityYear
+    };
+  } else if (livingAge >= 60) {
+    return {
+      age: livingAge,
+      label: `Mừng thọ ${livingAge} tuổi`,
+      honorificType: 'huong_tho',
+      isLongevityYear
+    };
+  }
+
+  return {
+    age: livingAge,
+    label: `${livingAge} tuổi`,
+    honorificType: 'living',
+    isLongevityYear: false
+  };
+};

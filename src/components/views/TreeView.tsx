@@ -20,7 +20,7 @@ import '@xyflow/react/dist/style.css';
 
 import { PersonNode, MemberEntry } from '@/types';
 import { cleanName, getNameRole, checkIsSpouseNode } from '@/utils/genealogyUtils';
-import { formatBirthDisplay, formatDeathDisplay } from '@/utils/dateUtils';
+import { formatBirthDisplay, formatDeathDisplay, calculateAgeInfo } from '@/utils/dateUtils';
 import { Icon } from '@/components/ui/Icon';
 
 interface TreeViewProps {
@@ -57,6 +57,7 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
   const nameRole = getNameRole(nodeData.name);
   const badge = nameRole || (nodeData.role && !getNameRole(nodeData.name) ? nodeData.role : '');
   const gender = nodeData.gender || 'unknown';
+  const ageInfo = calculateAgeInfo(nodeData);
 
   return (
     <div style={{ width: NODE_WIDTH, height: NODE_HEIGHT, position: 'relative' }}>
@@ -115,14 +116,28 @@ const FamilyMemberNode = ({ data }: NodeProps) => {
               <div className="meta-row">
                 <Icon name="sun" size={11} className="meta-icon birth" />
                 <span className="meta-label">Sinh:</span>
-                <span className="meta-val">{formatBirthDisplay(nodeData)}</span>
+                <span className="meta-val">
+                  {formatBirthDisplay(nodeData)}
+                  {!nodeData.deceased && ageInfo && (
+                    <span className="age-pill living" title="Tuổi âm lịch hiện tại">
+                      {ageInfo.label}
+                    </span>
+                  )}
+                </span>
               </div>
             )}
             {nodeData.deceased && (nodeData.deathSolar || nodeData.deathNote) && (
               <div className="meta-row death">
                 <Icon name="moon" size={11} className="meta-icon death" style={{ color: '#f87171', marginRight: 3 }} />
                 <span className="meta-label">Mất:</span>
-                <span className="meta-val">{formatDeathDisplay(nodeData)}</span>
+                <span className="meta-val">
+                  {formatDeathDisplay(nodeData)}
+                  {ageInfo && (
+                    <span className="age-pill deceased" title="Thọ tuế khi qua đời">
+                      {ageInfo.label}
+                    </span>
+                  )}
+                </span>
               </div>
             )}
           </div>
