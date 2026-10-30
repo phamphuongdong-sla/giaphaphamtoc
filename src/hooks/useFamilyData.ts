@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { GIA_PHA_DATA } from '@/data/giapha';
-import { PersonNode, MemberEntry, ReminderItem } from '@/types';
+import { PersonNode, ReminderItem } from '@/types';
 import { fetchFamilyTreeFromSheet } from '@/services/googleSheets';
 import { fetchFamilyTreeFromCloudflare } from '@/services/cloudflareApi';
 import {

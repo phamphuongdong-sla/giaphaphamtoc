@@ -296,6 +296,7 @@ export const getAllLichData = (treeData: PersonNode, year: number): { gio: any[]
       if (solarObj) {
         const targetDate = new Date(solarObj.y, solarObj.m - 1, solarObj.d);
         targetDate.setHours(0, 0, 0, 0);
+        const days = Math.round((targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
         const memorial = getPersonMemorialDetails(memberEntry);
         gio.push({
           fullName,

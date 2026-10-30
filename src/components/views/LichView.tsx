@@ -7,13 +7,15 @@ import { Icon } from '@/components/ui/Icon';
 interface LichViewProps {
   treeData: PersonNode;
   onSelectPerson?: (person: MemberEntry) => void;
+  onOpenReminders?: () => void;
+  remindersCount?: number;
 }
 
 const MONTH_NAMES = ['Th.1','Th.2','Th.3','Th.4','Th.5','Th.6','Th.7','Th.8','Th.9','Th.10','Th.11','Th.12'];
 const WEEKDAYS_SHORT = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 const WEEKDAYS_FULL = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 
-export const LichView = ({ treeData, onSelectPerson }: LichViewProps) => {
+export const LichView = ({ treeData, onSelectPerson, onOpenReminders, remindersCount }: LichViewProps) => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const lichData = getAllLichData(treeData, year);
@@ -111,11 +113,40 @@ export const LichView = ({ treeData, onSelectPerson }: LichViewProps) => {
       <div className="lich-inner">
 
         {/* Toolbar */}
-        <div className="toolbar">
+        <div className="toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
           <div>
             <p className="section-kicker">Âm lịch · Dương lịch</p>
             <h2 className="section-title font-display">Lịch giỗ &amp; Sinh nhật</h2>
           </div>
+          {onOpenReminders && (
+            <button
+              type="button"
+              className="action-button"
+              onClick={onOpenReminders}
+              style={{
+                fontSize: 12, padding: '6px 14px', height: 34,
+                display: 'flex', alignItems: 'center', gap: 6,
+                background: 'linear-gradient(135deg, rgba(180, 83, 9, 0.15), rgba(180, 83, 9, 0.05))',
+                borderColor: 'var(--border-gold-md)',
+                color: 'var(--gold-light)',
+                fontWeight: 600,
+                borderRadius: 'var(--r-md)'
+              }}
+              title="Mở bảng thông báo nghi thức cúng giỗ truyền thống sắp tới"
+            >
+              <Icon name="bell-ring" size={14} style={{ color: 'var(--gold)' }} />
+              <span>Nghi Thức Giỗ Sắp Tới</span>
+              {typeof remindersCount === 'number' && remindersCount > 0 && (
+                <span style={{
+                  background: 'var(--red-mid)', color: '#ffffff',
+                  fontSize: 10, fontWeight: 700, padding: '1px 6px',
+                  borderRadius: 10, lineHeight: 1
+                }}>
+                  {remindersCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Hint */}

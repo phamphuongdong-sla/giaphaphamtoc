@@ -12,7 +12,7 @@ import { InstallPrompt } from './components/shared/InstallPrompt';
 import { useNotificationSettings } from './hooks/useNotificationSettings';
 import { ManageAuthModal } from './components/shared/ManageAuthModal';
 import { VanKhanModal } from './components/shared/VanKhanModal';
-import { MemberEntry, ReminderItem } from './types';
+import { MemberEntry } from './types';
 import { setAppBadge, clearAppBadge } from './utils/badgeUtils';
 import { downloadCalendarEvent } from './utils/calendarUtils';
 import { AuthUser } from './services/cloudflareApi';
@@ -343,6 +343,28 @@ function App() {
             </div>
 
             <div className="modal-list memorial-modal-list">
+              {reminders.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--text-muted)' }}>
+                  <Icon name="calendar-check" size={38} style={{ color: 'var(--gold-mid)', marginBottom: 12 }} />
+                  <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 6px' }}>
+                    Không có ngày giỗ nào trong 30 ngày tới
+                  </p>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 16px', lineHeight: 1.5 }}>
+                    Mọi ngày giỗ và ngày sinh trong gia tộc đều được liệt kê đầy đủ trong mục Lịch Giỗ cả năm.
+                  </p>
+                  <button
+                    type="button"
+                    className="action-button"
+                    style={{ margin: '0 auto', background: 'var(--gold)', color: '#ffffff', borderColor: 'var(--gold)' }}
+                    onClick={() => {
+                      setShowReminderModal(false);
+                      handleViewChange('lich');
+                    }}
+                  >
+                    <Icon name="calendar" size={13} /> Mở Lịch Giỗ Cả Năm
+                  </button>
+                </div>
+              )}
               {reminders.map((item, idx) => {
                 const isSpecial = item.isSpecialDay;
                 const isWeekend = item.weekdayShort === 'CN' || item.weekdayShort === 'T7';
@@ -562,10 +584,21 @@ function App() {
               })}
             </div>
 
-            <div style={{ padding: '10px 14px 14px' }}>
+            <div style={{ padding: '10px 14px 14px', display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                className="action-button"
+                style={{ flex: 1, justifyContent: 'center' }}
+                onClick={() => {
+                  setShowReminderModal(false);
+                  handleViewChange('lich');
+                }}
+              >
+                <Icon name="calendar" size={13} /> Xem Lịch Cả Năm
+              </button>
               <button
                 className="action-button modal-close"
-                style={{ width: '100%', justifyContent: 'center' }}
+                style={{ flex: 1, justifyContent: 'center' }}
                 onClick={() => setShowReminderModal(false)}
               >
                 <Icon name="x" size={13} /> Đóng Thông Báo
@@ -653,6 +686,8 @@ function App() {
             <LichView
               treeData={treeData}
               onSelectPerson={setSelectedPerson}
+              onOpenReminders={() => setShowReminderModal(true)}
+              remindersCount={reminders.length}
             />
           )}
           {viewMode === 'stats' && (
