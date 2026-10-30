@@ -1645,6 +1645,438 @@ main {
 }
 
 /* ============================================================
+   MEMORIAL REMINDER MODAL & CARDS (CHUẨN PHONG TỤC VIỆT NAM)
+   ============================================================ */
+.modal.memorial-reminder-modal {
+  width: min(580px, 94vw);
+  max-height: min(850px, 92vh);
+  border: 1px solid var(--border-gold-md);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 30px rgba(201, 146, 58, 0.25);
+}
+
+.memorial-modal-list {
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.memorial-card {
+  padding: 16px;
+  border-radius: var(--r-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.memorial-card:hover {
+  transform: translateY(-1px);
+}
+
+.memorial-card.ancestor-card {
+  background: linear-gradient(145deg, rgba(38, 14, 14, 0.88), rgba(20, 8, 8, 0.94));
+  border: 1px solid rgba(201, 146, 58, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(201, 146, 58, 0.2);
+}
+
+.memorial-card.ancestor-card:hover {
+  border-color: rgba(201, 146, 58, 0.6);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5), 0 0 18px rgba(201, 146, 58, 0.2);
+}
+
+.memorial-card.special-day-card {
+  background: linear-gradient(145deg, rgba(32, 22, 10, 0.88), rgba(18, 12, 6, 0.94));
+  border: 1px solid rgba(201, 146, 58, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.memorial-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.memorial-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+.memorial-badge.ancestor {
+  background: rgba(180, 40, 40, 0.35);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+
+.memorial-badge.special {
+  background: rgba(201, 146, 58, 0.25);
+  border: 1px solid rgba(201, 146, 58, 0.5);
+  color: var(--gold-light);
+}
+
+.memorial-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.memorial-name {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--gold-light);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+.memorial-relation-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13.5px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.memorial-relation-line .relation-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.memorial-relation-line .relation-value {
+  color: #fef08a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.memorial-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.memorial-subtag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  line-height: 1.3;
+}
+
+.memorial-subtag.gen-tag {
+  background: rgba(201, 146, 58, 0.15);
+  border: 1px solid rgba(201, 146, 58, 0.35);
+  color: var(--gold-light);
+}
+
+.memorial-subtag.branch-tag {
+  background: rgba(180, 40, 40, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.memorial-subtag.age-tag {
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  color: #fef08a;
+}
+
+.memorial-ceremony-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+@media (max-width: 520px) {
+  .memorial-ceremony-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ceremony-box {
+  padding: 10px 12px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ceremony-box.chinh-ky-box {
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.4), rgba(45, 12, 12, 0.5));
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.ceremony-box.tien-thuong-box {
+  background: linear-gradient(135deg, rgba(201, 146, 58, 0.2), rgba(45, 28, 12, 0.4));
+  border: 1px solid rgba(201, 146, 58, 0.35);
+}
+
+.ceremony-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.chinh-ky-box .ceremony-tag {
+  color: #fca5a5;
+}
+
+.tien-thuong-box .ceremony-tag {
+  color: var(--gold-light);
+}
+
+.ceremony-lunar {
+  font-size: 12.5px;
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+.ceremony-solar {
+  font-size: 11.5px;
+  color: var(--text-primary);
+}
+
+.ceremony-timing {
+  font-size: 10px;
+  color: rgba(242, 237, 216, 0.7);
+  font-style: italic;
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+.memorial-life-row {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.life-timeline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.life-timeline strong {
+  color: var(--text-primary);
+}
+
+.dot-sep {
+  opacity: 0.5;
+}
+
+.life-bio-snippet {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.memorial-remind-note {
+  font-size: 11px;
+  color: var(--gold-light);
+  background: rgba(201, 146, 58, 0.1);
+  border-left: 3px solid var(--gold-mid);
+  padding: 6px 10px;
+  border-radius: 0 6px 6px 0;
+  line-height: 1.4;
+}
+
+.memorial-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.memorial-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+}
+
+.memorial-btn.vankhan {
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.6), rgba(201, 146, 58, 0.4));
+  border: 1px solid var(--border-gold-md);
+  color: var(--gold-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.memorial-btn.vankhan:hover {
+  background: linear-gradient(135deg, rgba(180, 30, 30, 0.8), rgba(201, 146, 58, 0.6));
+  border-color: var(--gold-light);
+  transform: translateY(-1px);
+}
+
+.memorial-btn.profile {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+}
+
+.memorial-btn.profile:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.memorial-btn.calendar {
+  background: rgba(201, 146, 58, 0.15);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-mid);
+}
+
+.memorial-btn.calendar:hover {
+  background: rgba(201, 146, 58, 0.28);
+  border-color: var(--gold-mid);
+  color: var(--gold-light);
+  transform: translateY(-1px);
+}
+
+.memorial-btn.calendar.downloaded {
+  background: rgba(34, 197, 94, 0.25);
+  border-color: #4ade80;
+  color: #86efac;
+}
+
+.memorial-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+}
+
+.weekend-tag {
+  margin-left: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(201, 146, 58, 0.2);
+  color: var(--gold-mid);
+}
+
+.memorial-desc {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Light Theme Styling for Memorial Modal */
+[data-theme="light"] .memorial-card.ancestor-card {
+  background: linear-gradient(145deg, #fffaf3, #fdf4e7);
+  border: 1px solid rgba(180, 130, 40, 0.4);
+  box-shadow: 0 4px 16px rgba(160, 100, 30, 0.1);
+}
+
+[data-theme="light"] .memorial-card.ancestor-card:hover {
+  border-color: #c9923a;
+  box-shadow: 0 6px 20px rgba(160, 100, 30, 0.18);
+}
+
+[data-theme="light"] .memorial-card.special-day-card {
+  background: linear-gradient(145deg, #fefcf8, #faf5eb);
+  border: 1px solid rgba(180, 130, 40, 0.35);
+}
+
+[data-theme="light"] .memorial-name {
+  color: #7f1d1d;
+}
+
+[data-theme="light"] .memorial-relation-line .relation-value {
+  color: #991b1b;
+}
+
+[data-theme="light"] .ceremony-box.chinh-ky-box {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+[data-theme="light"] .chinh-ky-box .ceremony-tag {
+  color: #991b1b;
+}
+
+[data-theme="light"] .ceremony-box.tien-thuong-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+[data-theme="light"] .tien-thuong-box .ceremony-tag {
+  color: #92400e;
+}
+
+[data-theme="light"] .ceremony-lunar {
+  color: #78350f;
+}
+
+[data-theme="light"] .ceremony-solar {
+  color: #1f2937;
+}
+
+[data-theme="light"] .ceremony-timing {
+  color: #4b5563;
+}
+
+[data-theme="light"] .memorial-life-row {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .memorial-remind-note {
+  background: #fff8eb;
+  border-left-color: #d97706;
+  color: #78350f;
+}
+
+[data-theme="light"] .memorial-btn.vankhan {
+  background: linear-gradient(135deg, #991b1b, #c9923a);
+  color: #ffffff;
+  border: none;
+}
+
+[data-theme="light"] .memorial-btn.profile {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #1f2937;
+}
+
+[data-theme="light"] .memorial-btn.calendar {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+}
+
+/* ============================================================
    PERSON DETAIL MODAL
    ============================================================ */
 .detail-modal {

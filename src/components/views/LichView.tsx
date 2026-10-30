@@ -61,7 +61,12 @@ export const LichView = ({ treeData, onSelectPerson }: LichViewProps) => {
           <span className="lich-day-label">Th.{e.solarMonth}</span>
         </div>
         <div style={{ flex: 1, minWidth: 0, paddingRight: 8 }}>
-          <p className="lich-name font-serif">{e.fullName}</p>
+          <p className="lich-name font-serif">{e.type === 'gio' && e.honorificName ? e.honorificName : e.fullName}</p>
+          {e.type === 'gio' && e.relationDetail && (
+            <p style={{ fontSize: '11px', color: 'var(--gold-light)', marginTop: '2px', opacity: 0.95 }}>
+              {e.relationDetail}
+            </p>
+          )}
           <p className="lich-meta">
             {e.type === 'gio'
               ? <>&#127761; Giỗ âm lịch: <strong style={{ color: 'var(--gold-mid)' }}>{e.lunarDay}/{e.lunarMonth} AL</strong> &middot; Dương: <strong>{weekdayFull}</strong>, {e.solarDay}/{e.solarMonth}/{year}</>

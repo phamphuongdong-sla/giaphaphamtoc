@@ -4,6 +4,9 @@ import { getLunarToday, getCanChiYear } from '@/utils/dateUtils';
 
 interface VanKhanModalProps {
   onClose: () => void;
+  initialTab?: string;
+  initialDeceasedName?: string;
+  initialDeceasedTitle?: string;
 }
 
 interface VanKhanItem {
@@ -212,8 +215,13 @@ const renderFormattedContent = (content: string) => {
   );
 };
 
-export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
-  const [activeTab, setActiveTab] = useState<string>('gio');
+export const VanKhanModal = ({
+  onClose,
+  initialTab,
+  initialDeceasedName,
+  initialDeceasedTitle
+}: VanKhanModalProps) => {
+  const [activeTab, setActiveTab] = useState<string>(initialTab || 'gio');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<number>(22);
   const [autoFillDate, setAutoFillDate] = useState<boolean>(true);
@@ -229,14 +237,20 @@ export const VanKhanModal = ({ onClose }: VanKhanModalProps) => {
     return localStorage.getItem('vankhan_host_addr') || '';
   });
   const [deceasedName, setDeceasedName] = useState<string>(() => {
-    return localStorage.getItem('vankhan_deceased_name') || '';
+    return initialDeceasedName || localStorage.getItem('vankhan_deceased_name') || '';
   });
   const [deceasedTitle, setDeceasedTitle] = useState<string>(() => {
-    return localStorage.getItem('vankhan_deceased_title') || '';
+    return initialDeceasedTitle || localStorage.getItem('vankhan_deceased_title') || '';
   });
   const [burialLocation, setBurialLocation] = useState<string>(() => {
     return localStorage.getItem('vankhan_burial_loc') || '';
   });
+
+  useEffect(() => {
+    if (initialTab) setActiveTab(initialTab);
+    if (initialDeceasedName) setDeceasedName(initialDeceasedName);
+    if (initialDeceasedTitle) setDeceasedTitle(initialDeceasedTitle);
+  }, [initialTab, initialDeceasedName, initialDeceasedTitle]);
 
   const handleSaveHostInfo = (name: string, addr: string, dec: string, title: string = deceasedTitle, burial: string = burialLocation) => {
     setHostName(name);

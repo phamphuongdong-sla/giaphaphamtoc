@@ -4,6 +4,7 @@ import {
   parseDeathText,
   formatBirthDisplay,
   formatDeathDisplay,
+  calculateAgeInfo,
   lunarToSolar,
   solarToLunar
 } from './dateUtils';
@@ -295,9 +296,11 @@ export const getAllLichData = (treeData: PersonNode, year: number): { gio: any[]
       if (solarObj) {
         const targetDate = new Date(solarObj.y, solarObj.m - 1, solarObj.d);
         targetDate.setHours(0, 0, 0, 0);
-        const days = Math.round((targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        const memorial = getPersonMemorialDetails(memberEntry);
         gio.push({
           fullName,
+          honorificName: memorial.honorificFullName,
+          relationDetail: memorial.summaryDesc,
           solarDay: solarObj.d,
           solarMonth: solarObj.m,
           lunarDay,
@@ -470,4 +473,80 @@ export const buildVietnameseRelation = (
 
   const parentHon = getHonorific(parentNode);
   return `${childTerm} của ${parentHon.prefix} ${parentHon.name}`;
+};
+
+export const getHonorificTitle = (node: PersonNode, gen: number = 1): string => {
+  const isFemale = node.gender === 'female' || checkIsSpouseNode(node) || /\bTHỊ\b/i.test(node.name);
+  const ageInfo = calculateAgeInfo(node);
+  if (ageInfo?.honorificType === 'mat_som' || (ageInfo?.age && ageInfo.age < 18)) {
+    return 'Hương linh';
+  }
+  if (gen === 1) {
+    return isFemale ? 'Cụ Thủy tổ bà' : 'Cụ Thủy tổ';
+  } else if (gen === 2) {
+    return isFemale ? 'Cụ bà' : 'Cụ';
+  } else if (gen === 3) {
+    return isFemale ? 'Cụ bà' : 'Cụ ông';
+  } else if (gen === 4) {
+    return isFemale ? 'Cụ bà' : 'Cụ ông';
+  } else {
+    return isFemale ? 'Bà' : 'Ông';
+  }
+};
+
+export const getPersonMemorialDetails = (member: MemberEntry) => {
+  const node = member.data;
+  const isSpouseNode = checkIsSpouseNode(node);
+  const cleanPersonName = cleanName(node.name);
+  const gen = member.gen || 1;
+  const honorificPrefix = getHonorificTitle(node, gen);
+  const honorificFullName = `${honorificPrefix} ${cleanPersonName}`;
+
+  let relationTitle = '';
+  if (isSpouseNode) {
+    const parent = member.parentNode;
+    const role = getNameRole(node.name) || node.role || 'Vợ';
+    if (parent) {
+      const partnerClean = cleanName(parent.name);
+      const partnerGen = member.gen;
+      const partnerHon = getHonorificTitle(parent, partnerGen);
+      if (/vợ/i.test(role) || /chính thất/i.test(role)) {
+        relationTitle = `Phu nhân (Vợ) ${partnerHon} ${partnerClean}`;
+      } else if (/bà cả/i.test(role)) {
+        relationTitle = `Bà Cả của ${partnerHon} ${partnerClean}`;
+      } else if (/bà hai/i.test(role)) {
+        relationTitle = `Bà Hai của ${partnerHon} ${partnerClean}`;
+      } else if (/bà ba/i.test(role)) {
+        relationTitle = `Bà Ba của ${partnerHon} ${partnerClean}`;
+      } else if (/chồng/i.test(role) || /rể/i.test(role)) {
+        relationTitle = `Phu quân (Chồng) của ${partnerHon} ${partnerClean}`;
+      } else {
+        relationTitle = `${role} của ${partnerHon} ${partnerClean}`;
+      }
+    } else {
+      relationTitle = role;
+    }
+  } else {
+    relationTitle = buildVietnameseRelation(node, member.parentNode, member.pathNodes);
+  }
+
+  const generationLabel = `Đời thứ ${gen}`;
+  const branchLabel = member.branchName || 'Gốc Gia Tộc';
+  const ageInfo = calculateAgeInfo(node);
+  const birthDisplay = formatBirthDisplay(node);
+  const deathDisplay = formatDeathDisplay(node);
+
+  return {
+    cleanPersonName,
+    honorificPrefix,
+    honorificFullName,
+    relationTitle,
+    generationLabel,
+    branchLabel,
+    ageLabel: ageInfo?.label,
+    birthDisplay,
+    deathDisplay,
+    bio: node.bio,
+    summaryDesc: `${relationTitle} · ${generationLabel} (${branchLabel})`
+  };
 };

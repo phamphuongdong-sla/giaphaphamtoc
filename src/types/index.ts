@@ -48,4 +48,42 @@ export interface LichEvent {
   lunarDay?: number;
   lunarMonth?: number;
   person?: MemberEntry;
+  honorificName?: string;
+  relationDetail?: string;
+  tienThuongSolar?: string;
+  chinhKySolar?: string;
+}
+
+export interface ReminderItem {
+  fullName: string;
+  displayName: string;
+  honorificName: string;
+  relationTitle?: string;
+  generationLabel?: string;
+  branchLabel?: string;
+  date: string;
+  days: number;
+  person?: MemberEntry;
+  solarDateStr?: string;
+  weekdayFull?: string;
+  weekdayShort?: string;
+  solarDay?: number;
+  solarMonth?: number;
+  solarYear?: number;
+  isSpecialDay?: boolean;
+  specialDayType?: string;
+  specialDayTitle?: string;
+  specialDayDesc?: string;
+  tienThuongLunar?: string;
+  tienThuongSolar?: string;
+  tienThuongWeekday?: string;
+  chinhKyLunar?: string;
+  chinhKySolar?: string;
+  chinhKyWeekday?: string;
+  ageLabel?: string;
+  birthDisplay?: string;
+  deathDisplay?: string;
+  bio?: string;
+  lunarDay?: number;
+  lunarMonth?: number;
 }
