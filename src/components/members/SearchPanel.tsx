@@ -57,37 +57,22 @@ export const SearchPanel = ({ query, onQueryChange, results, total, onSelect }: 
               Kết quả: <strong style={{ color: 'var(--gold-mid)' }}>{filteredResults.length}</strong> / {total} thành viên
             </p>
             
-            <div style={{ display: 'flex', gap: 4 }}>
+            <div className="search-filter-group" style={{ display: 'flex', gap: 4 }}>
               <button
                 onClick={() => setFilterType('all')}
-                style={{
-                  padding: '2px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600,
-                  background: filterType === 'all' ? 'var(--gold)' : 'var(--bg-glass)',
-                  color: filterType === 'all' ? '#0c0c0c' : 'var(--text-muted)',
-                  border: '1px solid var(--border-glass)', cursor: 'pointer', transition: 'all 0.15s ease'
-                }}
+                className={`search-filter-pill ${filterType === 'all' ? 'active' : ''}`}
               >
                 Tất cả
               </button>
               <button
                 onClick={() => setFilterType('living')}
-                style={{
-                  padding: '2px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600,
-                  background: filterType === 'living' ? 'var(--gold)' : 'var(--bg-glass)',
-                  color: filterType === 'living' ? '#0c0c0c' : 'var(--text-muted)',
-                  border: '1px solid var(--border-glass)', cursor: 'pointer', transition: 'all 0.15s ease'
-                }}
+                className={`search-filter-pill ${filterType === 'living' ? 'active' : ''}`}
               >
                 Đang sống
               </button>
               <button
                 onClick={() => setFilterType('deceased')}
-                style={{
-                  padding: '2px 8px', borderRadius: 12, fontSize: 10, fontWeight: 600,
-                  background: filterType === 'deceased' ? 'var(--gold)' : 'var(--bg-glass)',
-                  color: filterType === 'deceased' ? '#0c0c0c' : 'var(--text-muted)',
-                  border: '1px solid var(--border-glass)', cursor: 'pointer', transition: 'all 0.15s ease'
-                }}
+                className={`search-filter-pill ${filterType === 'deceased' ? 'active' : ''}`}
               >
                 Đã mất
               </button>

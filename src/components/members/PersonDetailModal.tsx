@@ -243,10 +243,10 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
                     <p className="detail-label">
                       <Icon name={data.deceased ? "moon" : "cake"} size={11} /> {data.deceased ? "Thọ tuế (Tuổi tạ thế)" : "Tuổi âm lịch hiện tại"}
                     </p>
-                    <p className="detail-value" style={{ color: data.deceased ? '#f87171' : 'var(--gold-mid)', fontWeight: 700 }}>
+                    <p className="detail-value" style={{ color: data.deceased ? 'var(--red-mid)' : 'var(--gold-mid)', fontWeight: 700 }}>
                       {ageInfo.label}
                       {ageInfo.isLongevityYear && (
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: '#ca8a04', marginLeft: 6 }}>
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--gold)', marginLeft: 6 }}>
                           🎉 (Năm nay mừng thọ)
                         </span>
                       )}

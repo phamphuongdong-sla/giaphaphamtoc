@@ -456,67 +456,61 @@ export const DashboardView = ({ memberEntries = [], onSelectPerson }: DashboardV
           {/* Cards Lifespan Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 14, marginBottom: 20 }}>
             {/* Nam */}
-            <div style={{
-              background: 'rgba(59,130,246,0.1)',
-              border: '1px solid rgba(59,130,246,0.35)',
+            <div className="dash-card-male" style={{
               borderRadius: 'var(--r-md)',
               padding: '14px 16px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 12, color: '#60a5fa', fontWeight: 700, textTransform: 'uppercase' }}>
+                <span className="dash-label-male" style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>
                   ♂ Tuổi Thọ TB Nam Giới
                 </span>
                 <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{stats.maleDeceasedWithAgeCount} thành viên Nam</span>
               </div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#93c5fd', marginTop: 4 }}>
+              <div className="dash-val-male" style={{ fontSize: 28, fontWeight: 800, marginTop: 4 }}>
                 {stats.avgMaleLifespan > 0 ? `${stats.avgMaleLifespan} tuổi` : 'Chưa rõ'}
               </div>
               {/* Visual Progress Bar */}
-              <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, marginTop: 8, overflow: 'hidden' }}>
-                <div style={{ width: `${Math.min(stats.avgMaleLifespan, 100)}%`, height: '100%', background: '#60a5fa', borderRadius: 3 }} />
+              <div style={{ width: '100%', height: 6, background: 'rgba(0,0,0,0.06)', borderRadius: 3, marginTop: 8, overflow: 'hidden' }}>
+                <div style={{ width: `${Math.min(stats.avgMaleLifespan, 100)}%`, height: '100%', background: '#3b82f6', borderRadius: 3 }} />
               </div>
             </div>
 
             {/* Nữ */}
-            <div style={{
-              background: 'rgba(236,72,153,0.1)',
-              border: '1px solid rgba(236,72,153,0.35)',
+            <div className="dash-card-female" style={{
               borderRadius: 'var(--r-md)',
               padding: '14px 16px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 12, color: '#f472b6', fontWeight: 700, textTransform: 'uppercase' }}>
+                <span className="dash-label-female" style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>
                   ♀ Tuổi Thọ TB Nữ Giới
                 </span>
                 <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{stats.femaleDeceasedWithAgeCount} thành viên Nữ</span>
               </div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: '#fbcfe8', marginTop: 4 }}>
+              <div className="dash-val-female" style={{ fontSize: 28, fontWeight: 800, marginTop: 4 }}>
                 {stats.avgFemaleLifespan > 0 ? `${stats.avgFemaleLifespan} tuổi` : 'Chưa rõ'}
               </div>
               {/* Visual Progress Bar */}
-              <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, marginTop: 8, overflow: 'hidden' }}>
-                <div style={{ width: `${Math.min(stats.avgFemaleLifespan, 100)}%`, height: '100%', background: '#f472b6', borderRadius: 3 }} />
+              <div style={{ width: '100%', height: 6, background: 'rgba(0,0,0,0.06)', borderRadius: 3, marginTop: 8, overflow: 'hidden' }}>
+                <div style={{ width: `${Math.min(stats.avgFemaleLifespan, 100)}%`, height: '100%', background: '#ec4899', borderRadius: 3 }} />
               </div>
             </div>
 
             {/* Toàn tộc */}
-            <div style={{
-              background: 'rgba(201,146,58,0.1)',
-              border: '1px solid var(--border-gold)',
+            <div className="dash-card-total" style={{
               borderRadius: 'var(--r-md)',
               padding: '14px 16px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 12, color: 'var(--gold-mid)', fontWeight: 700, textTransform: 'uppercase' }}>
+                <span className="dash-label-total" style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>
                   🌳 Tuổi Thọ TB Toàn Tộc
                 </span>
                 <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{stats.maleDeceasedWithAgeCount + stats.femaleDeceasedWithAgeCount} thành viên</span>
               </div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--gold-light)', marginTop: 4 }}>
+              <div className="dash-val-total" style={{ fontSize: 28, fontWeight: 800, marginTop: 4 }}>
                 {stats.averageLifespan > 0 ? `${stats.averageLifespan} tuổi` : 'Chưa rõ'}
               </div>
               {/* Visual Progress Bar */}
-              <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, marginTop: 8, overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: 6, background: 'rgba(0,0,0,0.06)', borderRadius: 3, marginTop: 8, overflow: 'hidden' }}>
                 <div style={{ width: `${Math.min(stats.averageLifespan, 100)}%`, height: '100%', background: 'var(--gold)', borderRadius: 3 }} />
               </div>
             </div>
@@ -609,7 +603,7 @@ export const DashboardView = ({ memberEntries = [], onSelectPerson }: DashboardV
                         <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>({g.count} người đã mất)</span>
                       </>
                     ) : hasDeceasedWithoutAge ? (
-                      <span style={{ color: '#fef08a', fontSize: 11 }}>
+                      <span className="dash-no-date-text" style={{ fontSize: 11 }}>
                         {g.totalDead} người đã mất (Chưa ghi năm sinh/năm mất)
                       </span>
                     ) : (

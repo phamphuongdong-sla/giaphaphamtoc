@@ -37,25 +37,19 @@ export const TopBar = ({ viewMode, onViewChange, lunarLabel, solarLabel, theme, 
           />
         </div>
         <div className="brand-text">
-          <p className="brand-kicker font-serif" style={theme === 'light' ? { color: '#1C1917', opacity: 1 } : undefined}>Lưu trữ thế hệ gia tộc</p>
-          <h1
-            className="brand-title font-royal"
-            style={{
-              color: theme === 'light' ? '#1C1917' : 'var(--gold-light)',
-              textShadow: theme === 'light' ? 'none' : '0 2px 12px rgba(201,146,58,0.35)',
-            }}
-          >
+          <p className="brand-kicker font-serif">Lưu trữ thế hệ gia tộc</p>
+          <h1 className="brand-title font-royal">
             Gia Phả Phạm Tộc
           </h1>
-          <p className="brand-sub" style={theme === 'light' ? { color: '#44403C' } : undefined}>
-            <span style={{ color: theme === 'light' ? '#44403C' : 'var(--gold)', opacity: theme === 'light' ? 1 : 0.8 }}>
+          <p className="brand-sub">
+            <span className="brand-calendar-icon">
               <Icon name="calendar" size={10} style={{ display: 'inline', verticalAlign: -1, marginRight: 4 }} />
             </span>
             {solarDate}
             <span style={{ margin: '0 6px', opacity: 0.3 }}>·</span>
             {lunarLabel}
             <span style={{ margin: '0 6px', opacity: 0.3 }}>·</span>
-            <span title="Thời điểm cập nhật dữ liệu gia phả gần nhất" style={{ color: theme === 'light' ? '#b45309' : 'var(--gold-light)', fontWeight: 600 }}>
+            <span title="Thời điểm cập nhật dữ liệu gia phả gần nhất" className="brand-updated-pill">
               Cập nhật: {GIA_PHA_LAST_UPDATED}
             </span>
           </p>
