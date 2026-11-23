@@ -59,7 +59,7 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
     const displayGen = genMap.get(cleanName(data.name)) || 1;
 
     const relation = buildVietnameseRelation(data, parentNode, pathNodes);
-    const spouseLineage = getSpouseLineageLabel(pathNodes);
+    const spouseLineage = isSpouseNode ? '' : getSpouseLineageLabel(pathNodes);
 
     let displayChildren: PersonNode[] = [];
     if (isSpouseNode) {
@@ -77,7 +77,22 @@ export const PersonDetailModal = ({ person, onClose }: PersonDetailModalProps) =
     }
 
     const displayName = cleanName(data.name);
-    const titleLabel = [...new Set([roleName, data.role].filter(Boolean))].join(' · ');
+    let roleDisplay = roleName;
+    if (isSpouseNode) {
+      const isMale = data.gender === 'male';
+      if (roleName) {
+        if (/vợ/i.test(roleName) || /bà (cả|hai|ba)/i.test(roleName) || /chính thất|kế thất/i.test(roleName)) {
+          roleDisplay = `Dâu họ (${roleName})`;
+        } else if (/chồng/i.test(roleName) || /rể/i.test(roleName)) {
+          roleDisplay = `Rể họ (${roleName})`;
+        } else {
+          roleDisplay = isMale ? `Rể họ (${roleName})` : `Dâu họ (${roleName})`;
+        }
+      } else {
+        roleDisplay = isMale ? 'Rể họ (Chồng)' : 'Dâu họ (Vợ)';
+      }
+    }
+    const titleLabel = [...new Set([roleDisplay, data.role].filter(Boolean))].join(' · ');
     const branchLabel = getFullBranchLabel(data, pathNodes);
     const shareText = buildShareText(data, displayName, displayGen, titleLabel, branchLabel, relation, pathNodes, displayChildren);
 

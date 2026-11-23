@@ -401,18 +401,41 @@ export const buildVietnameseRelation = (
     const name = cleanName(node.name);
     const isFemale = node.gender === 'female' || checkIsSpouseNode(node) || /\bTHỊ\b/i.test(node.name);
     const gen = getNodeGen(node);
+    const ageInfo = calculateAgeInfo(node);
 
     // Kính xưng theo tập quán Gia phả Việt Nam:
-    // Đời 1: Cụ Thủy tổ ông / Cụ Thủy tổ bà
-    // Đời 2 & 3 (Tổ tiên cao): Cụ ông / Cụ bà
-    // Đời 4+: Ông / Bà (thế hệ trên)
-    let prefix = 'ông';
+    // Đời 1: Cụ Thủy tổ / Cụ Thủy tổ bà
+    // Đời 2 (Tiên tổ thế hệ đầu, đều đã mất ở thế kỷ trước): Cụ ông / Cụ bà
+    // Đời 3 trở đi: Xét theo tình trạng đã mất hay còn sống và độ tuổi:
+    // - Đã mất: Nếu sinh trước 1945 hoặc hưởng thọ >= 70 tuổi -> Cụ ông / Cụ bà. Nếu mất sớm -> Hương linh. Còn lại mất tuổi trung niên -> ông / bà.
+    // - Đang còn sống: Chỉ khi thượng thọ/đại thọ (>= 80 tuổi) mới xưng Cụ ông / Cụ bà.
+    //   Người trung niên hoặc thanh niên (dưới 80 tuổi) xưng là ông / bà (tuyệt đối không xưng cụ).
+    let prefix = isFemale ? 'bà' : 'ông';
     if (gen === 1) {
-      prefix = isFemale ? 'Cụ Thủy tổ bà' : 'Cụ Thủy tổ ông';
-    } else if (gen <= 3) {
-      prefix = isFemale ? 'cụ bà' : 'cụ ông';
+      prefix = isFemale ? 'Cụ Thủy tổ bà' : 'Cụ Thủy tổ';
+    } else if (gen === 2) {
+      prefix = isFemale ? 'Cụ bà' : 'Cụ ông';
     } else {
-      prefix = isFemale ? 'bà' : 'ông';
+      if (node.deceased) {
+        let birthY = node.birthSolar?.y;
+        if (!birthY && node.birthNote) {
+          const m = node.birthNote.match(/\b(18|19|20)\d{2}\b/);
+          if (m) birthY = parseInt(m[0], 10);
+        }
+        if (ageInfo?.honorificType === 'mat_som' || (ageInfo?.age && ageInfo.age < 18)) {
+          prefix = 'Hương linh';
+        } else if ((ageInfo?.age && ageInfo.age >= 70) || (birthY && birthY <= 1945)) {
+          prefix = isFemale ? 'Cụ bà' : 'Cụ ông';
+        } else {
+          prefix = isFemale ? 'bà' : 'ông';
+        }
+      } else {
+        if (ageInfo?.age && ageInfo.age >= 80) {
+          prefix = isFemale ? 'Cụ bà' : 'Cụ ông';
+        } else {
+          prefix = isFemale ? 'bà' : 'ông';
+        }
+      }
     }
 
     return { prefix, name };
@@ -485,14 +508,28 @@ export const getHonorificTitle = (node: PersonNode, gen: number = 1): string => 
   if (gen === 1) {
     return isFemale ? 'Cụ Thủy tổ bà' : 'Cụ Thủy tổ';
   } else if (gen === 2) {
-    return isFemale ? 'Cụ bà' : 'Cụ';
-  } else if (gen === 3) {
     return isFemale ? 'Cụ bà' : 'Cụ ông';
-  } else if (gen === 4) {
-    return isFemale ? 'Cụ bà' : 'Cụ ông';
-  } else {
+  }
+
+  // Từ Đời 3 trở đi
+  if (node.deceased) {
+    let birthY = node.birthSolar?.y;
+    if (!birthY && node.birthNote) {
+      const m = node.birthNote.match(/\b(18|19|20)\d{2}\b/);
+      if (m) birthY = parseInt(m[0], 10);
+    }
+    if ((ageInfo?.age && ageInfo.age >= 70) || (birthY && birthY <= 1945)) {
+      return isFemale ? 'Cụ bà' : 'Cụ ông';
+    }
     return isFemale ? 'Bà' : 'Ông';
   }
+
+  // Đang còn sống: chỉ người đại thọ/thượng thọ (>= 80 tuổi) mới xưng Cụ
+  if (ageInfo?.age && ageInfo.age >= 80) {
+    return isFemale ? 'Cụ bà' : 'Cụ ông';
+  }
+
+  return isFemale ? 'Bà' : 'Ông';
 };
 
 export const getPersonMemorialDetails = (member: MemberEntry) => {
@@ -512,7 +549,7 @@ export const getPersonMemorialDetails = (member: MemberEntry) => {
       const partnerGen = member.gen;
       const partnerHon = getHonorificTitle(parent, partnerGen);
       if (/vợ/i.test(role) || /chính thất/i.test(role)) {
-        relationTitle = `Phu nhân (Vợ) ${partnerHon} ${partnerClean}`;
+        relationTitle = `Phu nhân (Vợ) của ${partnerHon} ${partnerClean}`;
       } else if (/bà cả/i.test(role)) {
         relationTitle = `Bà Cả của ${partnerHon} ${partnerClean}`;
       } else if (/bà hai/i.test(role)) {
